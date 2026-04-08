@@ -1,0 +1,14 @@
+# Large raw input files (download with Jan26/Project/Code/download_data.R)
+Jan26/Project/Input/cross-verified-database.csv
+Jan26/HYDE/Input/hyde_pop_asc/
+Jan26/HYDE/Input/2016_beta_release/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj.user
+
+# OS
+.DS_Store
+Thumbs.db

@@ -20,6 +20,16 @@ Jan26/
     └── Results/    # Figures and tables
 ```
 
+## How to Run
+
+The large raw input file (`cross-verified-database.csv`, ~1GB) is not tracked in git. Before running `Cleaning_Data.R` or `Coding_HYDE.R`, download it:
+
+```r
+source("Jan26/Project/Code/download_data.R")
+```
+
+This downloads and decompresses the [Cross-Verified Database of Notable People](https://data.sciencespo.fr/dataset.xhtml?persistentId=doi:10.7910/DVN/EEA236) (Laouan et al., SciencesPo) into `Jan26/Project/Input/`.
+
 ## Notes
 
 - The **Country analysis** was the first approach to estimating the impact of scientific infrastructure construction.
