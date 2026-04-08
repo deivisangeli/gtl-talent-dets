@@ -49,6 +49,35 @@ docs/           Reference PDFs and facility spreadsheet
 | `analysis_county.R` | US county-level DiD | `results/` |
 | `analysis_border.R` | County border discontinuity | `results/` |
 
+## Research Status & Next Steps
+
+### Where things stand
+
+The project has accumulated several **null results** across different treatments:
+- Mandatory schooling laws
+- Entering the USSR
+- Exposure to big scientific projects (facilities)
+
+These nulls are substantively interesting in combination — they cut against common intuitions about what drives top talent. The potential framing is a paper on *determinants of top talent* organized around a set of precise nulls, ideally paired with at least one thing that works.
+
+Lucas redid the county-level US analysis and is finishing work on identifying **candidate locations for big projects** in the US (to construct better control groups for the facilities analysis).
+
+### Priority next step
+
+**Download county-level covariates and test what predicts Wikipedia appearances in the US.**
+
+The frontier-exposure map (counties with historical frontier exposure) shows a suggestive positive relationship with talent production — this is the most promising lead. Specific things to collect and test:
+
+1. **Frontier exposure** — historical frontier county status by decade (from Census/NHGIS). The frontier-talent pattern in the map is striking and worth a proper regression.
+2. **Demographics by date** — county-level demographic composition over time (race, immigrant share, education). Available from NHGIS or Census IPUMS.
+3. **Selective high schools** — proxy for access to free, ability-selected secondary education. NYC specialized high schools (Stuyvesant, Bronx Science, etc.) have produced a disproportionate number of Nobelists. Could build a city-level panel of enrollment capacity at schools that admit solely on test scores. This might be the "one thing that works."
+
+### Data already in hand
+
+- `prep/output/us_panel_county.csv` — county × decade panel of inventor rates (from NHGIS + cross-verified database)
+- `prep/output/facilities_us.csv` — scientific facilities with coordinates and opening dates
+- `prep/input/nhgis0001_ts_nominal_county.csv` — NHGIS time-series data (check what variables are included)
+
 ## Key Packages
 
 - `did` — Callaway & Sant'Anna staggered DiD (`att_gt`, `aggte`)
