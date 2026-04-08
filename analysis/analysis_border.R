@@ -332,6 +332,12 @@ counties_names <- counties_names %>%
  left_join(states, by = "STATEFP") %>%
  mutate(GEOID = as.character(GEOID))
 
+# Top 10 counties by mean inventors per 100k
+top_counties <- county_stats %>%
+ arrange(desc(inv_per_100k_mean)) %>%
+ slice_head(n = 10) %>%
+ select(GEOID, mean_inv = inv_per_100k_mean)
+
 # Now join to our ranking
 top_counties_named <- top_counties %>%
  left_join(counties_names, by = "GEOID") %>%

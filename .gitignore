@@ -6,6 +6,7 @@ prep/input/2016_beta_release/
 # R
 .Rhistory
 .RData
+Rplots.pdf
 .Rproj.user/
 *.Rproj.user
 *.Rproj
