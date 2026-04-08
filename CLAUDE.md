@@ -1,0 +1,70 @@
+# CLAUDE.md — GTL Talent Determinants
+
+## Project Overview
+
+This project studies the causal effect of scientific infrastructure (particle accelerators, research labs, etc.) on local talent production, using historical data on notable people from Wikipedia matched to HYDE population rasters.
+
+Main identification strategy: staggered difference-in-differences and synthetic DiD, exploiting variation in when scientific facilities were constructed and their geographic proximity to birth locations of notable people.
+
+## Repository Layout
+
+```
+prep/           Data preparation — run scripts from here
+  input/        Raw data (large files gitignored)
+  output/       Intermediate processed datasets (committed)
+
+analysis/       Econometric analysis — run scripts from here
+  results/      Figures and model output (committed)
+
+docs/           Reference PDFs and facility spreadsheet
+```
+
+## Script Execution
+
+**Working directory matters.** Scripts use relative paths and must be run from within their parent folder.
+
+### Prep pipeline (run from `prep/`)
+
+| Script | Purpose | Key output |
+|--------|---------|------------|
+| `download_data.R` | Download cross-verified database from SciencesPo | `input/cross-verified-database.csv` |
+| `cleaning.R` | Clean Wikipedia notable people data | `output/data_final.csv`, `output/data_final_new.csv` |
+| `new_cleaning.R` | Alternative cleaning pass | `output/` |
+| `coding_city.R` | Geocode birth cities | `output/` |
+| `coding_hyde.R` | Match people to HYDE grid cells | `output/agg_hyde.csv` |
+| `hyde_data.R` | Extract HYDE .asc rasters from zip files | `input/hyde_pop_asc/` |
+| `cleaning_hyde.R` | Additional HYDE cleaning | `output/` |
+| `cleaning_us.R` | US-level HYDE cleaning | `output/facilities_us.csv`, `output/us_panel_county.csv` |
+| `cleaning_county.R` | County-level cleaning | `output/` |
+
+### Analysis pipeline (run from `analysis/`)
+
+| Script | Purpose | Key output |
+|--------|---------|------------|
+| `analysis_main.R` | Main USSR talent analysis (TWFE + staggered DiD) | `results/` |
+| `analysis_hyde.R` | HYDE event studies at 100km and 200km radii | `results/ES_all_100.png`, `results/ES_all_200.png`, etc. |
+| `analysis_jan26.R` | Jan 2026 analysis | `results/` |
+| `analysis_country.R` | Country-level analysis | `results/` |
+| `analysis_hyde_us.R` | US state-level HYDE analysis | `results/` |
+| `analysis_county.R` | US county-level DiD | `results/` |
+| `analysis_border.R` | County border discontinuity | `results/` |
+
+## Key Packages
+
+- `did` — Callaway & Sant'Anna staggered DiD (`att_gt`, `aggte`)
+- `fixest` — fast TWFE regressions (`feols`)
+- `synthdid` — synthetic DiD
+- `sf`, `terra` — spatial operations
+- `dataverse`, `R.utils` — data download
+
+## Known Issues
+
+- `analysis_hyde_us.R`: references `cells_sf$cell_id` after `cells_sf` is reassigned — pre-existing bug, verify before re-running
+- `analysis_border.R`: references `top_counties` which may not be defined — pre-existing bug, verify before re-running
+- The HYDE zip files (`prep/input/2016_beta_release/`) must be downloaded manually from [PBL Netherlands](https://www.pbl.nl/en/image/links/hyde); only `download_data.R` is automated
+
+## Data Sources
+
+- **Cross-verified database**: Laouan et al., notable people from Wikipedia with birth coordinates. Downloaded automatically by `prep/download_data.R` from SciencesPo Dataverse (DOI: 10.7910/DVN/EEA236).
+- **HYDE**: Historical Database of the Global Environment — decadal population rasters at ~10km resolution, 1800–2000. Must be downloaded manually.
+- **Scientific facilities**: `docs/scientific_facilities.xlsx` — hand-curated list of facility construction dates and coordinates. Also at `prep/output/scientific_facilities.csv`.

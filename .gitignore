@@ -1,13 +1,14 @@
-# Large raw input files (download with Jan26/Project/Code/download_data.R)
-Jan26/Project/Input/cross-verified-database.csv
-Jan26/HYDE/Input/hyde_pop_asc/
-Jan26/HYDE/Input/2016_beta_release/
+# Large raw input files (download with prep/download_data.R)
+prep/input/cross-verified-database.csv
+prep/input/hyde_pop_asc/
+prep/input/2016_beta_release/
 
 # R
 .Rhistory
 .RData
 .Rproj.user/
 *.Rproj.user
+*.Rproj
 
 # OS
 .DS_Store
