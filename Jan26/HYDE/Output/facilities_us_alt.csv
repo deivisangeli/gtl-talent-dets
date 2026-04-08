@@ -1,0 +1,34 @@
+facility;location;country;coordinates;lat_raw;lon_raw;lat;lon;year;year_end
+Argonne National Laboratory;Lemont, Downers Grove Township, DuPage County, Illinois, USA;United States of America;41.709166°N 87.981992°W;;;41.709166;-87.981992;1946;
+Lawrence Berkeley National Laboratory;"	Berkeley, California, United States";United States of America;37°52?33?N 122°14?55?W;;;37.875833;-122.248611;1931;
+Lawrence Livermore National Laboratory;"	Livermore, California, U.S.";United States of America;37.69°N 121.71°W;;;37.69;-121.71;1952;
+Fermilab;"	Winfield Township, DuPage County, Illinois, United States";United States of America;41°49?55?N 88°15?26?W;;;41.831944;-88.257222;1966;1967
+Brookhaven National Laboratory;"	Upton, Suffolk County, New York, United States";United States of America;40.875°N 72.877°W;;;40.875;-72.877;1947;1950
+Savannah River National Laboratory;"	Savannah River Site, near Jackson, South Carolina, U.S.";United States of America;33.342792°N 81.738121°W;;;33.342792;-81.738121;1951;1951
+National Laboratory of the Rockies;"	Golden, Colorado";United States of America;39.74068°N 105.17300°W;;;39.74068;-105.173;1974;1977
+SLAC National Accelerator Laboratory;Menlo Park, CA, US;United States of America;37°25?03?N 122°12?09?W;;;37.4175;-122.2025;1962;1966
+Thomas Jefferson National Accelerator Facility;"	Newport News, Virginia";United States of America;37°05?41?N 76°28?54?W;;;37.094722;-76.481667;1987;1994
+High Flux Isotope Reactor;Oak Ridge, Tennessee, United States;United States of America;35.9181°N 84.3040°W;;;35.9181;-84.304;1961;1965
+Green Bank Observatory;"	Green Bank, United States National Radio Quiet Zone, Pocahontas County, United States";United States of America;38°26?16?N 79°50?10?W;;;38.437778;-79.836111;1956;1958
+Very Large Array;Socorro County, NM, US;United States of America;34°04?43?N 107°37?04?W;;;34.078611;-107.617778;1973;1981
+Very Long Baseline Array;"	Washington, Pacific Northwest";United States of America;34°04?44?N 107°37?06?W;;;34.078889;-107.618333;1986;1993
+Kitt Peak National Observatory;"	Kitt Peak, Arizona, US";United States of America;31°57?30?N 111°35?48?W;;;31.958333;-111.596667;1960;1964
+Mount Wilson Observatory;Mount Wilson, CA, US;United States of America;34°13?30?N 118°03?26?W;;;34.225;-118.057222;1908;1917
+Johnson Space Center;Houston, Texas, United States;United States of America;29°33?30?N 95°05?20?W;;;29.558333;-95.088889;1963;1965
+Kennedy Space Center;Merritt Island, Florida;United States of America;28°31?27?N 80°39?03?W;;;28.524167;-80.650833;1963;
+Goddard Space Flight Center;Greenbelt, Maryland, United States;United States of America;38°59?32?N 76°51?9?W;;;38.992222;-76.8525;1959;
+Jet Propulsion Laboratory (JPL);La Cañada Flintridge, CA, US;United States of America;34°12?00?N 118°10?18?W;;;34.2;-118.171667;1936;
+Ames Research Center;"	Moffett Field, California, U.S.";United States of America;37.415229°N 122.062650°W;;;37.415229;-122.06265;1940;
+Glenn Research Center;"	Brook Park, Ohio, U.S.";United States of America;41.412843°N 81.862399°W;;;41.412843;-81.862399;1941;1942
+Langley Research Center;"	Hampton, Virginia, U.S.";United States of America;37.0925°N 76.3825°W;;;37.0925;-76.3825;1917;1920
+Marshall Space Flight Center;"	Redstone Arsenal, Madison County, Alabama";United States of America;34°39?3?N 86°40?22?W;;;34.650833;-86.672778;1960;
+Stennis Space Center;Hancock County, Mississippi, United States;United States of America;30°21?45.96?N 89°36?00.72?W;;;30.362767;-89.6002;1963;1965
+Wallops Flight Facility;"	Wallops Island, Virginia";United States of America;37.93333°N 75.46778°W;;;37.93333;-75.46778;1945;
+Palomar observatory;San Diego County, CA, US;United States of America;33°21?23?N 116°51?54?W;;;33.356389;-116.865;1947;1949
+Spacecraft Propulsion Research Facility;"	Erie County, Ohio";United States of America;41°22?1?N 82°41?1?W;;;41.366944;-82.683611;1968;
+Lick Observatory;San Jose, California;United States of America;37°20?28?N 121°38?35?W;;;37.341111;-121.643056;1876;1887
+McDonald Observatory;Jeff Davis County, Texas;United States of America;30°40?17?N 104°01?19?W;;;30.671389;-104.021944;1966;1968
+Mount Lemmon Observatory;Mount Lemmon, Arizona;United States of America;32.4420°N 110.7893°W;;;32.442;-110.7893;1970;
+Owens Valley Radio Observatory;"	Owens Valley, Inyo County, California, Pacific States Region";United States of America;37°14?02?N 118°16?55?W;;;37.233889;-118.281944;1958;1960
+Hat Creek Radio Observatory;California, Pacific States Region;United States of America;40°49?04?N 121°28?23?W;;;40.817778;-121.473056;1962;
+Haystack Observatory;Westford, Massachusetts;United States of America;42°37?24?N 71°29?18?W;;;42.623333;-71.488333;1960;1964

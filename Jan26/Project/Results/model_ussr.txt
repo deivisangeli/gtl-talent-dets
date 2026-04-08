@@ -1,0 +1,10 @@
+OLS estimation, Dep. Var.: rate_per_1000_deaths
+Observations: 36,720
+Fixed-effects: country: 170,  year: 216
+Standard-errors: Clustered (country) 
+                         Estimate Std. Error  t value Pr(>|t|) 
+ussr_member_timevarying -0.008421   0.006796 -1.23897  0.21707 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.045291     Adj. R2: 0.453541
+                 Within R2: 6.088e-4

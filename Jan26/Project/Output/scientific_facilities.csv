@@ -1,0 +1,29 @@
+facility;location;country;coordinates;lat_raw;lon_raw;lat;lon;year;year_end;wikipedia_link
+Very Large Array;Socorro County, NM, US;United States of America;34°04?43?N 107°37?04?W;34°04?43?N;107°37?04?W;34.078611;-107.617778;1973;1981;https://en.wikipedia.org/wiki/Very_Large_Array
+SLAC National Accelerator Laboratory;Menlo Park, CA, US;United States of America;37°25?03?N 122°12?09?W;37°25?03?N;122°12?09?W;37.4175;-122.2025;1966;;https://en.wikipedia.org/wiki/SLAC_National_Accelerator_Laboratory
+Fermilab;DuPage County, IL, US;United States of America;41°49?55?N 88°15?26?W;41°49?55?N;88°15?26?W;41.831944;-88.257222;1969;;https://en.wikipedia.org/wiki/Fermilab
+Jet Propulsion Laboratory (JPL);La Cañada Flintridge, CA, US;United States of America;34°12?00?N 118°10?18?W;34°12?00?N;118°10?18?W;34.2;-118.171667;1936;;https://en.wikipedia.org/wiki/Jet_Propulsion_Laboratory
+Brookhaven National Laboratory;Upton, NY, US;United States of America;40.875°N 72.877°W;40.875°N;72.877°W;40.875;-72.877;1947;1950;https://en.wikipedia.org/wiki/Brookhaven_National_Laboratory
+Mount Wilson Observatory;Mount Wilson, CA, US;United States of America;34°13?30?N 118°03?26?W;34°13?30?N;118°03?26?W;34.225;-118.057222;1915;1917;https://en.wikipedia.org/wiki/Mount_Wilson_Observatory
+Palomar observatory;San Diego County, CA, US;United States of America;33°21?23?N 116°51?54?W;33°21?23?N;116°51?54?W;33.356389;-116.865;1947;1949;https://en.wikipedia.org/wiki/Palomar_Observatory
+Arecibo observatory;Arecibo, Puerto Rico;Puerto Rico;18°20?39?N 66°45?10?W;18°20?39?N;66°45?10?W;18.344167;-66.752778;1963;;https://en.wikipedia.org/wiki/Arecibo_Observatory
+Jodrell Bank Observatory;Cheshire, England;United Kingdom;53°14?10?N 2°18?26?W;53°14?10?N;2°18?26?W;53.236111;-2.307222;1945;1947;https://en.wikipedia.org/wiki/Jodrell_Bank_Observatory
+Gran Sasso National Laboratory;L'Aquila, Italy;Italy;42°25?16?N 13°30?59?E;42°25?16?N;13°30?59?E;42.421111;13.516389;1985;;https://en.wikipedia.org/wiki/Laboratori_Nazionali_del_Gran_Sasso
+Institute for High Energy Physics;Protvino, Russia;Russia;54.8678°N 37.2030°E;54.8678°N;37.2030°E;54.8678;37.203;1967;;https://en.wikipedia.org/wiki/Institute_for_High_Energy_Physics
+Baikonur Cosmodrome;Baikonur, Russia;Russia;45.965°N 63.305°E;45.965°N;63.305°E;45.965;63.305;1955;;https://en.wikipedia.org/wiki/Baikonur_Cosmodrome
+Plesetsk Cosmodrome;Mirny, Russia;Russia;62°55?32?N 40°34?40?E;62°55?32?N;40°34?40?E;62.925556;40.577778;1957;1963;https://en.wikipedia.org/wiki/Plesetsk_Cosmodrome
+Parkes Observatory;New South Wales, Australia;Australia;32°59?52?S 148°15?47?E;32°59?52?S;148°15?47?E;-32.997778;148.263056;1956;1961;https://en.wikipedia.org/wiki/Parkes_Observatory
+CSIRO Radiophysics Lab;Canberra, Australia;Australia;33.78°S 151.11°E;33.78°S;151.11°E;-33.78;151.11;1948;;https://en.wikipedia.org/wiki/CSIRO
+Cerro-Tolo Observatory;Coquimbo, Chile;Chile;30°10?09?S 70°48?23?W;30°10?09?S;70°48?23?W;-30.169167;-70.806389;1963;1965;https://en.wikipedia.org/wiki/Cerro_Tololo_Inter-American_Observatory
+La Silla Observatory;Coquimbo, Chile;Chile;29°15?27?S 70°44?15?W;29°15?27?S;70°44?15?W;-29.2575;-70.7375;1965;1969;https://en.wikipedia.org/wiki/La_Silla_Observatory
+Hartebeesthoek Radio Astronomy Observatory;Gautengo, South Africa;South Africa;25°53?25?S 27°41?08?E;25°53?25?S;27°41?08?E;-25.890278;27.685556;1961;;https://en.wikipedia.org/wiki/Hartebeesthoek_Radio_Astronomy_Observatory
+Frascati National Laboratory;Frascati, Italy;Italy;41.82070°N 12.67313°E;41.82070°N;12.67313°E;41.8207;12.67313;1954;1959;https://en.wikipedia.org/wiki/Laboratori_Nazionali_di_Frascati
+DESY;Hamburg, Germany;Germany;53°34?33?N 9°52?46?E;53°34?33?N;9°52?46?E;53.575833;9.879444;1959;1964;https://en.wikipedia.org/wiki/DESY
+Kurchatov Institute;Moscow, Russia;Russia;55°48?5?N 37°28?37?E;55°48?5?N;37°28?37?E;55.801389;37.476944;1955;;https://en.wikipedia.org/wiki/Kurchatov_Institute
+Westerbork Synthesis Radio Telescope;Drenthe, Netherlands;Netherlands;52°54?53?N 6°36?12?E;52°54?53?N;6°36?12?E;52.914722;6.603333;1960;1970;https://en.wikipedia.org/wiki/Westerbork_Synthesis_Radio_Telescope
+Byurakan Observatory;Mount Aragats, Armenia;Armenia;40°19?51?N 44°16?06?E;40°19?51?N;44°16?06?E;40.330833;44.268333;1946;;https://en.wikipedia.org/wiki/Byurakan_Observatory
+Abastumani Astrophysical Observatory;Samtskhe–Javakheti, Georgia;Georgia;41°45?15?N 42°49?10?E;41°45?15?N;42°49?10?E;41.754167;42.819444;1932;1936;https://en.wikipedia.org/wiki/Georgian_National_Astrophysical_Observatory
+Crimean Astrophysical Observatory;Nauchnyi, Crimea;Ukraine;44°43?36?N 34°0?57.1?E;44°43?36?N;34°0?57.1?E;44.726667;34.015861;1945;1952;https://en.wikipedia.org/wiki/Crimean_Astrophysical_Observatory
+Budker Institute of Nuclear Physics;Novosibirsk, Russia;Russia;54°50?56?N 83°06?40?E;54°50?56?N;83°06?40?E;54.848889;83.111111;1961;;https://en.wikipedia.org/wiki/Budker_Institute_of_Nuclear_Physics
+Yerevan Physics Institute;Armenia;Armenia;40°12?23?N 44°29?06?E;40°12?23?N;44°29?06?E;40.206389;44.485;1967;;https://en.wikipedia.org/wiki/Yerevan_Physics_Institute
+Tien Shan Astronomical Observatory;Almaty, Kazakhstan;Kazakhstan;43°03?27?N 76°58?17?E;43°03?27?N;76°58?17?E;43.0575;76.971389;1957;;https://en.wikipedia.org/wiki/Tien_Shan_Astronomical_Observatory
