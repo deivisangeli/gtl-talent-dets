@@ -1,0 +1,23 @@
+=== Staggered DiD (within-USSR) — STEM absolute ===
+OLS estimation, Dep. Var.: n_stem
+Observations: 3,240
+Fixed-effects: country: 15,  year: 216
+Standard-errors: Clustered (country) 
+     Estimate Std. Error t value Pr(>|t|) 
+post  2.31644    1.95205 1.18667   0.2551 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 2.54345     Adj. R2: 0.541253
+                Within R2: 0.014761
+
+=== Staggered DiD (within-USSR) — STEM rate (per 1,000 births) ===
+OLS estimation, Dep. Var.: rate_per_1000_mort
+Observations: 3,240
+Fixed-effects: country: 15,  year: 216
+Standard-errors: Clustered (country) 
+      Estimate Std. Error  t value Pr(>|t|) 
+post -0.014048   0.011563 -1.21493  0.24449 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.024209     Adj. R2: 0.245084
+                 Within R2: 0.006045

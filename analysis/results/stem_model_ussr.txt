@@ -1,0 +1,23 @@
+=== Time-varying USSR membership — STEM absolute ===
+OLS estimation, Dep. Var.: n_stem
+Observations: 36,720
+Fixed-effects: country: 170,  year: 216
+Standard-errors: Clustered (country) 
+                         Estimate Std. Error   t value Pr(>|t|) 
+ussr_member_timevarying -0.378278   0.500137 -0.756349  0.45049 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 4.61938     Adj. R2: 0.632833
+                Within R2: 1.182e-4
+
+=== Time-varying USSR membership — STEM rate (per 1,000 births) ===
+OLS estimation, Dep. Var.: rate_per_1000_mort
+Observations: 36,720
+Fixed-effects: country: 170,  year: 216
+Standard-errors: Clustered (country) 
+                         Estimate Std. Error   t value Pr(>|t|) 
+ussr_member_timevarying -0.001026   0.001844 -0.556227  0.57879 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.022047     Adj. R2: 0.30072 
+                 Within R2: 3.813e-5
