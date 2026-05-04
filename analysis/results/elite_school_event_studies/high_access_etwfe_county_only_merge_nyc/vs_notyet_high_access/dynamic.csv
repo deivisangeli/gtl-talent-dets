@@ -1,0 +1,111 @@
+spec,outcome,estimator,conf_low,conf_high,event_time,att,se
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-1.1389392393774012,6.138939239377955,-50,2.500000000000277,1.8566016527437135
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-5.34867269624808,3.6820060295819252,-40,-0.8333333333330777,2.303744572915818
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-7.175895392155231,14.175895392155702,-30,3.5000000000002354,5.446885404160952
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-7.052963848346133,11.55296384834669,-20,2.250000000000279,4.746410126707353
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,0,0,-10,0,0
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-10.06075790685086,19.527424573517983,0,4.733333333333562,7.548005734787971
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-18.03725156346014,17.537251563460714,10,-0.24999999999971045,9.075128348704299
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-10.67610312499918,19.67610312499899,20,4.499999999999903,7.742909757652594
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-14.89066303883866,24.49066303883893,30,4.800000000000135,10.046256652468774
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-38.87384780555632,57.873847805556935,40,9.500000000000302,24.68053459467175
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE,-72.08762115784654,127.08762115784722,50,27.500000000000338,50.81001079481984
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-41.80059744320459,85.87202601463471,-50,22.035714285715066,32.56954680046921
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-24.8332253184115,50.102272937460334,-40,12.634523809524417,19.116198534661184
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-44.40790190337455,86.35075904623329,-30,20.97142857142937,33.35680126265506
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-42.09505032118403,79.4736217497571,-20,18.689285714286534,31.01241634462784
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-25.596249335983597,50.00577314550843,0,12.204761904762417,19.286230224870415
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-46.20706614392587,72.39278042964165,10,13.092857142857891,30.255062901420285
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-37.8014064783154,69.62283504974384,20,15.910714285714219,27.40414324695389
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-33.76248879641298,60.92820308212808,30,13.58285714285755,24.155788744525783
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-60.54786459534464,100.04072173820333,40,19.74642857142934,40.96647610549693
+High access only (not-yet-treated controls),STEM births (count),Wooldridge ETWFE + county pre-period trend,-91.64079491139327,165.06936633996636,50,36.71428571428655,65.48728603351012
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-18.76948759618545,118.76948759619194,-50,50.00000000000325,35.08647326336158
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-18.982320656282987,102.31565398962158,-40,41.66666666666929,30.943360879057288
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-43.769487596185655,93.76948759619182,-30,25.000000000003084,35.086473263361604
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-18.76948759618559,118.76948759619188,-20,50.00000000000315,35.086473263361604
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,0,0,-10,0,0
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-75.1858565250265,21.85252319169729,0,-26.6666666666646,24.754688703245865
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-93.76948759618564,43.769487596191894,10,-24.99999999999687,35.08647326336162
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,74.9999993491755,75.00000065082246,20,74.99999999999898,3.320527993257301e-7
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-75.01559007694974,35.01559007695245,30,-19.999999999998643,28.069178610689335
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-118.76948759618554,18.76948759619208,40,-49.99999999999673,35.08647326336164
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE,-118.76948759618548,18.769487596191844,50,-49.999999999996824,35.08647326336157
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-161.36462577366976,165.65034005938273,-50,2.142857142856485,83.42218516149298
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-77.00011948697633,104.97630996316605,-40,13.98809523809485,46.422558533199584
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-163.59935434865147,127.17078292007908,-30,-18.214285714286195,74.17605542569656
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-127.37517923046354,145.58946494474847,-20,9.107142857142463,69.63383779979898
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-87.95135815117183,5.1894533892661485,0,-41.38095238095284,23.760411107254587
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-169.64182376281062,51.7846809056669,10,-58.92857142857186,56.48635323175447
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-119.49769302203894,116.28340730775311,20,-1.6071428571429145,60.148239880049
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-131.22159101601142,20.364448158867937,30,-55.428571428571736,38.66990795277535
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-164.2837965334454,10.355225104873668,40,-76.96428571428586,44.550770826101804
+High access only (not-yet-treated controls),Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-155.05750227367565,5.771787987961105,50,-74.64285714285727,41.02788016878488
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.04879263746935488,0.15564417795355,-50,0.05342577024209757,0.0521522488323737
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.02007193259286674,0.05631026834030049,-40,0.01811916787371688,0.019485255340093682
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.028057668918275713,0.04451883359404672,-30,0.008230582337885504,0.018514413906204702
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.01769060982961511,0.02283137611257932,-20,0.0025703831414821063,0.010337241311784293
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,0,0,-10,0,0
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.02289414178411634,0.02873133005986843,0,0.0029185941378760435,0.01316976322550632
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.0562030681775473,-0.010958586267170632,10,-0.033580827222358965,0.011541959671014455
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,6.039297501272082e-4,0.007568141370135577,20,0.004086035560131393,0.0017765845969409104
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.021952223196516095,0.024614819395187844,30,0.0013312980993358745,0.011879347599924475
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.03373322440157027,0.001405413700459806,40,-0.016163905350555233,0.008963938291334204
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE,-0.03288362508031048,0.010533093603226544,50,-0.011175265738541969,0.01107569354171863
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.2617198694832879,0.1318659291808032,-50,-0.06492697015124237,0.10040454047553345
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.2268621327232376,0.10192233160439682,-40,-0.062469900559420394,0.08387358783868225
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.36575634080745906,0.1703677486490734,-30,-0.09769429607919283,0.13676634935115625
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.34120039222056686,0.14691926364563646,-20,-0.0971405642874652,0.12452032037403146
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.12910232997919718,0.04576616708596731,0,-0.041668081446614935,0.04460931047580727
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.29651121855240614,0.06721125517857937,10,-0.1146499816869134,0.09278634533953713
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.25746349088135545,0.1090118761963744,20,-0.07422580734249054,0.0934886140504413
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.1689322987937275,0.059925296650492246,30,-0.054503501071617624,0.05838203965413769
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.22103898628364457,0.06385645258221087,40,-0.07859126685071685,0.07267740787394272
+High access only (not-yet-treated controls),"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.19466629856470008,0.059888906063555014,50,-0.06738869625057253,0.06493755220108549
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.09470942348711046,0.3021146453164079,-50,0.10370261091464873,0.10123062979681592
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.03589628314429108,0.094400498080279,-40,0.029252107467993962,0.033238974802186246
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.05432456551591893,0.07044598578893427,-30,0.008060710136507665,0.031829222271646224
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.03623078741821778,0.03545982028468227,-20,-3.8548356676776016e-4,0.018288420332372463
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,0,0,-10,0,0
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.05392311516063554,0.05831980983429798,0,0.0021983473368312155,0.02863339923340141
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.12921914049407018,-0.02969813904314421,10,-0.07945863976860719,0.025388010574215806
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.003188054886392712,0.013672300180391943,20,0.0052421226469996154,0.004301110986424657
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.06872419357938894,0.05722007588009052,30,-0.005752058849649211,0.03212864016823455
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.10514593345288148,-0.001337494670789141,40,-0.05324171406183531,0.026481744587268454
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.10938600899256515,0.029077642202051807,50,-0.04015418339525667,0.035322359998626776
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.48365279705993075,0.25474717771788297,-50,-0.11445280967102388,0.18836734050454432
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.43737113252545107,0.1990587255951533,-40,-0.11915620346514888,0.16235455564301132
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.6948746061556322,0.3204792514376017,-30,-0.1871976773590153,0.25901884122276375
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.6475107928034465,0.27912008376901465,-20,-0.1841953545172159,0.23638542769705642
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.23940361121168288,0.07961751428079497,0,-0.07989304846544396,0.08138294017665251
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.5675988875328433,0.1097529653651807,10,-0.22892296108383126,0.1727938400250061
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.4855774333684899,0.2048235196202416,20,-0.14037695687412416,0.1761226920889621
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.30806155334887697,0.0899946946222729,30,-0.10903342936330203,0.10154496121713007
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.42567778304591647,0.08895681156224572,40,-0.16836048574183538,0.13128433535922504
+High access only (not-yet-treated controls),"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.3722140524751899,0.0845651754148262,50,-0.14382443853018187,0.11652531323724902
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-6687101.49661583,3284759.8401941964,-50,-1701170.8282108167,2543842.17775766
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-4595480.601980368,2255597.859637756,-40,-1169941.371171306,1747724.0973515622
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-6541785.063382424,3262236.949307745,-30,-1639774.05703734,2501026.0236454513
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-6408667.995955298,3195695.8359058835,-20,-1606486.0800247074,2450092.8142503016
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,0,0,-10,0,0
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-2911679.6196897156,1407450.6535438928,0,-752114.4830729114,1101818.9472534715
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-5493457.390669666,2778393.718794694,10,-1357531.835937486,2110166.0993531533
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-5091615.533437139,2368672.131093408,20,-1361471.7011718657,1903134.608298609
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-3646418.3279971965,1647860.65299722,30,-999278.8374999884,1350581.3727026572
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-3705264.96102742,1643788.2891524415,40,-1030738.3359374892,1364554.4005560873
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE,-2440662.434184444,1033542.3404344723,50,-703560.046874986,886276.72821911145
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-4376118.748610712,2816179.846836221,-50,-779969.4508872455,1834770.0498589114
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-2972054.826259496,1973914.1171710878,-40,-499070.3545442043,1261726.7712833122
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-4476382.494029744,2838976.573327996,-30,-818702.9603508741,1866163.0273871785
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-4466681.564100722,2795721.316787143,-20,-835480.1236567897,1852653.7961448636
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-2005866.9203381024,1254614.6827569052,0,-375626.1187905985,831755.5109936245
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-3925351.7605071915,2451909.159456727,10,-736721.300525232,1626852.2755009998
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-3998832.7394462368,1696509.197796274,20,-1151161.7708249814,1452893.3513373751
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-2677165.0464648707,1319463.531240159,30,-678850.7576123558,1019548.1065574054
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-2495417.207826376,1375170.764864599,40,-560123.2214808885,987394.8909925958
+High access only (not-yet-treated controls),County population,Wooldridge ETWFE + county pre-period trend,-1351876.5755258119,785856.4300519308,50,-283010.07273694046,545340.0524433017

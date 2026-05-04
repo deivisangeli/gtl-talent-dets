@@ -1,0 +1,63 @@
+=== Synthetic validation of BJS and Wooldridge ===
+
+Counties: 20000 
+Decades: 1800 to 2000 
+Treated cohorts: 1840, 1860, 1880, 1900, 1920 
+Never-treated share: 0.3 
+Post-treatment slope shift in truth: 1.5 per decade
+Noise SD: 1 
+
+Untreated potential outcomes include cohort-specific linear trends.
+Correctly specified trend-adjusted estimators should recover zero pre-period effects
+and the true post-treatment slope shift path.
+
+=== RMSE relative to exact truth ===
+# A tibble: 8 × 6
+  estimator        trend_spec        period_group  rmse max_abs_error mean_error
+  <chr>            <chr>             <chr>        <dbl>         <dbl>      <dbl>
+1 BJS              Cohort linear tr… post          7.53         10.4        7.24
+2 BJS              Cohort linear tr… pre           2.01          3.71       1.36
+3 BJS              No cohort trends  post          3.38          5.10       3.17
+4 BJS              No cohort trends  pre           3.89          4.98       3.79
+5 Wooldridge ETWFE Cohort linear tr… post          6.17          9.21      -5.71
+6 Wooldridge ETWFE Cohort linear tr… pre           2.19          3.65       1.52
+7 Wooldridge ETWFE No cohort trends  post         15.8          17.4      -15.8 
+8 Wooldridge ETWFE No cohort trends  pre          18.7          19.6      -18.7 
+
+=== Manual untreated-only benchmark ===
+# A tibble: 13 × 6
+   estimator                    trend_spec event_time      att true_att    error
+   <chr>                        <chr>           <int>    <dbl>    <dbl>    <dbl>
+ 1 Manual untreated-only bench… Cohort li…        -60 -2.46e-3      0   -2.46e-3
+ 2 Manual untreated-only bench… Cohort li…        -50  1.07e-4      0    1.07e-4
+ 3 Manual untreated-only bench… Cohort li…        -40 -2.29e-3      0   -2.29e-3
+ 4 Manual untreated-only bench… Cohort li…        -30  2.96e-3      0    2.96e-3
+ 5 Manual untreated-only bench… Cohort li…        -20 -9.33e-3      0   -9.33e-3
+ 6 Manual untreated-only bench… Cohort li…        -10  9.88e-3      0    9.88e-3
+ 7 Manual untreated-only bench… Cohort li…          0  1.54e-3      0    1.54e-3
+ 8 Manual untreated-only bench… Cohort li…         10  1.49e+0      1.5 -1.04e-2
+ 9 Manual untreated-only bench… Cohort li…         20  2.99e+0      3   -1.07e-2
+10 Manual untreated-only bench… Cohort li…         30  4.50e+0      4.5 -2.40e-3
+11 Manual untreated-only bench… Cohort li…         40  5.99e+0      6   -6.06e-3
+12 Manual untreated-only bench… Cohort li…         50  7.51e+0      7.5  9.47e-3
+13 Manual untreated-only bench… Cohort li…         60  9.00e+0      9   -8.25e-4
+
+=== Wooldridge wrapper versus direct check ===
+# A tibble: 13 × 7
+   event_time att_wrapper se_wrapper att_direct se_direct abs_diff abs_se_diff
+        <int>       <dbl>      <dbl>      <dbl>     <dbl>    <dbl>       <dbl>
+ 1        -60      -18.9      0.0150     -18.9     0.0150 0           8.70e-11
+ 2        -50      -18.3      0.0149     -18.3     0.0149 0           3.40e-10
+ 3        -40      -19.6      0.0150     -19.6     0.0150 0           6.76e-10
+ 4        -30      -19.0      0.0149     -19.0     0.0149 0           2.27e-11
+ 5        -20      -18.5      0.0150     -18.5     0.0150 0           6.62e-11
+ 6        -10      -17.9      0.0149     -17.9     0.0149 0           3.90e-10
+ 7          0      -17.4      0.0150     -17.4     0.0150 3.55e-15    1.06e- 9
+ 8         10      -15.4      0.0150     -15.4     0.0150 0           5.05e-10
+ 9         20      -13.3      0.0150     -13.3     0.0150 1.78e-15    2.71e-10
+10         30      -11.3      0.0150     -11.3     0.0150 1.78e-15    9.28e-11
+11         40       -9.26     0.0150      -9.26    0.0150 0           2.92e-10
+12         50       -7.19     0.0150      -7.19    0.0150 8.88e-16    3.42e-11
+13         60       -5.17     0.0151      -5.17    0.0151 0           5.52e-10
+
+Runtime (minutes): 4.56 

@@ -1,0 +1,3 @@
+access,n,mean,median,p25,p75,min,max
+High access,17,404,200,150,300,50,2400
+Low access,71,75,60,40,100,12,300

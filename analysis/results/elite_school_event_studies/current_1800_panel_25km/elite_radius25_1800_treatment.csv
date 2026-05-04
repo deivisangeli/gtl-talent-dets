@@ -1,0 +1,241 @@
+county_geoid,n_nearby_schools,first_exposure_year,first_exposure_schools,first_exposure_access,g_any
+01003,1,1892,St. Paul's School,low,1880
+01097,1,1892,St. Paul's School,low,1880
+04013,1,1928,Brophy College Preparatory,low,1920
+05045,1,1927,Little Rock Central High School,high,1920
+05119,1,1927,Little Rock Central High School,high,1920
+05125,1,1927,Little Rock Central High School,high,1920
+06001,1,1856,Lowell High School,high,1850
+06013,1,1856,Lowell High School,high,1850
+06037,1,1922,The Webb School of California,low,1910
+06041,1,1856,Lowell High School,high,1850
+06075,1,1856,Lowell High School,high,1850
+06081,1,1856,Lowell High School,high,1850
+06083,1,1910,Cate School,low,1900
+06111,1,1889,The Thacher School,low,1880
+08001,1,1926,Kent Denver School,low,1920
+08005,2,1906,Colorado Academy,low,1900
+08019,1,1906,Colorado Academy,low,1900
+08031,1,1906,Colorado Academy,low,1900
+08035,1,1906,Colorado Academy,low,1900
+08039,1,1926,Kent Denver School,low,1920
+08041,1,1930,Fountain Valley School of Colorado,low,1920
+08059,1,1906,Colorado Academy,low,1900
+08093,1,1906,Colorado Academy,low,1900
+09001,1,1896,Choate School / Choate Rosemary Hall,low,1890
+09003,2,1896,Choate School / Choate Rosemary Hall,low,1890
+09005,3,1890,The Taft School,low,1880
+09007,1,1896,Choate School / Choate Rosemary Hall,low,1890
+09009,1,1896,Choate School / Choate Rosemary Hall,low,1890
+09015,1,1889,Wheeler School,low,1880
+10003,3,1884,The Haverford School,low,1870
+11001,2,1839,Episcopal High School,low,1830
+12086,1,1903,Ransom Everglades School,low,1890
+13063,2,1888,Westminster Schools,low,1880
+13067,2,1888,Westminster Schools,low,1880
+13089,2,1888,Westminster Schools,low,1880
+13097,2,1888,Westminster Schools,low,1880
+13121,2,1888,Westminster Schools,low,1880
+15003,2,1841,Punahou School,low,1830
+17031,4,1888,Latin School of Chicago,low,1880
+17043,4,1888,Latin School of Chicago,low,1880
+18011,1,1864,Shortridge High School,high,1850
+18019,2,1856,Louisville Male High School,high,1850
+18043,2,1856,Louisville Male High School,high,1850
+18049,1,1894,Culver Academies,low,1880
+18057,1,1864,Shortridge High School,high,1850
+18059,1,1864,Shortridge High School,high,1850
+18063,1,1864,Shortridge High School,high,1850
+18081,1,1864,Shortridge High School,high,1850
+18085,1,1894,Culver Academies,low,1880
+18097,1,1864,Shortridge High School,high,1850
+18099,1,1894,Culver Academies,low,1880
+18109,1,1864,Shortridge High School,high,1850
+18141,1,1894,Culver Academies,low,1880
+18145,1,1864,Shortridge High School,high,1850
+18149,1,1894,Culver Academies,low,1880
+19031,1,1890,Scattergood Friends School,low,1880
+21029,2,1856,Louisville Male High School,high,1850
+21111,2,1856,Louisville Male High School,high,1850
+21185,2,1856,Louisville Male High School,high,1850
+22051,2,1903,Isidore Newman School,low,1890
+22057,1,1929,Metairie Park Country Day School,low,1920
+22071,2,1903,Isidore Newman School,low,1890
+22075,2,1903,Isidore Newman School,low,1890
+22087,1,1903,Isidore Newman School,low,1890
+22089,1,1929,Metairie Park Country Day School,low,1920
+22103,1,1903,Isidore Newman School,low,1890
+23001,1,1898,Waynflete School,low,1890
+23005,1,1898,Waynflete School,low,1890
+23017,1,1804,Hebron Academy,low,1790
+24003,3,1839,Baltimore City College,high,1830
+24005,4,1839,Baltimore City College,high,1830
+24015,2,1919,Tower Hill School,low,1910
+24017,1,1839,Episcopal High School,low,1830
+24025,1,1873,McDonogh School,high,1860
+24027,3,1839,Baltimore City College,high,1830
+24031,2,1839,Episcopal High School,low,1830
+24033,1,1839,Episcopal High School,low,1830
+24510,4,1839,Baltimore City College,high,1830
+25005,3,1866,Noble and Greenough School,low,1860
+25017,4,1866,Noble and Greenough School,low,1860
+25021,2,1866,Noble and Greenough School,low,1860
+25023,1,1866,Noble and Greenough School,low,1860
+25025,1,1866,Noble and Greenough School,low,1860
+25027,4,1884,Groton School,low,1870
+26125,3,1877,University of Detroit Jesuit High School and Academy,low,1870
+26163,1,1877,University of Detroit Jesuit High School and Academy,low,1870
+27003,2,1886,Breck School,low,1880
+27019,2,1886,Breck School,low,1880
+27037,1,1858,Shattuck-St. Mary's School,low,1850
+27053,2,1886,Breck School,low,1880
+27131,1,1858,Shattuck-St. Mary's School,low,1850
+27147,1,1858,Shattuck-St. Mary's School,low,1850
+28039,1,1892,St. Paul's School,low,1880
+28059,1,1892,St. Paul's School,low,1880
+29037,1,1910,Pembroke Hill School,low,1900
+29047,1,1910,Pembroke Hill School,low,1900
+29095,1,1910,Pembroke Hill School,low,1900
+29099,2,1913,MICDS,low,1900
+29183,2,1913,MICDS,low,1900
+29189,2,1913,MICDS,low,1900
+29510,2,1913,MICDS,low,1900
+31053,2,1859,Omaha Central High School,high,1850
+31055,2,1859,Omaha Central High School,high,1850
+31153,2,1859,Omaha Central High School,high,1850
+31155,2,1859,Omaha Central High School,high,1850
+31177,2,1859,Omaha Central High School,high,1850
+33001,1,1856,St. Paul's School,low,1850
+33009,2,1842,St. Johnsbury Academy,high,1830
+33011,1,1856,St. Paul's School,low,1850
+33013,1,1856,St. Paul's School,low,1850
+34003,7,1884,The Brearley School,low,1870
+34005,3,1810,The Lawrenceville School,low,1800
+34007,1,1836,Central High School,high,1830
+34013,5,1884,The Brearley School,low,1870
+34015,2,1836,Central High School,high,1830
+34017,7,1884,The Brearley School,low,1870
+34019,4,1810,The Lawrenceville School,low,1800
+34021,2,1810,The Lawrenceville School,low,1800
+34023,3,1810,The Lawrenceville School,low,1800
+34025,3,1810,The Lawrenceville School,low,1800
+34027,2,1848,Blair Academy,low,1840
+34031,4,1884,The Brearley School,low,1870
+34033,3,1884,The Haverford School,low,1870
+34035,3,1810,The Lawrenceville School,low,1800
+34037,1,1848,Blair Academy,low,1840
+34039,6,1861,The Pingry School,low,1850
+34041,1,1848,Blair Academy,low,1840
+35005,1,1891,New Mexico Military Institute,high,1880
+36005,7,1884,The Brearley School,low,1870
+36047,7,1884,The Brearley School,low,1870
+36059,7,1884,The Brearley School,low,1870
+36061,7,1884,The Brearley School,low,1870
+36081,7,1884,The Brearley School,low,1870
+36083,1,1829,Burr and Burton Academy,high,1820
+36085,5,1884,The Brearley School,low,1870
+36087,2,1887,Horace Mann School,low,1880
+36115,1,1829,Burr and Burton Academy,high,1820
+36119,6,1884,The Brearley School,low,1870
+37021,1,1900,Asheville School,low,1890
+37089,1,1900,Asheville School,low,1890
+37115,1,1900,Asheville School,low,1890
+39013,1,1814,Linsly School,low,1800
+39035,3,1826,Western Reserve Academy,low,1820
+39041,1,1911,Columbus Academy,low,1900
+39045,1,1911,Columbus Academy,low,1900
+39049,1,1911,Columbus Academy,low,1900
+39081,1,1814,Linsly School,low,1800
+39103,3,1826,Western Reserve Academy,low,1820
+39129,1,1911,Columbus Academy,low,1900
+39133,1,1826,Western Reserve Academy,low,1820
+39153,3,1826,Western Reserve Academy,low,1820
+39169,1,1826,Western Reserve Academy,low,1820
+40037,1,1922,Holland Hall,low,1910
+40113,1,1922,Holland Hall,low,1910
+40131,1,1922,Holland Hall,low,1910
+40143,1,1922,Holland Hall,low,1910
+40145,1,1922,Holland Hall,low,1910
+41005,2,1869,Oregon Episcopal School,low,1860
+41051,2,1869,Oregon Episcopal School,low,1860
+42003,1,1883,Shady Side Academy,low,1870
+42017,4,1810,The Lawrenceville School,low,1800
+42029,2,1851,The Hill School,low,1840
+42045,3,1836,Central High School,high,1830
+42055,1,1893,Mercersburg Academy,low,1880
+42057,1,1893,Mercersburg Academy,low,1880
+42059,1,1814,Linsly School,low,1800
+42061,1,1893,Mercersburg Academy,low,1880
+42089,1,1848,Blair Academy,low,1840
+42091,3,1836,Central High School,high,1830
+42095,1,1848,Blair Academy,low,1840
+42101,2,1836,Central High School,high,1830
+42125,1,1814,Linsly School,low,1800
+44001,1,1896,St. George's School,low,1890
+44003,2,1889,Wheeler School,low,1880
+44005,1,1896,St. George's School,low,1890
+44007,1,1889,Wheeler School,low,1880
+44009,1,1896,St. George's School,low,1890
+45015,1,1867,Porter-Gaud School,low,1860
+45019,1,1867,Porter-Gaud School,low,1860
+45035,1,1867,Porter-Gaud School,low,1860
+47003,1,1870,The Webb School,low,1860
+47011,1,1893,Baylor School,low,1880
+47021,1,1867,Montgomery Bell Academy,low,1860
+47031,1,1870,The Webb School,low,1860
+47037,1,1867,Montgomery Bell Academy,low,1860
+47065,1,1893,Baylor School,low,1880
+47103,1,1870,The Webb School,low,1860
+47115,1,1893,Baylor School,low,1880
+47117,1,1870,The Webb School,low,1860
+47127,1,1870,The Webb School,low,1860
+47149,1,1870,The Webb School,low,1860
+47153,1,1893,Baylor School,low,1880
+47165,1,1867,Montgomery Bell Academy,low,1860
+47187,1,1867,Montgomery Bell Academy,low,1860
+47189,1,1867,Montgomery Bell Academy,low,1860
+48029,1,1893,TMI Episcopal,low,1880
+48113,1,1913,The Hockaday School,low,1900
+48201,1,1906,The Kinkaid School,low,1900
+48339,1,1906,The Kinkaid School,low,1900
+49011,1,1867,Rowland Hall,low,1860
+49035,1,1867,Rowland Hall,low,1860
+50003,1,1829,Burr and Burton Academy,high,1820
+50005,1,1842,St. Johnsbury Academy,high,1830
+50009,1,1842,St. Johnsbury Academy,high,1830
+50019,1,1842,St. Johnsbury Academy,high,1830
+50023,1,1842,St. Johnsbury Academy,high,1830
+50025,1,1829,Burr and Burton Academy,high,1820
+51013,2,1839,Episcopal High School,low,1830
+51041,1,1911,St. Christopher's School,low,1900
+51047,1,1889,Woodberry Forest School,low,1880
+51059,2,1839,Episcopal High School,low,1830
+51075,1,1911,St. Christopher's School,low,1900
+51079,1,1889,Woodberry Forest School,low,1880
+51085,1,1911,St. Christopher's School,low,1900
+51087,1,1911,St. Christopher's School,low,1900
+51107,1,1906,The Madeira School,low,1900
+51113,1,1889,Woodberry Forest School,low,1880
+51137,1,1889,Woodberry Forest School,low,1880
+51139,1,1889,Woodberry Forest School,low,1880
+51145,1,1911,St. Christopher's School,low,1900
+51153,1,1906,The Madeira School,low,1900
+51157,1,1889,Woodberry Forest School,low,1880
+51165,1,1889,Woodberry Forest School,low,1880
+51510,2,1839,Episcopal High School,low,1830
+51600,2,1839,Episcopal High School,low,1830
+51610,2,1839,Episcopal High School,low,1830
+51683,1,1906,The Madeira School,low,1900
+51685,1,1906,The Madeira School,low,1900
+51760,1,1911,St. Christopher's School,low,1900
+53011,2,1869,Oregon Episcopal School,low,1860
+53033,2,1884,Annie Wright Schools,low,1870
+53053,1,1884,Annie Wright Schools,low,1870
+53059,2,1869,Oregon Episcopal School,low,1860
+54009,1,1814,Linsly School,low,1800
+54051,1,1814,Linsly School,low,1800
+54069,1,1814,Linsly School,low,1800
+55027,1,1855,Wayland Academy,low,1850
+55079,2,1851,University School of Milwaukee,low,1840
+55101,2,1851,University School of Milwaukee,low,1840
+55133,2,1851,University School of Milwaukee,low,1840

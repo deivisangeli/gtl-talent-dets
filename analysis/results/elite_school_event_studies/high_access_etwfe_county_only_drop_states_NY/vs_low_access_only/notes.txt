@@ -1,0 +1,71 @@
+=== High access vs low-access counties only ===
+
+States dropped from the panel: NY
+
+Treated:  high-access counties (g = first fully exposed decade).
+Control:  low-access counties (g = 0).
+          Counties with no elite school are excluded from this spec.
+
+Panel decades: 1800 to 2000
+School age assumption: 14
+School file: ../prep/output/elite_high_schools_core_1800_1930.csv
+
+Sample restriction (applies to BOTH estimators)
+- Counties with fewer than 4 non-missing pre-treatment outcome
+  observations are dropped before any regression. The trend
+  specification needs at least 4 pre-period cells to identify a
+  county-specific slope with 2 residual degrees of freedom; we apply
+  the same sample restriction to the plain estimator so the two lines
+  in each figure are directly comparable.
+
+Estimators
+- Wooldridge ETWFE:
+    Implemented as fixest::sunab(g, decade, ref.p = -10) with county
+    and decade fixed effects. Sun and Abraham's saturated cohort x
+    event-time regression is the same model as Wooldridge's ETWFE
+    with anti-treatment leads. The reference event time is fixed at
+    e = -10 (one decade before the school opens), so ATT(e = -10) =
+    0 by construction. e = 0 is the partial-exposure decade (school
+    opens this decade; cohorts born early in the decade reach age 14
+    just as the school opens, so they receive partial exposure).
+    e = +10 is the first fully-exposed decade. e = -20, -30, ... are
+    honest pre-period placebo estimates of the pre-trend.
+    Standard errors are clustered at the county level.
+
+- Wooldridge ETWFE + county pre-period trend:
+    Step 1 fits y_it = a_i + b_i * decade by OLS for each county on
+    pre-treatment cells only (decade < g for treated counties; all
+    decades for control counties with g = 0).
+    Step 2 subtracts the fitted path from y to obtain y_resid.
+    Step 3 feeds y_resid into the same sunab regression as the plain
+    estimator above.
+    Caveat: standard errors do not propagate first-step uncertainty.
+
+=== Support ===
+# A tibble: 5 × 9
+  spec       outcome sample_counties counties_dropped_min…¹ sample_counties_used
+  <chr>      <chr>             <int>                  <int>                <int>
+1 High acce… STEM b…              71                      4                   67
+2 High acce… Any ST…              71                      4                   67
+3 High acce… STEM b…              71                      4                   67
+4 High acce… STEM b…              71                      4                   67
+5 High acce… County…              71                      4                   67
+# ℹ abbreviated name: ¹​counties_dropped_min_pre
+# ℹ 4 more variables: treated_counties_used <int>, control_counties_used <int>,
+#   first_cohort <int>, last_cohort <int>
+
+=== Summary ===
+# A tibble: 10 × 11
+   outcome  estimator lead_m60 se_m60 lead_m40  se_m40 lead_m20  se_m20   post_0
+   <chr>    <chr>        <dbl>  <dbl>    <dbl>   <dbl>    <dbl>   <dbl>    <dbl>
+ 1 Any STE… Wooldrid…       NA     NA -1.92e+1 1.09e+1 -7.28e+0 1.06e+1 -4.21e+0
+ 2 Any STE… Wooldrid…       NA     NA -6.15e-1 6.44e+0 -1.10e+0 8.78e+0 -1.04e+1
+ 3 County … Wooldrid…       NA     NA -4.39e+4 3.43e+4 -1.69e+4 1.35e+4  2.46e+4
+ 4 County … Wooldrid…       NA     NA -1.13e+5 2.44e+4 -3.98e+4 9.39e+3  4.76e+4
+ 5 STEM bi… Wooldrid…       NA     NA -2.09e+0 1.42e+0 -2.11e+0 1.33e+0  3.52e-1
+ 6 STEM bi… Wooldrid…       NA     NA -1.42e+0 9.15e-1 -1.88e+0 1.16e+0  1.29e-1
+ 7 STEM bi… Wooldrid…       NA     NA -2.29e-2 9.60e-3 -6.59e-3 8.47e-3  5.60e-3
+ 8 STEM bi… Wooldrid…       NA     NA  2.02e-3 7.63e-3  1.72e-3 7.68e-3 -2.71e-3
+ 9 STEM bi… Wooldrid…       NA     NA -1.21e-2 5.95e-3 -1.97e-3 5.20e-3  5.13e-3
+10 STEM bi… Wooldrid…       NA     NA  3.94e-3 4.72e-3  3.36e-3 4.72e-3 -2.04e-4
+# ℹ 2 more variables: se_0 <dbl>, post_avg_0_60 <dbl>

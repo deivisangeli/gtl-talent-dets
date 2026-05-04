@@ -1,0 +1,58 @@
+=== 50 km elite-school exposure event studies ===
+
+School point proxy: school county centroid from the elite-school file.
+Treated counties: county centroids within 50 km of that school-centroid proxy.
+Treatment timing: first full post-opening decade.
+
+=== Support ===
+# A tibble: 3 × 3
+  spec                              treated_counties control_counties
+  <chr>                                        <int>            <int>
+1 Any nearby elite-school exposure               119             2937
+2 High-access first nearby exposure                5             2937
+3 Low-access first nearby exposure               114             2937
+
+Counties ever exposed within 50 km: 206 
+Dropped because treated in or before 1870: 87 
+Nearby high-access treated counties after 1870: 5 
+
+=== ATT summary ===
+# A tibble: 9 × 9
+  spec        outcome treated_counties control_counties first_cohort last_cohort
+  <chr>       <chr>              <int>            <int>        <int>       <int>
+1 Any nearby… STEM s…              119             2937         1880        1930
+2 Any nearby… STEM b…              119             2937         1880        1930
+3 Any nearby… Any ST…              119             2937         1880        1930
+4 High-acces… STEM s…                5             2937         1880        1930
+5 High-acces… STEM b…                5             2937         1880        1930
+6 High-acces… Any ST…                5             2937         1880        1930
+7 Low-access… STEM s…              114             2937         1880        1930
+8 Low-access… STEM b…              114             2937         1880        1930
+9 Low-access… Any ST…              114             2937         1880        1930
+# ℹ 3 more variables: overall_att <dbl>, overall_se <dbl>, p_value <dbl>
+
+=== Pre-period leads (-40, -30, -20) ===
+# A tibble: 9 × 8
+  spec                   outcome lead_m40 lead_m30 lead_m20 se_m40 se_m30 se_m20
+  <chr>                  <chr>      <dbl>    <dbl>    <dbl>  <dbl>  <dbl>  <dbl>
+1 Any nearby elite-scho… Any ST…  -12.6    -14.0    -7.09    7.74   4.80   4.55 
+2 Any nearby elite-scho… STEM b…   -2.65    -3.21   -3.22    2.74   3.47   3.56 
+3 Any nearby elite-scho… STEM s…   -2.92    -8.92   -2.72    6.77   4.20   4.37 
+4 High-access first nea… Any ST…  -29.6      0.451  -0.0171 33.0    0.571  0.593
+5 High-access first nea… STEM b…   -0.741   -2.67    0.743   0.909  2.38   0.731
+6 High-access first nea… STEM s…  -10.2     15.6     8.06   12.5   12.6    7.90 
+7 Low-access first near… Any ST…  -11.5    -14.8    -7.35    8.07   5.15   4.68 
+8 Low-access first near… STEM b…   -2.78    -3.24   -3.37    2.95   3.49   3.70 
+9 Low-access first near… STEM s…   -2.44   -10.3    -3.11    6.98   4.17   4.36 
+
+=== Nearby high-access treated counties ===
+# A tibble: 5 × 4
+  GEOID first_exposure_year treated_cohort first_exposure_schools         
+  <chr>               <int>          <int> <chr>                          
+1 24013                1873           1880 McDonogh School                
+2 35005                1891           1900 New Mexico Military Institute  
+3 05085                1927           1930 Little Rock Central High School
+4 05119                1927           1930 Little Rock Central High School
+5 05125                1927           1930 Little Rock Central High School
+
+Runtime (minutes): 0.33 

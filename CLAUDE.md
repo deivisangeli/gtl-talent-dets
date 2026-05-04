@@ -62,6 +62,36 @@ These nulls are substantively interesting in combination — they cut against co
 
 Lucas redid the county-level US analysis and is finishing work on identifying **candidate locations for big projects** in the US (to construct better control groups for the facilities analysis).
 
+### Team
+
+- **Deivis Angeli** — PI
+- **João** (jotaprox on GitHub) — taking over from Lucas
+
+Lucas has left the project. João is likely taking it over.
+
+### Taxonomy of US-born scientists in the database
+
+Key findings from `analysis/taxonomy_us_scientists.R`:
+
+- **353k US-born individuals** (1800–1999): 74k in 1800s, 279k in 1900s
+- **Discovery/Science share** is stable: ~13% in 1800s, ~11% in 1900s
+- **Level 2 is too coarse** — "Academia" lumps historians and physicists together. Level 3 is needed for STEM identification.
+- **Within Discovery/Science (Level 3 classification):**
+
+| Field | 1800s | 1900s |
+|-------|-------|-------|
+| Hard STEM | 43% | 39% |
+| Humanities/Social Science | 28% | 35% |
+| Medicine/Health | 14% | 6% |
+| Social Science | 5% | 11% |
+| Other/Unclassified | 10% | 10% |
+
+- So roughly **40% of "Discovery/Science" are genuinely hard STEM**; the rest are historians, philosophers, social scientists, medical professionals.
+- 1800s notable occupations: engineers, physicians, botanists, historians, inventors, chemists, zoologists — natural history was huge.
+- Gender is remarkably stable: ~83% male in both centuries.
+- The peak birth decade for US scientists is the **1940s** (6,638 individuals), then sharp drop-off (right-censoring: 1960s+ born haven't had time to accumulate Wikipedia entries).
+- Top by Wikipedia visibility: Edison, Kaczynski (!!), Armstrong, Chomsky, Nash, Wozniak — the list is a reminder that "notable" ≠ "scientist."
+
 ### Priority next step
 
 **Download county-level covariates and test what predicts Wikipedia appearances in the US.**

@@ -1,0 +1,572 @@
+sample,design,spec,outcome,event_time,att,se,conf_low,conf_high
+All controls,County of school,Any exposure,STEM share zero-filled (pp),-60,-8.044167776516545,5.822667255687698,-19.456595597664432,3.3682600446313415
+All controls,County of school,Any exposure,STEM share zero-filled (pp),-50,-6.106565747220337,6.151012104958051,-18.162549472938117,5.949417978497442
+All controls,County of school,Any exposure,STEM share zero-filled (pp),-40,-4.937014766435165,5.205139671120802,-15.139088521831937,5.265058988961607
+All controls,County of school,Any exposure,STEM share zero-filled (pp),-30,-1.1699641079191287,5.1807743805474775,-11.324281893792184,8.984353677953928
+All controls,County of school,Any exposure,STEM share zero-filled (pp),-20,2.785499301799926,5.1127958428789535,-7.235580550242823,12.806579153842677
+All controls,County of school,Any exposure,STEM share zero-filled (pp),0,14.01710337151948,4.571049891844568,5.057845583504127,22.976361159534832
+All controls,County of school,Any exposure,STEM share zero-filled (pp),10,2.4718651867805934,5.928930884364941,-9.14883934657469,14.092569720135877
+All controls,County of school,Any exposure,STEM share zero-filled (pp),20,12.067825976380968,5.344090612039803,1.5934083767829534,22.542243575978983
+All controls,County of school,Any exposure,STEM share zero-filled (pp),30,10.799065144147884,5.383958588364278,0.2465063109538992,21.351623977341866
+All controls,County of school,Any exposure,STEM share zero-filled (pp),40,10.79000321084069,5.20888741761131,0.5805838723225225,20.999422549358854
+All controls,County of school,Any exposure,STEM share zero-filled (pp),50,18.542122379780235,5.3887878663141695,7.980098161804463,29.104146597756007
+All controls,County of school,Any exposure,STEM share zero-filled (pp),60,3.575183659614952,4.977048070571799,-6.179830558705774,13.330197877935678
+All controls,County of school,Any exposure,STEM share smoothed (pp),-60,-10.96532588588013,4.3327288269033755,-19.45747438661075,-2.473177385149514
+All controls,County of school,Any exposure,STEM share smoothed (pp),-50,-7.934213271632122,4.355851542244779,-16.47168229443189,0.6032557511676453
+All controls,County of school,Any exposure,STEM share smoothed (pp),-40,-6.1861694315581595,3.952561663390093,-13.933190291802742,1.5608514286864228
+All controls,County of school,Any exposure,STEM share smoothed (pp),-30,-3.432380890004809,4.131742141693767,-11.530595487724593,4.665833707714974
+All controls,County of school,Any exposure,STEM share smoothed (pp),-20,2.2577478894174066,3.536183000814502,-4.673170792179017,9.18866657101383
+All controls,County of school,Any exposure,STEM share smoothed (pp),0,9.876749987472742,3.7949384789011824,2.4386705688264243,17.31482940611906
+All controls,County of school,Any exposure,STEM share smoothed (pp),10,2.529682431743539,4.118511783993878,-5.5426006648844615,10.60196552837154
+All controls,County of school,Any exposure,STEM share smoothed (pp),20,10.245783152460415,3.881157148340161,2.6387151417137,17.85285116320713
+All controls,County of school,Any exposure,STEM share smoothed (pp),30,9.115156600302797,4.3809111315867675,0.5285707823927321,17.70174241821286
+All controls,County of school,Any exposure,STEM share smoothed (pp),40,8.3539040124614,4.129878591431054,0.25934197325653585,16.448466051666266
+All controls,County of school,Any exposure,STEM share smoothed (pp),50,14.813365343510467,4.36343908054351,6.261024745645187,23.365705941375747
+All controls,County of school,Any exposure,STEM share smoothed (pp),60,2.394882419143987,4.071077575316015,-5.5844296284754025,10.374194466763377
+All controls,County of school,Any exposure,STEM births (count),-60,-1.5782906439398072,1.0144649194665687,-3.566641886094282,0.41006059821466745
+All controls,County of school,Any exposure,STEM births (count),-50,-1.0547999500243004,0.6717417832989497,-2.371413845290242,0.26181394524164103
+All controls,County of school,Any exposure,STEM births (count),-40,-1.124333287009746,0.810960398312835,-2.713815667702902,0.4651490936834104
+All controls,County of school,Any exposure,STEM births (count),-30,-0.9091038247946683,0.8469369001514125,-2.5691001490914367,0.7508924995021002
+All controls,County of school,Any exposure,STEM births (count),-20,-0.40955276607520535,0.58286566330562,-1.5519694661542205,0.7328639340038097
+All controls,County of school,Any exposure,STEM births (count),0,1.4714141051322502,1.1653629486944534,-0.8126972743088783,3.7555254845733788
+All controls,County of school,Any exposure,STEM births (count),10,3.8507903303143003,3.4798968422721352,-2.9698074805390844,10.671388141167686
+All controls,County of school,Any exposure,STEM births (count),20,3.612281650230131,2.705538232174025,-1.690573284830958,8.91513658529122
+All controls,County of school,Any exposure,STEM births (count),30,5.4112058742536835,3.4088540296151835,-1.2701480237920757,12.092559772299442
+All controls,County of school,Any exposure,STEM births (count),40,3.8953306821284515,1.2021525021691735,1.5391117778768715,6.2515495863800314
+All controls,County of school,Any exposure,STEM births (count),50,3.0737382136804294,1.2781649436061076,0.5685349242124587,5.5789415031484
+All controls,County of school,Any exposure,STEM births (count),60,2.005585157288971,1.2081373554402273,-0.36236405937387417,4.373534373951816
+All controls,County of school,Any exposure,Any STEM birth (pp),-60,-17.221764463781984,7.682428886099091,-32.2793250805362,-2.164203847027766
+All controls,County of school,Any exposure,Any STEM birth (pp),-50,-15.699481669998654,6.960141098633124,-29.341358223319578,-2.057605116677731
+All controls,County of school,Any exposure,Any STEM birth (pp),-40,-8.488930050886893,6.319992627741969,-20.87611560126115,3.898255499487366
+All controls,County of school,Any exposure,Any STEM birth (pp),-30,-8.749413304951835,6.039272942054635,-20.58638827137892,3.087561661475249
+All controls,County of school,Any exposure,Any STEM birth (pp),-20,-0.3327087447749982,5.957183036716171,-12.008787496738693,11.343370007188698
+All controls,County of school,Any exposure,Any STEM birth (pp),0,13.519898717512838,5.545630777125937,2.650462394346002,24.389335040679676
+All controls,County of school,Any exposure,Any STEM birth (pp),10,7.250554782027659,6.677469736377405,-5.837285901272055,20.338395465327373
+All controls,County of school,Any exposure,Any STEM birth (pp),20,16.78847755153425,6.1867975345362,4.662354383843299,28.9146007192252
+All controls,County of school,Any exposure,Any STEM birth (pp),30,22.931724204218476,7.1981148304710105,8.823419136495296,37.040029271941656
+All controls,County of school,Any exposure,Any STEM birth (pp),40,21.50002002666466,6.514483157712003,8.731633037549136,34.268407015780184
+All controls,County of school,Any exposure,Any STEM birth (pp),50,32.62395877779918,6.341958164636817,20.193720775111018,45.054196780487345
+All controls,County of school,Any exposure,Any STEM birth (pp),60,16.018781946082346,6.398485750844831,3.477749874426477,28.559814017738212
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),-60,-12.488857371830361,20.213633708963712,-52.10757944139924,27.129864697738512
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),-50,-17.198968754727442,14.98611991745594,-46.571763792941084,12.1738262834862
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),-40,-19.299154989221332,14.815034473577695,-48.336622557433614,9.73831257899095
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),-30,-13.991704592749777,13.745072468353861,-40.93204663072335,12.948637445223792
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),-20,1.6237224479442474,6.547392014493198,-11.20916590046242,14.456610796350915
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),0,-1.2410493872457666,11.27079607153923,-23.33180968746266,20.849710912971126
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),10,-6.5315898347189165,11.842802953761003,-29.74348362409048,16.68030395465265
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),20,11.586543107222267,12.670847418297027,-13.248317832639907,36.421404047084444
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),30,7.868817813966176,8.698333884870356,-9.179916600379721,24.917552228312076
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),40,3.3527028683947293,13.066531879400197,-22.257699615229654,28.963105352019113
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),50,9.60668281363502,13.311137695077951,-16.483147068717763,35.696512695987806
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),60,-7.139057049400865,11.948558056960556,-30.558230841043553,16.280116742241823
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),-60,-18.262435334109693,17.192209369955222,-51.95916569922193,15.434295031002545
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),-50,-15.93851739000539,11.504424256011914,-38.487188931788744,6.610154151777962
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),-40,-21.129646213336787,10.57937225271516,-41.8652158286585,-0.3940765980150758
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),-30,-11.973700601536663,10.48662997823617,-32.527495358879555,8.58009415580623
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),-20,-1.481566976910111,8.803014707320697,-18.73547580325868,15.772341849438456
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),0,0.7438356344827554,10.489765970795867,-19.816105668277142,21.303776937242656
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),10,-3.071617203010225,9.491266781502373,-21.674500094754876,15.531265688734427
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),20,12.03195870266794,8.421767342199304,-4.474705288042696,28.538622693378574
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),30,9.10267473758226,7.621702165535348,-5.835861506867021,24.041210982031544
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),40,4.197532010735939,9.814023413452535,-15.037953879631031,23.433017901102907
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),50,7.390831762175734,11.649034085406841,-15.441275045221676,30.22293856957314
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),60,-5.092236316999328,8.40501368769605,-21.566063144883586,11.381590510884928
+All controls,County of school,High-access first exposure,STEM births (count),-60,-11.41268220463298,8.537079325478697,-28.145357682571223,5.319993273305265
+All controls,County of school,High-access first exposure,STEM births (count),-50,-4.572143654643615,4.9973643947833555,-14.366977868418992,5.2226905591317605
+All controls,County of school,High-access first exposure,STEM births (count),-40,-5.578904495198949,6.2425831329627135,-17.814367435805867,6.65655844540797
+All controls,County of school,High-access first exposure,STEM births (count),-30,-4.239653702734894,5.027964426660392,-14.094463978989264,5.615156573519475
+All controls,County of school,High-access first exposure,STEM births (count),-20,-2.820916851661691,3.2260599307699818,-9.143994315970854,3.502160612647473
+All controls,County of school,High-access first exposure,STEM births (count),0,5.728955587933556,6.900105510536005,-7.795251212717015,19.253162388584126
+All controls,County of school,High-access first exposure,STEM births (count),10,15.541211088102557,20.79948890386366,-25.225787163470216,56.30820933967533
+All controls,County of school,High-access first exposure,STEM births (count),20,12.859132356255026,15.573579589314264,-17.66508363880093,43.383348351310985
+All controls,County of school,High-access first exposure,STEM births (count),30,16.598850600365903,20.678243051678987,-23.930505780924907,57.12820698165672
+All controls,County of school,High-access first exposure,STEM births (count),40,4.846274518765106,5.460879331281438,-5.857048970546512,15.549598008076725
+All controls,County of school,High-access first exposure,STEM births (count),50,-0.5771607929625492,3.0994760162232318,-6.652133784760084,5.4978121988349855
+All controls,County of school,High-access first exposure,STEM births (count),60,-2.500940632775872,5.76947499514258,-13.809111623255328,8.807230357703583
+All controls,County of school,High-access first exposure,Any STEM birth (pp),-60,-19.447885082068886,19.915901279402135,-58.48305158969707,19.587281425559297
+All controls,County of school,High-access first exposure,Any STEM birth (pp),-50,-21.670539577088093,17.91280278302868,-56.779633031824304,13.438553877648118
+All controls,County of school,High-access first exposure,Any STEM birth (pp),-40,-22.265349907802722,17.922486695014452,-57.39342383003105,12.862724014425602
+All controls,County of school,High-access first exposure,Any STEM birth (pp),-30,-25.299063581309525,13.25590033070759,-51.2806282294964,0.6825010668773501
+All controls,County of school,High-access first exposure,Any STEM birth (pp),-20,0.7498064281133827,0.8815379090688452,-0.9780078736615538,2.4776207298883195
+All controls,County of school,High-access first exposure,Any STEM birth (pp),0,-0.9773281202211886,12.409877263812232,-25.300687557293163,23.346031316850787
+All controls,County of school,High-access first exposure,Any STEM birth (pp),10,6.242654675845689,14.173751383422315,-21.53789803566205,34.02320738735342
+All controls,County of school,High-access first exposure,Any STEM birth (pp),20,21.82490796750437,12.477996181741757,-2.6319645487094725,46.28178048371821
+All controls,County of school,High-access first exposure,Any STEM birth (pp),30,29.657675435996147,15.262140184917941,-0.2561193264430166,59.57147019843531
+All controls,County of school,High-access first exposure,Any STEM birth (pp),40,12.825623140868874,17.608801505668467,-21.68762781024132,47.338874091979065
+All controls,County of school,High-access first exposure,Any STEM birth (pp),50,20.43854362866606,12.603113405930516,-4.263558646957751,45.14064590428987
+All controls,County of school,High-access first exposure,Any STEM birth (pp),60,3.691930923060011,12.676468494233335,-21.153947325637326,28.537809171757345
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-60,-7.713115318198194,6.379225806748042,-20.216397899424354,4.790167263027967
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-50,-4.557656305477447,6.272229396760742,-16.8512259231285,7.735913312173607
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-40,-3.0282035629175645,5.701971589158137,-14.204067877667512,8.147660751832383
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-30,1.097681958962088,5.630806437878098,-9.938698659278984,12.13406257720316
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-20,3.0058735278648543,5.561005529775208,-7.893697310494553,13.905444366224263
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),0,16.937036970347474,5.181516446076989,6.781264736036576,27.092809204658373
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),10,4.200501582847592,6.114053495378744,-7.7830432680947474,16.18404643378993
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),20,12.179782081434796,6.011737733230735,0.3967761243025567,23.962788038567034
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),30,11.380347409545074,6.663083644091301,-1.6792965328738756,24.439991351964025
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),40,12.220985656356923,5.655596067932715,1.1360173632088024,23.305953949505046
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),50,20.261561556240217,5.7377716788491755,9.015529065695834,31.5075940467846
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),60,5.6289947241676215,5.5593992423827086,-5.267427790902487,16.52541723923773
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),-60,-10.418220648485129,4.682364410663727,-19.595654893386033,-1.2407864035842238
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),-50,-6.8189760322502835,4.525277576635122,-15.688520082455122,2.0505680179545553
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),-40,-4.198994108622055,4.064867272027951,-12.166133961796838,3.7681457445527284
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),-30,-1.923334773865091,4.193993140159919,-10.143561328578533,6.296891780848351
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),-20,2.966734017752507,4.279051068325678,-5.420206076165823,11.353674111670838
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),0,11.626319431578823,3.9682797240148187,3.848491172509778,19.404147690647868
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),10,3.608793811862824,4.424603887635717,-5.063429807903182,12.28101743162883
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),20,9.922878830284937,4.505278054821875,1.0925338428340616,18.75322381773581
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),30,9.13884048154487,5.16075208242778,-0.976233600013579,19.25391456310332
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),40,9.159482747017162,4.632927985449951,0.07894389553525727,18.240021598499066
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),50,16.2433998801465,4.09588036851732,8.215474357852555,24.271325402440446
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),60,3.8320833393904645,4.142708891840033,-4.287626088615999,11.95179276739693
+All controls,County of school,Low-access first exposure,STEM births (count),-60,-0.842246901042973,0.3077305500177857,-1.4453987790778329,-0.23909502300811292
+All controls,County of school,Low-access first exposure,STEM births (count),-50,-0.5660682526096094,0.29207866814226313,-1.1385424421684451,0.006405936949226421
+All controls,County of school,Low-access first exposure,STEM births (count),-40,-0.533886375801585,0.2563806767899118,-1.0363925023098122,-0.03138024929335792
+All controls,County of school,Low-access first exposure,STEM births (count),-30,-0.3205951496190101,0.21421024716345347,-0.7404472340593788,0.09925693482135872
+All controls,County of school,Low-access first exposure,STEM births (count),-20,0.048599589662287085,0.17110391080116588,-0.286764075507998,0.3839632548325722
+All controls,County of school,Low-access first exposure,STEM births (count),0,0.6630155302441466,0.3827729998290326,-0.08721954942075727,1.4132506099090505
+All controls,County of school,Low-access first exposure,STEM births (count),10,1.6274148400029302,1.0932832802831347,-0.515420389352014,3.7702500693578744
+All controls,County of school,Low-access first exposure,STEM births (count),20,1.8558300245748964,0.8972005484718149,0.09731694957013937,3.6143430995796537
+All controls,County of school,Low-access first exposure,STEM births (count),30,3.2836605463546467,1.22522627946716,0.8822170385990131,5.68510405411028
+All controls,County of school,Low-access first exposure,STEM births (count),40,3.7175131363041083,1.2116926876084213,1.3425954685916026,6.0924308040166135
+All controls,County of school,Low-access first exposure,STEM births (count),50,3.7716968174770766,1.4330314722706863,0.9629551318265315,6.580438503127622
+All controls,County of school,Low-access first exposure,STEM births (count),60,2.8656745999194255,1.317751096378152,0.2828824510182475,5.4484667488206036
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),-60,-17.05892619009277,8.231833161221285,-33.193319186086484,-0.9245331940990518
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),-50,-14.87206127575066,7.6525538539807,-29.87106682955283,0.12694427805151065
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),-40,-6.66309057421155,7.308135703992043,-20.987036554035953,7.660855405612855
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),-30,-5.822055746872164,6.805751382268883,-19.161328456119175,7.517216962374847
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),-20,-0.5383423204690251,7.0080636107633865,-14.274146997565262,13.197462356627211
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),0,16.30473269446796,5.8730328093923845,4.793588388058884,27.81587700087703
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),10,7.466228809685301,7.2369496239933095,-6.718192453341585,21.65065007271219
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),20,15.859940928311287,7.042974711295149,2.0557104941727946,29.66417136244978
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),30,21.689155456369086,8.057285099360271,5.896876661622954,37.48143425111522
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),40,23.18007046174742,6.762991631748266,9.924606863520818,36.43553405997402
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),50,34.97224115030737,6.811180555962891,21.622327260620104,48.322155039994634
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),60,18.38674278126231,7.91824940769213,2.8669739421857354,33.90651162033888
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),-60,-0.3866411844178288,3.132309284562781,-6.5259673821608795,5.752685013325222
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),-50,-1.0608385912310765,2.811447435794939,-6.571275565389158,4.449598382927004
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),-40,-0.7887274379141385,2.717489385000535,-6.115006632515187,4.53755175668691
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),-30,-3.2826988205841494,2.0752431636617743,-7.350175421361227,0.7847777801929285
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),-20,2.133378256756596,2.4170393808305684,-2.6040189296713177,6.87077544318451
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),0,3.518922554424699,2.227065537707293,-0.8461258994815957,7.8839710083309935
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),10,4.591585731114889,2.7296640794036637,-0.7585558645162918,9.941727326746069
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),20,5.755040183312008,2.664941118186333,0.531755591666796,10.97832477495722
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),30,6.628783504634136,2.6090218736366593,1.5151006323062832,11.742466376961989
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),40,6.105483646042035,2.460777534183649,1.2823596790420835,10.928607613041986
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),50,8.856719068266614,2.5164894314558803,3.9243997826130883,13.789038353920139
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),60,3.0350056340572324,2.3863431167803353,-1.6422268748322244,7.712238142946689
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),-60,-1.8160023879186955,2.510595587110147,-6.7367697386545835,3.1047649628171925
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),-50,-2.176635806474986,2.209542697951917,-6.507339494460743,2.154067881510771
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),-40,-1.427073202413856,2.0275376028214644,-5.401046903943927,2.5469004991162145
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),-30,-3.026402290783223,1.6520443913537057,-6.264409297836487,0.21160471627004052
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),-20,1.6282737315133264,1.6617058687272659,-1.6286697711921145,4.885217234218768
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),0,2.964827378600141,1.742431254483255,-0.4503378801870386,6.379992637387321
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),10,3.998240759206125,2.168658206800178,-0.2523293261222235,8.248810844534473
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),20,5.281359142120247,2.127461890001703,1.1115338377169097,9.451184446523584
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),30,5.289655976565192,2.1391857213105183,1.0968519627965758,9.482459990333808
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),40,4.23223940697177,2.0587010009132993,0.19718544518170322,8.267293368761838
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),50,6.7869515715257736,1.994449280018387,2.877830982689735,10.696072160361812
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),60,2.222919216878859,2.1654287868268196,-2.0213212053017076,6.4671596390594255
+All controls,25 km radius,Any exposure,STEM births (count),-60,-0.623932034949945,0.28651125573685804,-1.1854940961941867,-0.062369973705703186
+All controls,25 km radius,Any exposure,STEM births (count),-50,-0.4560772024331454,0.22812783466285724,-0.9032077583723457,-0.00894664649394522
+All controls,25 km radius,Any exposure,STEM births (count),-40,-0.388160631718343,0.1583356443489396,-0.6984984946422645,-0.07782276879442135
+All controls,25 km radius,Any exposure,STEM births (count),-30,-0.36974364137064825,0.1416246051896251,-0.6473278675423135,-0.09215941519898302
+All controls,25 km radius,Any exposure,STEM births (count),-20,-0.06159563252950659,0.09545519945690645,-0.24868782346504323,0.12549655840603005
+All controls,25 km radius,Any exposure,STEM births (count),0,0.16792115180266018,0.11731632330747342,-0.06201884187998771,0.39786114548530804
+All controls,25 km radius,Any exposure,STEM births (count),10,0.36337935435183444,0.3177349906846069,-0.25938122738999514,0.986139936093664
+All controls,25 km radius,Any exposure,STEM births (count),20,0.7154409811179165,0.270987381279957,0.1843057138092009,1.2465762484266323
+All controls,25 km radius,Any exposure,STEM births (count),30,1.0732061818480643,0.37158362826199215,0.3449022704545597,1.8015100932415689
+All controls,25 km radius,Any exposure,STEM births (count),40,1.5788694494702915,0.6123825519779282,0.37859964759355225,2.779139251347031
+All controls,25 km radius,Any exposure,STEM births (count),50,2.4052603745030345,1.3405956851679877,-0.22230716842622122,5.03282791743229
+All controls,25 km radius,Any exposure,STEM births (count),60,1.829785259452817,1.083345283005302,-0.2935714952375752,3.953142014143209
+All controls,25 km radius,Any exposure,Any STEM birth (pp),-60,-3.9151952310784583,3.9877039813149207,-11.731095034455702,3.9007045722987863
+All controls,25 km radius,Any exposure,Any STEM birth (pp),-50,-5.845586580995704,3.5208727949466536,-12.746497259091145,1.0553240970997368
+All controls,25 km radius,Any exposure,Any STEM birth (pp),-40,-3.7446563002266253,3.473650495163181,-10.55301127074646,3.0636986702932085
+All controls,25 km radius,Any exposure,Any STEM birth (pp),-30,-6.418722293126882,2.6238917381694558,-11.561550099939016,-1.2758944863147486
+All controls,25 km radius,Any exposure,Any STEM birth (pp),-20,-0.9059598979046624,2.7435559435899286,-6.283329547340923,4.471409751531597
+All controls,25 km radius,Any exposure,Any STEM birth (pp),0,2.7986711285609167,2.6343405312852255,-2.3646363127581256,7.9619785698799586
+All controls,25 km radius,Any exposure,Any STEM birth (pp),10,4.912499977685653,3.082703657294783,-1.1295991906121214,10.954599145983426
+All controls,25 km radius,Any exposure,Any STEM birth (pp),20,6.05762727834567,3.1302761856437575,-0.07771404551609429,12.192968602207435
+All controls,25 km radius,Any exposure,Any STEM birth (pp),30,10.331455717237281,3.326203502294382,3.812096852740292,16.85081458173427
+All controls,25 km radius,Any exposure,Any STEM birth (pp),40,9.87987611905383,3.321464809550209,3.3698050923354197,16.38994714577224
+All controls,25 km radius,Any exposure,Any STEM birth (pp),50,14.435128251493616,3.098400736873109,8.362262807222322,20.50799369576491
+All controls,25 km radius,Any exposure,Any STEM birth (pp),60,7.433120806279976,3.3880844379973865,0.7924753078050983,14.073766304754853
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-60,-10.02357640037693,16.844308215383492,-43.038420502528574,22.99126770177471
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-50,-1.423038600213101,5.751821056604829,-12.696607871158564,9.850530670732363
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-40,-5.437621810463403,4.9700287366607006,-15.178878134318376,4.30363451339157
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-30,-2.03637064819791,4.527816965554211,-10.910891900684163,6.838150604288344
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-20,9.60166703238798,5.97395941265319,-2.107293416412272,21.31062748118823
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),0,-2.6704874113499266,4.323595881334791,-11.144735338766116,5.803760516066264
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),10,10.724717762640072,6.387306455213765,-1.7944028895789064,23.24383841485905
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),20,-0.7931931463604388,5.660705010045771,-11.888174966050151,10.301788673329273
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),30,7.688503020033221,5.901237801411816,-3.877923070733938,19.25492911080038
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),40,8.821033560447955,6.283617362347563,-3.4948564697532696,21.13692359064918
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),50,11.978905775130086,7.111913890094957,-1.9604454494560297,25.9182569997162
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),60,-0.47105444714107497,5.54492276592593,-11.339103068355898,10.396994174073749
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-60,-9.586395665944822,16.335967944260204,-41.60489283669482,22.432101504805182
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-50,-2.189039161512385,5.165756505509402,-12.313921912310814,7.935843589286044
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-40,-5.285700241958086,4.255846914684705,-13.627160194740107,3.055759710823935
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-30,-1.8525895887827026,4.003161269142041,-9.698785676301103,5.993606498735697
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-20,4.5678132996951755,4.372840881905683,-4.002954828839962,13.138581428230314
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),0,-0.6717256380217663,3.387571583950381,-7.311365942564513,5.96791466652098
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),10,8.181501590121348,4.61057088032447,-0.8552173353146131,17.21822051555731
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),20,2.80619347650967,4.4903451868333555,-5.994883089683707,11.607270042703046
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),30,5.712243561409927,4.450694038171072,-3.011116753405373,14.435603876225228
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),40,6.98660079337252,4.691888333576351,-2.2095003404371285,16.18270192718217
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),50,8.405402779152356,5.1471602235248595,-1.683031258956369,18.49383681726108
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),60,-0.7149407593112198,4.981957596767325,-10.479577648975177,9.049696130352736
+All controls,25 km radius,High-access first exposure,STEM births (count),-60,-0.9290008935829865,1.1871951705231656,-3.255903427808391,1.3979016406424178
+All controls,25 km radius,High-access first exposure,STEM births (count),-50,-0.18010508619638327,0.2495637696237357,-0.6692500746589052,0.3090399022661387
+All controls,25 km radius,High-access first exposure,STEM births (count),-40,-0.22114719408486788,0.2595445227978884,-0.7298544587687292,0.2875600705989934
+All controls,25 km radius,High-access first exposure,STEM births (count),-30,-0.14654689771777377,0.1817436867289258,-0.5027645237064683,0.2096707282709208
+All controls,25 km radius,High-access first exposure,STEM births (count),-20,-0.12394579607615311,0.14274757002280997,-0.4037310333208607,0.15583944116855444
+All controls,25 km radius,High-access first exposure,STEM births (count),0,0.005734317200841514,0.16027921316224966,-0.30841294059716784,0.31988157499885084
+All controls,25 km radius,High-access first exposure,STEM births (count),10,0.16016082423504602,0.21449931658803975,-0.26025783627751187,0.5805794847476039
+All controls,25 km radius,High-access first exposure,STEM births (count),20,0.18896745428552,0.2739189188792396,-0.3479136267177896,0.7258485352888295
+All controls,25 km radius,High-access first exposure,STEM births (count),30,0.49067426848071605,0.32662319257137834,-0.14950718895918547,1.1308557259206176
+All controls,25 km radius,High-access first exposure,STEM births (count),40,0.15736577707823785,0.2115389336163949,-0.2572505328098961,0.5719820869663719
+All controls,25 km radius,High-access first exposure,STEM births (count),50,0.6391288382609641,0.3518144746538737,-0.05042753206062833,1.3286852085825567
+All controls,25 km radius,High-access first exposure,STEM births (count),60,0.5186769992507475,0.4204046878736186,-0.305316188981545,1.34267018748304
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),-60,-14.835216506021371,23.69153322091736,-61.270621619019394,31.600188606976655
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),-50,-4.543144444007909,9.029280917438031,-22.24053504218645,13.15424615417063
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),-40,-8.670930597713344,5.953468528451527,-20.33972891347834,2.9978677180516495
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),-30,-8.021467235840936,5.690457270876445,-19.174763486758767,3.131829015076896
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),-20,7.033342854310126,6.494230004482552,-5.695347954475675,19.762033663095927
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),0,-5.407244198390281,5.41482328092358,-16.020297829000498,5.205809432219935
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),10,15.016752274688372,7.384331709268053,0.5434621245229891,29.490042424853755
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),20,-1.3259747069921843,8.988029452542657,-18.942512433975793,16.290563019991424
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),30,13.431921121257785,7.81843014983797,-1.892201972424635,28.756044214940204
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),40,8.535238345302783,7.480379878189921,-6.126306215949461,23.19678290655503
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),50,11.313864474650044,7.366004810621451,-3.1235049541680002,25.75123390346809
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),60,0.02287988282102789,7.5267737884185655,-14.72959674247936,14.775356508121417
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-60,-0.05745300307630344,2.9921561003716746,-5.922078959804786,5.807172953652179
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-50,-1.0076429263036566,3.243621051788972,-7.3651401878100415,5.349854335202728
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-40,0.011563281947556403,3.1295587087191725,-6.122371787142021,6.145498351037134
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-30,-3.5993677751904674,2.4871511919911984,-8.474184111493216,1.275448561112281
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-20,0.22377980813273426,2.5366931398148553,-4.748138745904382,5.195698362169851
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),0,5.131539248801238,2.7444975830368055,-0.24767601395090022,10.510754511553376
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),10,3.044570262307027,3.0274827680052336,-2.8892959629832307,8.978436487597286
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),20,7.45499998859382,3.2941071783843,0.9985499189605918,13.911450058227048
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),30,6.374599202015656,2.994246866492942,0.5058753436894898,12.243323060341822
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),40,5.418550173145416,2.9838013451894665,-0.42970046342593804,11.26680080971677
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),50,8.075329933051776,2.825578185440558,2.5371966895882823,13.613463176515271
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),60,3.954130784880231,2.7611258835375936,-1.4576759468534526,9.365937516613915
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-60,-1.5529958639266495,2.3244478080475948,-6.108913567699935,3.0029218398466364
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-50,-2.1939088790964556,2.355937851262608,-6.811547067571167,2.423729309378256
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-40,-0.7696741452539771,2.4337044553340927,-5.539734877708799,4.000386587200845
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-30,-3.3277811137975735,2.00681119015875,-7.261131046508723,0.6055688189135764
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-20,0.8753403072938627,1.9155289821691701,-2.8790964977577107,4.629777112345436
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),0,3.9142653614139076,1.9275186277760774,0.136328850972796,7.692201871855019
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),10,2.9502898455762545,2.1992520979484564,-1.3602442664027197,7.260823957555228
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),20,5.93043936095169,2.336216927713157,1.3514541826339022,10.509424539269478
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),30,5.201264153678214,2.350748902075848,0.5937963056095521,9.808732001746876
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),40,3.535804046489652,2.28356521612407,-0.9399837771135253,8.011591870092829
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),50,6.390769585139963,2.248261118378922,1.9841777931172757,10.79736137716265
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),60,2.992193013417825,2.2344687909794345,-1.3873658169018666,7.371751843737517
+All controls,25 km radius,Low-access first exposure,STEM births (count),-60,-0.6136305868847075,0.2906823697136853,-1.1833680315235307,-0.043893142245884365
+All controls,25 km radius,Low-access first exposure,STEM births (count),-50,-0.5084770090377121,0.2855091079424106,-1.068074860604837,0.051120842529412625
+All controls,25 km radius,Low-access first exposure,STEM births (count),-40,-0.41840218681723773,0.19121834756586653,-0.7931901480463361,-0.04361422558813932
+All controls,25 km radius,Low-access first exposure,STEM births (count),-30,-0.4259265901417306,0.19097300097584455,-0.8002336720543859,-0.051619508229075295
+All controls,25 km radius,Low-access first exposure,STEM births (count),-20,-0.04621912643915804,0.11660589366658662,-0.2747666780256678,0.18232842514735173
+All controls,25 km radius,Low-access first exposure,STEM births (count),0,0.21130245824268573,0.15780995015558627,-0.09800504406226335,0.5206099605476349
+All controls,25 km radius,Low-access first exposure,STEM births (count),10,0.4192311020800558,0.38175052565872686,-0.3289999282110488,1.1674621323711605
+All controls,25 km radius,Low-access first exposure,STEM births (count),20,0.853278191013813,0.33683229559195876,0.19308689165357384,1.5134694903740522
+All controls,25 km radius,Low-access first exposure,STEM births (count),30,1.2255273421320263,0.44740165301257173,0.3486201022273857,2.102434582036667
+All controls,25 km radius,Low-access first exposure,STEM births (count),40,1.9459813324984099,0.7539341565116984,0.4682703857354811,3.4236922792613385
+All controls,25 km radius,Low-access first exposure,STEM births (count),50,2.860508781400806,1.648946915495852,-0.37142717297106387,6.092444735772676
+All controls,25 km radius,Low-access first exposure,STEM births (count),60,2.1674390959060648,1.3653967806269884,-0.5087385941228324,4.843616785934962
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-60,-3.542897215447727,3.748827104543135,-10.890598340352271,3.804803909456817
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-50,-6.093785204282921,3.8758138635505355,-13.69038037684197,1.5028099682761287
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-40,-2.898031703023619,3.6479698275199035,-10.04805256496263,4.251989158915391
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-30,-6.051274656529611,2.7935899149625656,-11.52671088985624,-0.575838423202983
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-20,-2.9270677082603083,3.0372186117600304,-8.880016187309968,3.0258807707893514
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),0,4.955473032841711,3.047134940419258,-1.016911450380034,10.927857516063456
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),10,2.3625270770245006,3.4286222002548414,-4.357572435474989,9.08262658952399
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),20,7.9948950148419655,3.4932262963468683,1.1481714740021038,14.841618555681826
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),30,9.584597160374315,3.652453983186084,2.42578735332959,16.74340696741904
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),40,10.256277776122674,3.36629209707876,3.658345265848305,16.854210286397045
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),50,15.274421985318146,3.714820416663581,7.993373968657527,22.555470001978765
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),60,9.367449057192875,3.714518218442162,2.086993349046238,16.64790476533951
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),-60,8.158564890484328,6.484219870330481,-4.550506055363414,20.86763583633207
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),-50,8.308107656050074,6.114269555880879,-3.675860673476448,20.292075985576595
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),-40,4.457169890620989,7.014323110820283,-9.290903406586764,18.205243187828742
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),-30,6.741183218407987,6.766472625063432,-6.52110312671634,20.003469563532313
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),-20,5.152519000956877,6.70995973316674,-7.999002076049933,18.304040077963688
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),0,8.455034654924457,6.335683288399995,-3.962904590339532,20.872973900188448
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),10,-9.56793349350437,7.6707230822788866,-24.602550734770986,5.466683747762248
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),20,1.423472817200699,8.035818257705095,-14.326730967901288,17.173676602302685
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),30,-8.317676010118042,10.605489868788654,-29.104436152943805,12.46908413270772
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),40,-3.4282612828760493,10.426097802531611,-23.86341297583801,17.00689041008591
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),50,-7.507092347722196,13.663414480951186,-34.28738473038652,19.27320003494213
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),60,-15.222372249283389,15.829126598726715,-46.24746038278775,15.802715884220973
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),-60,3.03247446084169,5.258534495383711,-7.2742531501103835,13.339202071793764
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),-50,4.720026090257693,4.403162397890007,-3.9101722096067215,13.350224390122108
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),-40,2.734611949428585,4.972711146713509,-7.011901898129894,12.481125796987063
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),-30,3.791114377989232,4.857877022870933,-5.730324586837797,13.31255334281626
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),-20,5.0655731493550356,4.740174610130558,-4.225169086500859,14.35631538521093
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),0,4.0871400919780765,5.240190677184827,-6.183633635304183,14.357913819260336
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),10,-8.54002471070057,5.964980189216518,-20.231385881564943,3.1513364601638045
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),20,-1.491668549741993,6.411646847730567,-14.058496371293904,11.075159271809918
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),30,-9.195378020093294,8.150474032006333,-25.170307122825704,6.779551082639118
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),40,-5.733562131910951,8.515066771958587,-22.42309300494978,10.95596874112788
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),50,-6.910233307494102,10.845570377187915,-28.167551246782416,14.34708463179421
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),60,-14.287568620925308,12.386721729775834,-38.56554321128594,9.990405969435328
+Not-yet-only controls,County of school,Any exposure,STEM births (count),-60,-0.0993826844989638,0.39892417481925596,-0.8812740671447055,0.6825086981467778
+Not-yet-only controls,County of school,Any exposure,STEM births (count),-50,-0.003834502276362796,0.2960320581518717,-0.5840573362540314,0.5763883317013058
+Not-yet-only controls,County of school,Any exposure,STEM births (count),-40,-0.452305395532067,0.5258773617711172,-1.4830250246034569,0.5784142335393228
+Not-yet-only controls,County of school,Any exposure,STEM births (count),-30,-0.3433328320660657,0.6232648959773154,-1.564932028181604,0.8782663640494724
+Not-yet-only controls,County of school,Any exposure,STEM births (count),-20,-0.06144149184522563,0.4071358419641571,-0.8594277420949735,0.7365447584045223
+Not-yet-only controls,County of school,Any exposure,STEM births (count),0,0.7529372242097967,0.6119668127120422,-0.44651772870580597,1.9523921771253994
+Not-yet-only controls,County of school,Any exposure,STEM births (count),10,-0.42588343828160624,0.7032233730359694,-1.804201249432106,0.9524343728688937
+Not-yet-only controls,County of school,Any exposure,STEM births (count),20,-0.8951577722990749,1.583514541743208,-3.9988462741157624,2.208530729517612
+Not-yet-only controls,County of school,Any exposure,STEM births (count),30,0.8498108292911436,1.1873838412942495,-1.4774614996455853,3.1770831582278722
+Not-yet-only controls,County of school,Any exposure,STEM births (count),40,-0.526042820228867,1.6549456105566234,-3.7697362169198487,2.717650576462115
+Not-yet-only controls,County of school,Any exposure,STEM births (count),50,-1.360931216931217,2.522774472993999,-6.305569183999455,3.5837067501370212
+Not-yet-only controls,County of school,Any exposure,STEM births (count),60,-0.7540858318636098,1.731535912836676,-4.147896221023495,2.639724557296275
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),-60,6.733334279845907,8.976193142979833,-10.860004280394566,24.326672840086378
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),-50,4.319729772320552,8.192466430182373,-11.737504430836896,20.376963975478002
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),-40,7.072901782272108,7.865607600297172,-8.343689114310347,22.489492678854564
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),-30,2.5811491530045787,7.085952595532091,-11.30731793423832,16.469616240247476
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),-20,4.571195750220669,8.121881835520897,-11.347692647400288,20.49008414784163
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),0,5.164446064969534,7.961374060326656,-10.439847093270712,20.768739223209778
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),10,-11.328422576338745,9.74747368460429,-30.433470998163155,7.776625845485665
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),20,-0.6459940571187686,10.040752361880866,-20.32586868640527,19.033880572167728
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),30,-9.032499962222527,12.050940195450154,-32.65234274530483,14.587342820859774
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),40,-3.2767395717977106,11.95950424638793,-26.717367894718052,20.163888751122634
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),50,-5.509732988802755,14.92690198395695,-34.76646087735838,23.74699489975287
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),60,-8.230452674897117,19.275733461621265,-46.010890259674795,29.549984909880564
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),-60,37.11225950377349,34.83625950859336,-31.166809133069492,105.39132814061647
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),-50,1.9768561060405665,23.830110498294825,-44.73016047061729,48.68387268269842
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),-40,1.2688308825001182,3.079926782359465,-4.767825610924433,7.30548737592467
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),-30,0.32507390107744666,15.891752134157121,-30.82276028187051,31.472908084025402
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),-20,5.971143539198625,14.140465242327094,-21.744168335762478,33.686455414159724
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),0,3.8694992098619143,13.933055618192993,-23.439289801796352,31.17828822152018
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),10,-8.039415806966874,19.191054239210846,-45.65388211582013,29.575050501886388
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),20,10.862247030413894,18.005118597669146,-24.427785421017628,46.15227948184541
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),30,6.86491186134718,12.144013986879738,-16.937355552937106,30.66717927563147
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),40,11.135742635784563,15.123544559566666,-18.5064047009661,40.77788997253523
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),50,-10.781923005939056,26.236442979763545,-62.205351246275605,40.64150523439749
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),60,-32.85591963432926,19.835300561341665,-71.73310873455893,6.021269465900403
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),-60,14.590252191058639,26.024314440717898,-36.41740411274844,65.59790849486572
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),-50,0.6398108331804497,17.94135080894234,-34.52523675234654,35.80485841870743
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),-40,-7.21285083324254,22.740973229634545,-51.785158363326246,37.359456696841164
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),-30,-0.6109243694755364,12.814528238598545,-25.727399717128684,24.50555097817761
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),-20,2.1820497253772535,10.509090053939287,-18.41576678034375,22.779866231098257
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),0,-0.6813970340734011,13.336589490097138,-26.821112434663792,25.458318366516988
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),10,-3.1896191189850813,12.969132765144852,-28.609119338668993,22.22988110069883
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),20,10.56126635461313,12.42783108695247,-13.797282575813709,34.91981528503997
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),30,9.090056672717964,11.355706580813916,-13.16712822567731,31.347241571113237
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),40,12.095949276728849,12.260839226010097,-11.93529560625094,36.12719415970864
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),50,-5.364081358705015,19.985668062129324,-44.53599076047849,33.80782804306846
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),60,-28.699110589231555,15.812516459360358,-59.69164284957786,2.2934216711147464
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),-60,-7.166666666666665,11.078333243833523,-28.88019982458037,14.546866491247041
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),-50,-1.1904761904761907,3.1484285207040736,-7.361396091056175,4.980443710103794
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),-40,-2.3571428571428577,3.993948833525295,-10.185282570852436,5.47099685656672
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),-30,-2.666666666666667,4.250126359716059,-10.99691433171014,5.6635809983768075
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),-20,-2.7916666666666665,3.665109427158002,-9.97528114389635,4.391947810563018
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),0,4.557506887052341,5.391363950368945,-6.0095664556707895,15.124580229775471
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),10,-3.054166666666667,3.841226727021963,-10.582971051629714,4.47463771829638
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),20,-3.483333333333334,4.8133092857733955,-12.91741953344919,5.950752866782521
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),30,-4.250000000000001,4.670196988292647,-13.403586097053587,4.903586097053586
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),40,-9.333333333333334,10.54294910937317,-29.997513587704745,11.330846921038079
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),50,-13.814814814814815,8.575298016912027,-30.622398927962386,2.9927692983327585
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),60,-6.5625,5.918826044190333,-18.16339904661305,5.038399046613053
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),-60,33.33333333333333,32.946715966791146,-31.242229961577323,97.90889662824398
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),-30,-10.000000000000002,16.30862440356162,-41.964903830980774,21.964903830980774
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),-20,9.917355371900829,15.03766337327245,-19.556464839713172,39.39117558351483
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),0,0,26.95640397282913,-52.834551786745095,52.834551786745095
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),10,6.250000000000001,19.690810714527526,-32.34398900047395,44.84398900047395
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),20,23.750000000000004,17.698563983410622,-10.939185407484818,58.43918540748483
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),30,30,22.23903327758403,-13.588505224064704,73.5885052240647
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),40,27.77777777777778,19.676510924611378,-10.788183634460523,66.34373919001608
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),50,0,32.94671596679114,-64.57556329491064,64.57556329491064
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),60,-25,18.532527731320023,-61.323754353387244,11.323754353387244
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-60,7.92244207672445,6.658235718668758,-5.127699931866315,20.972584085315216
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-50,10.23374440689411,6.509437971561897,-2.524754017367208,22.992242831155426
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-40,6.131732399810118,7.2383305732678584,-8.055395523794886,20.31886032341512
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-30,8.383588189161117,7.413802678128272,-6.147465059970296,22.914641438292527
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),-20,4.344878870543288,7.4925040401742775,-10.340429048198295,19.030186789284873
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),0,11.171379669162311,7.1609919234047865,-2.8641645007110696,25.206923839035692
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),10,-7.858543290979936,9.099123593822409,-25.692825534871858,9.975738952911984
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),20,2.9322119654137166,8.401611200042089,-13.534945986668777,19.399369917496212
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),30,-7.666660711903554,12.297558880942097,-31.769876118550062,16.436554694742956
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),40,-3.6082259161090904,12.236378897440046,-27.591528555091582,20.3750767228734
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),50,-3.869901970744899,16.555624904899222,-36.318926784347376,28.57912284285758
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),60,-0.5884564777327936,20.35606682649432,-40.48634745766166,39.309434502196076
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),-60,4.002052992733097,6.0045482620136275,-7.766861600813613,15.770967586279806
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),-50,6.781327438870525,5.258659519917663,-3.5256452201680943,17.088300097909144
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),-40,5.054673843552307,5.685324166355421,-6.088561522504317,16.19790920960893
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),-30,5.1975540250909065,5.0705216398108135,-4.740668388938288,15.1357764391201
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),-20,5.069146397073397,5.349115679999456,-5.415120335725537,15.553413129872332
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),0,5.3430813276041755,5.740440221426146,-5.908181506391071,16.594344161599423
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),10,-7.557037199515803,7.049242428282049,-21.37355235894862,6.259477959917013
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),20,-1.9436981511294946,6.370872559991146,-14.430608368712141,10.543212066453153
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),30,-9.661268725942396,10.250079221812461,-29.75142400069482,10.428886548810027
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),40,-7.1764952959988655,10.579749482734158,-27.912804282157815,13.559813690160084
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),50,-4.1390651874785,13.82764034027042,-31.241240254408524,22.963109879451522
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),60,-4.7606860902255645,17.078024134846206,-38.23361339452413,28.712241214073
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),-60,-0.21477877825262243,0.29678251644944736,-0.7964725104935393,0.3669149539882944
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),-50,0.008879214427151238,0.30290754781409346,-0.584819579288472,0.6025780081427744
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),-40,-0.0855921165821016,0.25278604894844553,-0.5810527725210548,0.40986853935685164
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),-30,0.06385501113142213,0.23052962748283765,-0.38798305873493966,0.5156930809977839
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),-20,0.22990808569122462,0.18274066493034744,-0.12826361757225635,0.5880797889547056
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),0,0.37211017666727225,0.335454794192666,-0.2853812199503531,1.0296015732848975
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),10,0.1694979591601536,0.37527759462755417,-0.5660461263098526,0.9050420446301597
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),20,0.13377381139886682,0.6064539936102281,-1.0548760160771802,1.322423638874914
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),30,1.7282768993306652,1.3489799195837804,-0.9157237430535443,4.372277541714874
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),40,0.9685379035006574,0.8114806129515334,-0.6219640978843481,2.5590399048856627
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),50,0.3920559210526316,0.900625879032823,-1.3731708018517015,2.1572826439569646
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),60,-0.27452631578947373,0.5805589373563379,-1.412421833007896,0.8633692014289485
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),-60,7.37424869163791,9.978858665988065,-12.184314293698698,26.932811676974517
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),-50,6.414111655983388,8.71083279051055,-10.65912061341729,23.487343925384064
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),-40,9.324727854863976,8.254658787963207,-6.85440336954391,25.503859079271862
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),-30,5.505572328986893,8.388443855860249,-10.935777628499196,21.946922286472983
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),-20,3.701106329577459,9.599413257358878,-15.11374365484594,22.51595631400086
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),0,8.50364793251485,9.398354161677311,-9.917126224372678,26.924422089402377
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),10,-11.300509713757403,10.932941793595585,-32.72907562920475,10.128056201689944
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),20,-1.270638973350313,11.443501460495721,-23.699901835921924,21.1586238892213
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),30,-11.978256348894803,14.240480566040862,-39.88959825833489,15.933085560545287
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),40,-5.498466332343349,15.682334604225355,-36.23584215662505,25.238909491938347
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),50,-0.5016447368421053,19.35787815327811,-38.4430859172672,37.43979644358299
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),60,6.981578947368419,26.0422457631547,-44.06122274841479,58.02438064315163
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),-60,3.557495544367003,3.35460384299815,-3.017527987909371,10.132519076643376
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),-50,0.6068737256842619,3.808002029601288,-6.856810252334262,8.070557703702786
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),-40,-0.08567186069420309,3.141179940761819,-6.2423845445873685,6.071040823198961
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),-30,-3.370158780772267,2.607529177436237,-8.480915968547292,1.7405984070027576
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),-20,1.58957843244853,2.9055242533772145,-4.10524910417081,7.28440596906787
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),0,0.7144006595879651,2.9483729725628303,-5.064410366635182,6.493211685811112
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),10,0.15014750784837352,3.927049749624294,-7.546870001415242,7.8471650171119895
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),20,3.270526350242571,4.433657561538379,-5.419442470372651,11.960495170857794
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),30,0.08221712193336778,5.392915993182212,-10.487898224703768,10.652332468570505
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),40,4.3089859528195475,5.392841308698122,-6.26098301222877,14.878954917867866
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),50,-2.358730721149117,7.172614559343136,-16.417055257461662,11.699593815163428
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),60,-7.1467744866888365,7.684795366157486,-22.208973404357508,7.915424430979836
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),-60,1.787818570622625,2.518472295935584,-3.1483871294111196,6.72402427065637
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),-50,-0.22207634069415666,3.1209613850859057,-6.339160655462532,5.895007974074218
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),-40,-0.28991130995449643,2.6770120114240172,-5.53685485234557,4.9570322324365765
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),-30,-2.629321780727355,1.8712400576102577,-6.29695229364346,1.0383087321887503
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),-20,1.535494057899249,2.106009390957658,-2.5922843483777607,5.663272464176258
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),0,0.2607481419090317,2.338278576145991,-4.322277867337111,4.843774151155174
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),10,0.09421386671135808,3.2133538633235643,-6.203959705402828,6.392387438825543
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),20,2.5483876612618754,3.517612660674028,-4.34613315365922,9.442908476182971
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),30,-0.40511380410514064,4.575673766888619,-9.373434387206833,8.563206778996554
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),40,2.909063369554752,4.298207818953745,-5.515423955594589,11.333550694704094
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),50,-1.6108796618351002,5.586561203943011,-12.5605396215634,9.338780297893202
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),60,-5.364808189640601,6.670679331473034,-18.439339679327748,7.709723300046545
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),-60,-0.3748057614572215,0.2599634142128929,-0.8843340533144914,0.1347225304000485
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),-50,-0.22458264147715332,0.1981222532719773,-0.6129022578902288,0.16373697493592218
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),-40,-0.20018965839917538,0.12176380698425736,-0.4388467200883198,0.03846740328996903
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),-30,-0.23207392127860751,0.12683459655266144,-0.48066973052182393,0.016521887964608906
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),-20,0.010478284809824772,0.09001094388978101,-0.165943165214146,0.18689973483379554
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),0,-0.002886281166013262,0.1316774096662021,-0.26097400411176935,0.25520144177974285
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),10,-0.16625830035400566,0.17296295513004756,-0.5052656924088988,0.17274909170088756
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),20,0.09367116728277514,0.21912427659373718,-0.3358124148409497,0.5231547494065
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),30,0.3869006661366484,0.3648219340049611,-0.32815032451307535,1.101951656786372
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),40,1.185574723236918,1.1319082894103467,-1.0329655240073616,3.4041149704811975
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),50,0.11170261091385236,0.3432809245447512,-0.56112800119386,0.7845332230215647
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),60,0.0981169677176672,0.3704839339472784,-0.6280315428189984,0.8242654782543328
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),-60,3.5011037543082453,4.318221141900112,-4.962609683815975,11.964817192432465
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),-50,-2.180255087008892,4.804751246316252,-11.597567529788746,7.237057355770963
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),-40,-0.9606141486946526,4.124517193413709,-9.044667847785522,7.123439550396217
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),-30,-5.708804939464791,2.7904747455983907,-11.178135440837636,-0.23947443809194535
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),-20,-1.166743698167131,3.6006834021712066,-8.224083166422696,5.890595770088433
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),0,-1.4275466955391085,3.68566808912524,-8.651456150224579,5.796362759146361
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),10,-2.034159623992688,4.701508984966407,-11.249117234526844,7.180797986541469
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),20,1.0828644333534703,5.260790459105693,-9.228284866493688,11.39401373320063
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),30,-2.203680617427597,6.533629080732696,-15.009593615663682,10.602232380808488
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),40,4.361373509648263,6.78164432400593,-8.930649365403358,17.653396384699885
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),50,-4.102793026038205,8.690535937383284,-21.13624346330944,12.930657411233033
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),60,-10.550897174330577,10.639899059828627,-31.405099331594684,10.30330498293353
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-50,17.066666666666666,24.797016305245695,-31.535485291614894,65.66881862494823
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-40,-5.333333333333334,5.614120400741213,-16.337009318786112,5.670342652119444
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-30,9.992458521870287,13.103515581578163,-15.690432018022914,35.675349061763484
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),-20,19.087418509443136,14.487234080322414,-9.307560287988796,47.48239730687507
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),0,8.916749764902981,12.266770415743624,-15.126120249954521,32.95961977976049
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),10,9.540740915451986,7.55782345645752,-5.272593059204752,24.354074890108723
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),20,1.2470999133105833,5.631201164992356,-9.790054370074435,12.284254196695601
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),30,13.68673050615595,6.569349600412392,0.8108052893476625,26.562655722964237
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),40,14.844058835655474,6.2308379338041915,2.6316164853992596,27.05650118591169
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),50,0.5345838494887608,19.157673174326014,-37.01445557219022,38.083623271167745
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),60,-5.907828786783707,13.168579465675576,-31.718244539507836,19.902586965940422
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-60,7.291666666666666,3.3461508403772258,0.733211019527304,13.850122313806029
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-50,12.750000000000005,21.50802801707085,-29.405734913458858,54.90573491345887
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-40,-3.049999999999998,4.315196123750472,-11.507784402550925,5.407784402550928
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-30,8.73510748510749,11.526246487539087,-13.85633563046912,31.3265506006841
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),-20,12.810858545908381,12.510170035973662,-11.709074724599997,37.33079181641676
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),0,6.308766753118913,13.496323156452227,-20.144026633527453,32.76156013976528
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),10,7.658268733850128,5.285601416910721,-2.701510043294884,18.01804751099514
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),20,0.6430165441793327,5.521738378408982,-10.179590677502274,11.465623765860938
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),30,10.959134534715929,5.131658472026384,0.9010839295442157,21.017185139887644
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),40,10.447158661444375,4.944931783542205,0.7550923657016533,20.139224957187096
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),50,0.5588624338624344,13.870679485678828,-26.62766935806807,27.745394225792936
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),60,-6.478565472467913,12.749756742000708,-31.4680886867893,18.510957741853474
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),-50,0.32799999999999996,0.4787026043110886,-0.6102571044497336,1.2662571044497335
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),-40,0.10400000000000001,0.21634131572433737,-0.32002897881970127,0.5280289788197012
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),-30,0.1846153846153846,0.2700850905348666,-0.344751392832954,0.7139821620637232
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),-20,0.15581395348837207,0.3032425359663836,-0.43854141700573984,0.750169323982484
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),0,0.27209302325581397,0.2908577348490904,-0.2979881370484032,0.8421741835600312
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),10,0.2093023255813953,0.20968116827431849,-0.20167276423626893,0.6202774153990596
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),20,0.28460686600221474,0.26322399093141247,-0.23131215622335366,0.8005258882277831
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),30,0.6542635658914728,0.2828820356962626,0.09981477592679822,1.2087123558561474
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),40,0.3492063492063492,0.21404159012439147,-0.07031516743745808,0.7687278658501564
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),50,0.6587301587301587,0.41799745087119405,-0.16054484497738164,1.478005162437699
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),60,-0.13008130081300812,1.001141137170549,-2.092317929667284,1.8321553280412677
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),-50,14.399999999999999,26.85289138157346,-38.231667107883986,67.03166710788398
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),-40,-8.000000000000002,5.4559761641006155,-18.69371328163721,2.693713281637205
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),-30,4.102564102564102,14.426372671849377,-24.173126334260676,32.37825453938888
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),-20,17.397563676633442,14.366654212915096,-10.761078580680145,45.55620593394703
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),0,5.548172757475084,12.62743136523526,-19.201592718386028,30.297938233336193
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),10,12.790697674418604,8.240338182318379,-3.360365162925417,28.941760511762624
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),20,0.8859357696566987,8.739692698622259,-16.243861919642928,18.015733458956323
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),30,19.689922480620158,8.878685577032288,2.287698749636874,37.09214621160344
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),40,15.87301587301587,7.340169713689864,1.4862832341837375,30.259748511848002
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),50,2.886579864025407e-15,18.82669483816637,-36.90032188280609,36.90032188280609
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),60,-8.94308943089431,20.49125017446767,-49.105939772850945,31.219760911062323
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-60,3.544020802914066,3.1481423264550354,-2.6263381569378033,9.714379762765935
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-50,-0.1470981148183237,4.580262918506019,-9.124413435090121,8.830217205453474
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-40,0.5071663802806552,3.649662912976298,-6.646172929152888,7.660505689714199
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-30,-5.116511086617957,2.80494141777547,-10.614196265457878,0.38117409222196397
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),-20,-1.0030813757813515,3.265897211093148,-7.4042399095239215,5.398077157961218
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),0,2.0091710533958653,3.7268907848447332,-5.295534884899812,9.313876991691542
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),10,-1.3430928542386644,4.511937340359078,-10.186490041342458,7.500304332865129
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),20,6.839303696727026,4.8587549651428965,-2.68385603495305,16.362463428407104
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),30,-2.263962437554433,8.110720739809908,-18.160975087581853,13.633050212472988
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),40,2.878896122633695,7.383339695177636,-11.592449679914472,17.350241925181862
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),50,-6.310173795948726,9.143242834775679,-24.230929752109056,11.610582160211605
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),60,-0.845774301690865,9.681237423488888,-19.820999651729085,18.129451048347352
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-60,2.000836954112094,2.636990867047204,-3.1676651453004263,7.169339053524614
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-50,-0.383154111290143,3.689211464964308,-7.614008582620187,6.847700360039902
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-40,0.4171169463888291,2.900254918634512,-5.267382694134815,6.101616586912472
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-30,-3.6322477750407995,2.216751335318286,-7.977080392264639,0.7125848421830407
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),-20,0.27796979486283485,2.2661851544949423,-4.163753107947252,4.719692697672921
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),0,0.9039860460758404,2.725465848367308,-4.437927016724084,6.245899108875765
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),10,-0.5698341890910593,3.993461853874114,-8.397019422684322,7.257351044502204
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),20,3.5919424400163145,3.782612074427385,-3.8219772258613602,11.00586210589399
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),30,-2.8055778226698216,6.333190687688242,-15.218631570538776,9.607475925199132
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),40,1.5800806302851362,6.552020488852374,-11.261879527865517,14.42204078843579
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),50,-3.731573715246032,7.632643764930187,-18.691555494509196,11.228408064017133
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),60,-0.017303694849059692,8.43052354268231,-16.541129838506386,16.50652244880827
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),-60,-0.35103952023533586,0.2554293880536046,-0.8516811208204009,0.14960208034972916
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),-50,-0.2897357481154193,0.2592048126725413,-0.7977771809536003,0.21830568472276163
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),-40,-0.2323819278355583,0.1552293118777821,-0.5366313791160112,0.07186752344489464
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),-30,-0.3109643375512018,0.16412747955150672,-0.6326541974721549,0.010725522369751384
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),-20,0.018301872666968397,0.11383320409400652,-0.20481120735728436,0.24141495269122115
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),0,0.018068950138061923,0.1497871945020568,-0.2755139510859694,0.3116518513620932
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),10,-0.12450029677238768,0.18153349621847023,-0.4803059493605893,0.23130535581581396
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),20,0.13671726700253437,0.3142204243377965,-0.47915476469954676,0.7525892987046156
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),30,0.5139014814208981,0.524736276984044,-0.5145816214678282,1.5423845843096244
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),40,1.90962860566903,1.7527538564754779,-1.5257689530229068,5.3450261643609664
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),50,0.2241611188155438,0.3228384320338502,-0.4086022079708026,0.8569244456018902
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),60,0.046784532671629436,0.4417794849093591,-0.8191032577507144,0.9126723230939732
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-60,3.866517736570065,4.5750223691182565,-5.100526106901718,12.833561580041849
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-50,-2.6694600073156423,5.453199073317273,-13.357730191017497,8.018810176386213
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-40,0.2253840695740349,4.827346647732559,-9.23621535998178,9.68698349912985
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-30,-6.6564759512189955,3.429576906279135,-13.3784466875261,0.06549478508810846
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),-20,-3.6401987851846322,3.9515360805163993,-11.385209502996775,4.104811932627511
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),0,0.7630532721621209,4.271378859736458,-7.608849292921337,9.13495583724558
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),10,-4.621282166871241,5.506209340545638,-15.41345247434069,6.170888140598208
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),20,5.142155468823901,6.350494091699453,-7.304812950907026,17.58912388855483
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),30,-5.952133890010064,9.398292800551781,-24.372787779091553,12.468519999071425
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),40,4.395782507586478,9.417988954326631,-14.06347584289372,22.855040858066676
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),50,-5.26200296627382,12.027855381278918,-28.8365995135805,18.31259358103286
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),60,-2.1129408226182433,13.75759973580117,-29.077836304788534,24.85195465955205

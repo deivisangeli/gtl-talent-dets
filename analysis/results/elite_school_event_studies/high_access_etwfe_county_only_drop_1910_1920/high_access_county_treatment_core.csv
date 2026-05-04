@@ -1,0 +1,76 @@
+county_geoid,county_name,state_abbr,n_schools,has_high_access,first_exposure_year,first_exposure_schools,first_exposure_access,g_any
+01097,Mobile County,AL,1,FALSE,1892,St. Paul's School,low,1880
+04013,Maricopa County,AZ,1,FALSE,1928,Brophy College Preparatory,low,1920
+05119,Pulaski County,AR,1,TRUE,1927,Little Rock Central High School,high,1920
+06037,Los Angeles County,CA,1,FALSE,1922,The Webb School of California,low,1910
+06075,San Francisco County,CA,1,TRUE,1856,Lowell High School,high,1850
+06083,Santa Barbara County,CA,1,FALSE,1910,Cate School,low,1900
+06111,Ventura County,CA,1,FALSE,1889,The Thacher School,low,1880
+08041,El Paso County,CO,1,FALSE,1930,Fountain Valley School of Colorado,low,1920
+08059,Jefferson County,CO,1,FALSE,1906,Colorado Academy,low,1900
+09003,Hartford County,CT,2,FALSE,1843,Miss Porter's School,low,1830
+09005,Litchfield County,CT,2,FALSE,1890,The Taft School,low,1880
+10003,New Castle County,DE,2,FALSE,1919,Tower Hill School,low,1910
+13121,Fulton County,GA,1,FALSE,1900,Woodward Academy,low,1890
+15003,Honolulu County,HI,2,FALSE,1841,Punahou School,low,1830
+17031,Cook County,IL,3,TRUE,1908,Lane Tech College Prep High School,high,1900
+18097,Marion County,IN,1,TRUE,1864,Shortridge High School,high,1850
+18099,Marshall County,IN,1,FALSE,1894,Culver Academies,low,1880
+19031,Cedar County,IA,1,FALSE,1890,Scattergood Friends School,low,1880
+20209,Wyandotte County,KS,1,TRUE,1905,Sumner Academy of Arts and Science,high,1900
+21111,Jefferson County,KY,2,TRUE,1856,Louisville Male High School,high,1850
+22051,Jefferson Parish,LA,1,FALSE,1929,Metairie Park Country Day School,low,1920
+22071,Orleans Parish,LA,1,FALSE,1903,Isidore Newman School,low,1890
+23005,Cumberland County,ME,1,FALSE,1898,Waynflete School,low,1890
+23017,Oxford County,ME,1,FALSE,1804,Hebron Academy,low,1790
+24005,Baltimore County,MD,1,TRUE,1873,McDonogh School,high,1860
+24510,Baltimore city,MD,3,TRUE,1839,Baltimore City College,high,1830
+25017,Middlesex County,MA,3,FALSE,1884,Groton School,low,1870
+25021,Norfolk County,MA,2,FALSE,1866,Noble and Greenough School,low,1860
+26125,Oakland County,MI,2,FALSE,1914,Detroit Country Day School,low,1900
+26163,Wayne County,MI,1,FALSE,1877,University of Detroit Jesuit High School and Academy,low,1870
+27053,Hennepin County,MN,1,FALSE,1886,Breck School,low,1880
+29189,St. Louis County,MO,1,FALSE,1923,John Burroughs School,low,1910
+29510,St. Louis city,MO,1,TRUE,1875,Sumner High School,high,1870
+31055,Douglas County,NE,2,TRUE,1859,Omaha Central High School,high,1850
+33009,Grafton County,NH,1,FALSE,1879,Holderness School,low,1870
+33013,Merrimack County,NH,1,FALSE,1856,St. Paul's School,low,1850
+34021,Mercer County,NJ,2,FALSE,1810,The Lawrenceville School,low,1800
+34035,Somerset County,NJ,1,FALSE,1861,The Pingry School,low,1850
+34041,Warren County,NJ,1,FALSE,1848,Blair Academy,low,1840
+36005,Bronx County,NY,2,FALSE,1887,Horace Mann School,low,1880
+36047,Kings County,NY,1,TRUE,1922,Brooklyn Technical High School,high,1910
+36061,New York County,NY,4,TRUE,1904,Stuyvesant High School,high,1890
+36083,Rensselaer County,NY,1,FALSE,1814,Emma Willard School,low,1800
+37021,Buncombe County,NC,1,FALSE,1900,Asheville School,low,1890
+39035,Cuyahoga County,OH,2,FALSE,1890,University School,low,1880
+39049,Franklin County,OH,1,FALSE,1911,Columbus Academy,low,1900
+39153,Summit County,OH,1,FALSE,1826,Western Reserve Academy,low,1820
+40143,Tulsa County,OK,1,FALSE,1922,Holland Hall,low,1910
+41051,Multnomah County,OR,1,FALSE,1869,Oregon Episcopal School,low,1860
+42003,Allegheny County,PA,1,FALSE,1883,Shady Side Academy,low,1870
+42045,Delaware County,PA,1,FALSE,1884,The Haverford School,low,1870
+42055,Franklin County,PA,1,FALSE,1893,Mercersburg Academy,low,1880
+42091,Montgomery County,PA,1,FALSE,1851,The Hill School,low,1840
+42101,Philadelphia County,PA,1,TRUE,1836,Central High School,high,1830
+44005,Newport County,RI,1,FALSE,1896,St. George's School,low,1890
+44007,Providence County,RI,1,FALSE,1889,Wheeler School,low,1880
+47003,Bedford County,TN,1,FALSE,1870,The Webb School,low,1860
+47037,Davidson County,TN,1,FALSE,1867,Montgomery Bell Academy,low,1860
+47065,Hamilton County,TN,1,FALSE,1893,Baylor School,low,1880
+48029,Bexar County,TX,1,FALSE,1893,TMI Episcopal,low,1880
+48113,Dallas County,TX,1,FALSE,1913,The Hockaday School,low,1900
+48201,Harris County,TX,1,FALSE,1906,The Kinkaid School,low,1900
+49035,Salt Lake County,UT,1,FALSE,1867,Rowland Hall,low,1860
+50003,Bennington County,VT,1,TRUE,1829,Burr and Burton Academy,high,1820
+50005,Caledonia County,VT,1,TRUE,1842,St. Johnsbury Academy,high,1830
+51059,Fairfax County,VA,1,FALSE,1906,The Madeira School,low,1900
+51107,Loudoun County,VA,1,FALSE,1914,Foxcroft School,low,1900
+51113,Madison County,VA,1,FALSE,1889,Woodberry Forest School,low,1880
+51510,Alexandria city,VA,1,FALSE,1839,Episcopal High School,low,1830
+51760,Richmond city,VA,1,FALSE,1911,St. Christopher's School,low,1900
+53033,King County,WA,1,FALSE,1919,Lakeside School,low,1910
+53053,Pierce County,WA,1,FALSE,1884,Annie Wright Schools,low,1870
+54069,Ohio County,WV,1,FALSE,1814,Linsly School,low,1800
+55027,Dodge County,WI,1,FALSE,1855,Wayland Academy,low,1850
+55079,Milwaukee County,WI,1,FALSE,1926,Milwaukee Country Day School,low,1920

@@ -1,0 +1,111 @@
+spec,outcome,estimator,conf_low,conf_high,event_time,att,se
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,-6.0798070583454695,-3.9430500845176084,-50,-5.011428571431539,0.5450910647520055
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,-7.13839661633968,-5.810174812237658,-40,-6.474285714288669,0.3388320928831686
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,-7.462521329503117,-6.579383432407472,-30,-7.020952380955294,0.22529027987133787
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,-4.920040617375606,-4.272340335011223,-20,-4.5961904761934145,0.1652296638684652
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,0,0,-10,0,0
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,8.152999809423868,9.991762095333264,0,9.072380952378566,0.4690720117115804
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,25.009592107196106,27.382788845181345,10,26.196190476188725,0.6054073311186838
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,18.337159458230477,19.967602446527454,20,19.152380952378966,0.41592933374922897
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,22.893683407140873,27.887268973807902,30,25.390476190474388,1.2738738690477123
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,4.224030879559475,7.9054929299594985,40,6.064761904759487,0.9391484822449038
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE,-5.289197160948017,0.4434828752281459,50,-2.4228571428599355,1.4624183765755518
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,-2.8881065400466817,-1.6463799258748084,-50,-2.267243232960745,0.3167669934111921
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,-4.807661263501653,-4.024632157369678,-40,-4.416146710435665,0.1997523229928507
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,-6.027783581930544,-5.269935841509728,-30,-5.648859711720136,0.19332850520939168
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,-4.138256368883545,-3.682031914268516,-20,-3.9101441415760303,0.11638378944260949
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,7.380736046787972,9.391933188732798,0,8.386334617760385,0.5130604953940882
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,23.47290410946365,26.175291504441702,10,24.824097806952675,0.6893845395352182
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,16.075865789242407,18.112618107807933,20,17.09424194852517,0.5195796731034507
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,19.781667000685168,25.51091470332028,30,22.646290852002725,1.4615427812844684
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,0.3617277210025298,4.907332742337652,40,2.634530231670091,1.1595931176875311
+High access vs low-access counties only,STEM births (count),Wooldridge ETWFE + county pre-period trend,-9.632712360171395,-3.4455579409628,50,-6.539135150567097,1.578355719185866
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,-5.791363178588906,43.12469651191532,-50,18.666666666663208,12.478586655740875
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,-7.887014697658152,41.0298718405098,-40,16.571428571425823,12.478797586267335
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,14.649440435651982,63.82675004053233,-30,39.23809523809216,12.545232042061313
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,9.637704367805696,58.552771822663516,-20,34.095238095234606,12.478333534402505
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,0,0,-10,0,0
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,18.87949003719496,67.59670043899217,0,43.238095238093564,12.42785979637684
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,27.327939948420514,76.29110767062372,10,51.80952380952211,12.490604010766122
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,23.933845274639456,73.58996424916639,20,48.76190476190292,12.667377289420134
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,6.02940918462841,55.68487652965304,30,30.857142857140722,12.667211057404241
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,7.228380811757049,57.15257156919124,40,32.19047619047414,12.735762948325048
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE,-6.89096077495012,43.462389346374124,50,18.285714285712,12.845242377888837
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,5.970954194855283,27.034897096681277,-50,16.50292564576828,5.373454821894386
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,1.2855550023759488,28.611690609128026,-40,14.948622805751988,6.970952960906143
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,15.135962231620862,61.17648722365705,-30,38.15622472763896,11.745031885723519
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,12.738274812379675,54.3703308676251,-20,33.554302840002386,10.620422463072812
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,17.86120268633773,69.69685830026879,0,43.77903049330326,13.223381534166087
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,24.868313314668523,80.91447532523652,10,52.891394319952525,14.297490308818368
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,17.568585855596083,83.20083519951258,20,50.38471052755433,16.742920750999108
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-0.08900763036366044,66.13077538638947,30,33.02088387801291,16.892801789988045
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-1.0301079293285795,70.82041286246327,40,34.895152466567346,18.329214487702004
+High access vs low-access counties only,Any STEM birth (pp),Wooldridge ETWFE + county pre-period trend,-17.39471465645339,60.457366290505405,50,21.531325817026005,19.86022473136704
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,-0.01272298181360764,0.07095237592127882,-50,0.02911469705383559,0.021345754524205732
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,-0.028684865510326427,0.026889331429859584,-40,-8.977670402334229e-4,0.014177091056169901
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,-0.01827225312025934,0.010011382779160005,-30,-0.004130435170549668,0.007215213239647793
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,-0.011908821767861233,0.012956158780403907,-20,5.236685062713372e-4,0.006343107282720699
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,0,0,-10,0,0
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,0.020006961932815887,0.047488622279487414,0,0.03374779210615165,0.007010627639457021
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,0.018343519278422617,0.04085294166320598,10,0.029598230470814297,0.005742199587954939
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,0.01261577223071997,0.0294955102517465,20,0.021055641241233235,0.004306055617608808
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,0.00914775304287257,0.0366606529766799,30,0.022904203009776233,0.007018596921889625
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,0.002840911992184272,0.023734934122053464,40,0.013287923057118867,0.00533010768619112
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE,0.002488267730087026,0.024403376372558502,50,0.013445822051322765,0.005590588939405989
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.03823713436312208,0.002256580505463311,-50,-0.017990276928829384,0.010330029303210558
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.05823862511614595,-0.014214369938330647,-40,-0.0362264975272383,0.011230677341279414
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.040681143110090856,-0.014684701213698786,-30,-0.027682922161894823,0.006631745381732672
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,-0.021788502004657213,-7.166479741694421e-4,-20,-0.011252574989413329,0.005375472966961167
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,0.026629842539285145,0.06441822866428995,0,0.04552403560178755,0.009639894419644083
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,0.0320804083841343,0.07422102654008532,10,0.05315071746210981,0.01075015769284465
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,0.03565362165866155,0.07711512179771622,20,0.05638437172818889,0.01057691330077925
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,0.035590082177519494,0.10442827180726422,30,0.07000917699239186,0.017560762660649164
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,0.03665238663514043,0.10768589443564883,40,0.07216914053539462,0.01812079280625214
+High access vs low-access counties only,"STEM births per 1,000 population",Wooldridge ETWFE + county pre-period trend,0.04234518683459407,0.12586137921592264,50,0.08410328302525835,0.02130515111768586
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.025893211260019477,0.13664485793030415,-50,0.055375823335142335,0.04146379316079685
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.0510519663977383,0.042758554254865834,-40,-0.004146706071436233,0.023931255268521464
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.035435283908869825,0.014977898871309356,-30,-0.010228692518780233,0.012860505811270198
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.019600314802688357,0.026500694983000905,-20,0.0034501900901562728,0.01176046168002277
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,0,0,-10,0,0
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,0.04153344815932694,0.10067911354261919,0,0.07110628085097306,0.015088179944717409
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,0.052434410770017356,0.09988394888996156,10,0.07615917982998946,0.01210447401018985
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,0.03687897320121765,0.07155084331015533,20,0.05421490825568649,0.008844864823708595
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,0.022307422551313183,0.0908287863356179,30,0.05656810444346554,0.01747993974089406
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.003733947342540945,0.04743022517009578,40,0.021848138913777414,0.013052084824652223
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE,-0.006504083774025414,0.05109713986094604,50,0.022296528043460315,0.014694189702798842
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.06902565805318056,0.012751070992894145,-50,-0.028137293530143208,0.020861410470937425
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.10457018702237345,-0.02899290041844868,-40,-0.06678154372041106,0.019279920052021626
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.076249500283332175,-0.027721001619557335,-30,-0.05198525095144475,0.012379719046881336
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,-0.0373851884730862,0.0025290102206898465,-20,-0.017428089126198178,0.010182193544330625
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,0.05260858618202075,0.1313605339524585,0,0.09198456006723962,0.020089782594499426
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,0.0754080811608486,0.1604233953642841,10,0.11791573826256635,0.021687580153937625
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,0.07611439713247768,0.1575850946766693,20,0.11684974590457349,0.020783341210252965
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,0.06610534638450051,0.2140570962328251,30,0.1400812213086628,0.037742793328654226
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,0.05223214976467869,0.20024692022588983,40,0.12623953499528426,0.037758870015615086
+High access vs low-access counties only,"STEM births per 1,000 est. births",Wooldridge ETWFE + county pre-period trend,0.05941361195613083,0.23571879472642526,50,0.14756620334127804,0.044975811931197554
+High access vs low-access counties only,County population,Wooldridge ETWFE,-359005.2263132151,-189283.30076248676,-50,-274144.26353785093,43296.409579267434
+High access vs low-access counties only,County population,Wooldridge ETWFE,-321891.42493626097,-161920.24294946028,-40,-241905.83394286063,40808.97499663282
+High access vs low-access counties only,County population,Wooldridge ETWFE,-262361.89044805703,-134588.01928409326,-30,-198474.95486607516,32595.37529692954
+High access vs low-access counties only,County population,Wooldridge ETWFE,-186435.36554221285,-102729.49392369743,-20,-144582.42973295515,21353.538678192712
+High access vs low-access counties only,County population,Wooldridge ETWFE,0,0,-10,0,0
+High access vs low-access counties only,County population,Wooldridge ETWFE,54065.16446945442,244835.8688694227,0,149450.51666943857,48665.996020400074
+High access vs low-access counties only,County population,Wooldridge ETWFE,188374.72632485523,351520.9714626146,10,269947.8488937349,41618.94008616311
+High access vs low-access counties only,County population,Wooldridge ETWFE,165653.18160021835,520556.49667135143,20,343104.8391357849,90536.55996712578
+High access vs low-access counties only,County population,Wooldridge ETWFE,128659.04447030599,627181.6071862156,30,377920.3258282608,127174.12314181367
+High access vs low-access counties only,County population,Wooldridge ETWFE,72058.64888145804,810670.2366422454,40,441364.44276185177,188421.32340836414
+High access vs low-access counties only,County population,Wooldridge ETWFE,-72928.72552442487,982937.9397832376,50,455004.60712940636,269353.74114991387
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,-323829.4189899794,-213409.76748250768,-50,-268619.5932362435,28168.278445783588
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,-285575.8991747685,-189948.76325848565,-40,-237762.33121662706,24394.677529663993
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,-234948.43198536252,-156476.8074450719,-30,-195712.6197152172,20018.271566400672
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,-172859.06655174546,-113543.45776320736,-20,-143201.26215747642,15131.532854218905
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,0,0,-10,0,0
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,65636.38938473535,230502.3088036053,0,148069.34909417032,42057.632504813766
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,218648.81637416815,315722.21111201297,10,267185.51374309056,24763.62110659307
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,203990.1708786909,473932.5019408403,20,338961.3364097656,68862.83955667076
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,182981.66813401796,561809.6429197137,30,372395.65552686586,96639.78948614688
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,145385.65807834273,723531.5516918204,40,434458.6048850816,147486.19735037696
+High access vs low-access counties only,County population,Wooldridge ETWFE + county pre-period trend,17747.979649022454,875687.223705496,50,446717.60167725926,218862.05205522286

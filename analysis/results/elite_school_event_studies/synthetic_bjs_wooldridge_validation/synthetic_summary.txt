@@ -1,0 +1,67 @@
+=== Synthetic validation of BJS and Wooldridge ===
+
+Counties: 600 
+Decades: 1800 to 2000 
+Treated cohorts: 1840, 1860, 1880, 1900, 1920 
+Never-treated share: 0.3 
+Post-treatment slope shift in truth: 1.5 per decade
+Noise SD: 6 
+
+Untreated potential outcomes include cohort-specific linear trends.
+Correctly specified trend-adjusted estimators should recover zero pre-period effects
+and the true post-treatment slope shift path.
+
+BJS and Wooldridge pre/post periods are residualized event-cell means from
+the same untreated first-stage model for each trend specification. This keeps
+the validation plot on the raw ATT scale and avoids event-reference normalization.
+
+=== RMSE relative to exact truth ===
+# A tibble: 8 × 6
+  estimator        trend_spec        period_group  rmse max_abs_error mean_error
+  <chr>            <chr>             <chr>        <dbl>         <dbl>      <dbl>
+1 BJS              Cohort linear tr… post         0.754         0.937    -0.717 
+2 BJS              Cohort linear tr… pre          0.391         0.793    -0.0566
+3 BJS              No cohort trends  post         3.68          6.02      3.33  
+4 BJS              No cohort trends  pre          0.810         1.47      0.354 
+5 Wooldridge ETWFE Cohort linear tr… post         0.754         0.937    -0.717 
+6 Wooldridge ETWFE Cohort linear tr… pre          0.391         0.793    -0.0566
+7 Wooldridge ETWFE No cohort trends  post         3.68          6.02      3.33  
+8 Wooldridge ETWFE No cohort trends  pre          0.810         1.47      0.354 
+
+=== Manual untreated-only benchmark ===
+# A tibble: 13 × 6
+   estimator                      trend_spec event_time     att true_att   error
+   <chr>                          <chr>           <int>   <dbl>    <dbl>   <dbl>
+ 1 Manual untreated-only benchma… Cohort li…        -60  0.388       0    0.388 
+ 2 Manual untreated-only benchma… Cohort li…        -50 -0.793       0   -0.793 
+ 3 Manual untreated-only benchma… Cohort li…        -40 -0.240       0   -0.240 
+ 4 Manual untreated-only benchma… Cohort li…        -30  0.0976      0    0.0976
+ 5 Manual untreated-only benchma… Cohort li…        -20 -0.0493      0   -0.0493
+ 6 Manual untreated-only benchma… Cohort li…        -10  0.258       0    0.258 
+ 7 Manual untreated-only benchma… Cohort li…          0 -0.937       0   -0.937 
+ 8 Manual untreated-only benchma… Cohort li…         10  1.06        1.5 -0.437 
+ 9 Manual untreated-only benchma… Cohort li…         20  2.14        3   -0.861 
+10 Manual untreated-only benchma… Cohort li…         30  3.60        4.5 -0.904 
+11 Manual untreated-only benchma… Cohort li…         40  5.07        6   -0.933 
+12 Manual untreated-only benchma… Cohort li…         50  6.91        7.5 -0.594 
+13 Manual untreated-only benchma… Cohort li…         60  8.64        9   -0.355 
+
+=== Wooldridge wrapper versus direct check ===
+# A tibble: 13 × 7
+   event_time att_wrapper se_wrapper att_direct se_direct abs_diff abs_se_diff
+        <int>       <dbl>      <dbl>      <dbl>     <dbl>    <dbl>       <dbl>
+ 1        -60       -26.0      0.670     0.106      0.306     26.1       0.364
+ 2        -50       -26.8      0.687    -0.842      0.304     25.9       0.383
+ 3        -40       -26.1      0.627    -0.0317     0.288     26.0       0.340
+ 4        -30       -25.2      0.635     0.558      0.270     25.8       0.365
+ 5        -20       -24.5      0.630     0.865      0.267     25.4       0.363
+ 6        -10       -23.7      0.622     1.47       0.285     25.2       0.337
+ 7          0       -24.1      0.635     1.11       0.313     25.2       0.322
+ 8         10       -21.5      0.640     3.51       0.324     25.0       0.317
+ 9         20       -19.6      0.646     5.52       0.349     25.1       0.296
+10         30       -17.6      0.628     7.46       0.348     25.0       0.280
+11         40       -15.4      0.642     9.90       0.347     25.3       0.295
+12         50       -12.9      0.632    12.3        0.365     25.2       0.268
+13         60       -10.4      0.646    15.0        0.374     25.5       0.272
+
+Runtime (minutes): 0.21 

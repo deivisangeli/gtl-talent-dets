@@ -1,0 +1,49 @@
+sample,design,spec,outcome,treated_counties,control_counties,first_cohort,last_cohort,overall_att,overall_se,p_value
+All controls,County of school,Any exposure,STEM share zero-filled (pp),75,3065,1820,1920,5.809637489015821,3.743857251303181,0.12071521290666465
+All controls,County of school,Any exposure,STEM share smoothed (pp),75,3065,1820,1920,3.8182056967844247,2.940414667003298,0.1941065544012175
+All controls,County of school,Any exposure,STEM births (count),75,3065,1820,1920,1.952924992720928,0.5667688730395954,5.69547029382278e-4
+All controls,County of school,Any exposure,Any STEM birth (pp),75,3065,1820,1920,10.385052946664558,5.0627708113789875,0.040241754887759384
+All controls,County of school,High-access first exposure,STEM share zero-filled (pp),12,3065,1820,1920,1.5022233146596233,7.881365762525858,0.8488355106517047
+All controls,County of school,High-access first exposure,STEM share smoothed (pp),12,3065,1820,1920,1.5881422694753273,6.411558193330408,0.8043666157467919
+All controls,County of school,High-access first exposure,STEM births (count),12,3065,1820,1920,3.9368394219189073,2.5223980494505156,0.11858212510148536
+All controls,County of school,High-access first exposure,Any STEM birth (pp),12,3065,1820,1920,8.396463071236534,10.106985963820208,0.4061101509407625
+All controls,County of school,Low-access first exposure,STEM share zero-filled (pp),63,3065,1820,1920,6.78359133761007,4.341439517759997,0.1181652527432373
+All controls,County of school,Low-access first exposure,STEM share smoothed (pp),63,3065,1820,1920,4.326059103715923,3.2201070159927876,0.17912566947202002
+All controls,County of school,Low-access first exposure,STEM births (count),63,3065,1820,1920,1.5106402721908394,0.4759529999769918,0.001503912978480182
+All controls,County of school,Low-access first exposure,Any STEM birth (pp),63,3065,1820,1920,10.84619121363327,5.834116107866386,0.06301330639966074
+All controls,25 km radius,Any exposure,STEM share zero-filled (pp),225,2903,1820,1920,3.5505700541434386,1.7549252555458512,0.04305222178917134
+All controls,25 km radius,Any exposure,STEM share smoothed (pp),225,2903,1820,1920,2.302186920787432,1.503822632796654,0.12579659911793573
+All controls,25 km radius,Any exposure,STEM births (count),225,2903,1820,1920,0.8527365902943432,0.3015383759183075,0.004684656947907095
+All controls,25 km radius,Any exposure,Any STEM birth (pp),225,2903,1820,1920,4.481499199903725,2.3814564707537933,0.05985893178658652
+All controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),46,2903,1820,1920,1.246783978947721,3.915397175254833,0.7501579991733034
+All controls,25 km radius,High-access first exposure,STEM share smoothed (pp),46,2903,1820,1920,-0.03592734920555637,3.3384167364199864,0.9914134974193529
+All controls,25 km radius,High-access first exposure,STEM births (count),46,2903,1820,1920,0.5018838052870714,0.3463202298304616,0.14728453632832328
+All controls,25 km radius,High-access first exposure,Any STEM birth (pp),46,2903,1820,1920,1.2036642462789786,5.886683718507603,0.8379843714720812
+All controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),179,2903,1820,1920,4.279280114233239,1.9430610393249124,0.027641334658790484
+All controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),179,2903,1820,1920,3.040373702661571,1.6081244718697723,0.058673309706002374
+All controls,25 km radius,Low-access first exposure,STEM births (count),179,2903,1820,1920,0.9631563978858493,0.40413485297151935,0.017160304114817615
+All controls,25 km radius,Low-access first exposure,Any STEM birth (pp),179,2903,1820,1920,5.5249362902387205,2.6389568908444385,0.036295082173623205
+Not-yet-only controls,County of school,Any exposure,STEM share zero-filled (pp),75,0,1820,1920,-3.987658460610909,6.371239279331927,0.531390851146927
+Not-yet-only controls,County of school,Any exposure,STEM share smoothed (pp),75,0,1820,1920,-5.321519690081657,5.8471548206483055,0.3627676022096771
+Not-yet-only controls,County of school,Any exposure,STEM births (count),75,0,1820,1920,-0.17616844771325016,1.0088995839049097,0.8613825921985523
+Not-yet-only controls,County of school,Any exposure,Any STEM birth (pp),75,0,1820,1920,-5.317877750880562,8.404685650389586,0.5269114520785243
+Not-yet-only controls,County of school,High-access first exposure,STEM share zero-filled (pp),12,0,1820,1920,-8.082065063124439,11.428382616099551,0.4794469353873123
+Not-yet-only controls,County of school,High-access first exposure,STEM share smoothed (pp),12,0,1820,1920,-5.838944266890399,8.224562042231344,0.477741442935649
+Not-yet-only controls,County of school,High-access first exposure,STEM births (count),12,0,1820,1920,-5.639154704944179,3.5467706598016404,0.11184819276762559
+Not-yet-only controls,County of school,High-access first exposure,Any STEM birth (pp),12,0,1820,1920,0.6578947368421063,12.391381942236487,0.9576578669454772
+Not-yet-only controls,County of school,Low-access first exposure,STEM share zero-filled (pp),63,0,1820,1920,-0.36752377299680017,7.531235239522091,0.9610787357928767
+Not-yet-only controls,County of school,Low-access first exposure,STEM share smoothed (pp),63,0,1820,1920,-3.2615464964960066,6.355278551492599,0.6078094951528823
+Not-yet-only controls,County of school,Low-access first exposure,STEM births (count),63,0,1820,1920,0.513093450328659,0.40691621063227695,0.20733354344747745
+Not-yet-only controls,County of school,Low-access first exposure,Any STEM birth (pp),63,0,1820,1920,-2.6967654017305045,9.53888828997374,0.7773970368022853
+Not-yet-only controls,25 km radius,Any exposure,STEM share zero-filled (pp),225,0,1820,1920,-0.17667977721600975,3.912846654690405,0.9639847429703559
+Not-yet-only controls,25 km radius,Any exposure,STEM share smoothed (pp),225,0,1820,1920,-0.5947763602925773,3.566800256503403,0.8675640225306898
+Not-yet-only controls,25 km radius,Any exposure,STEM births (count),225,0,1820,1920,0.19932904490392064,0.19986246186833032,0.318603832566541
+Not-yet-only controls,25 km radius,Any exposure,Any STEM birth (pp),225,0,1820,1920,-2.315980559216832,5.3963735406929745,0.6677969612318106
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share zero-filled (pp),46,0,1820,1920,2.327538560759773,7.677840550002196,0.7617754323859078
+Not-yet-only controls,25 km radius,High-access first exposure,STEM share smoothed (pp),46,0,1820,1920,0.6447158516361564,6.839138380656055,0.9248958096543127
+Not-yet-only controls,25 km radius,High-access first exposure,STEM births (count),46,0,1820,1920,0.29694785926239936,0.37748225555189974,0.43148454282967386
+Not-yet-only controls,25 km radius,High-access first exposure,Any STEM birth (pp),46,0,1820,1920,1.9980217606330375,9.496467159686778,0.8333583631766963
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share zero-filled (pp),179,0,1820,1920,0.9860357025050318,4.695541742123029,0.8336723376716069
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM share smoothed (pp),179,0,1820,1920,0.28961993333061886,4.064708672523153,0.9431969398398923
+Not-yet-only controls,25 km radius,Low-access first exposure,STEM births (count),179,0,1820,1920,0.3121927379825301,0.25070533116497296,0.21303704798926404
+Not-yet-only controls,25 km radius,Low-access first exposure,Any STEM birth (pp),179,0,1820,1920,-0.6348313029303579,6.110636263548765,0.9172569934614341

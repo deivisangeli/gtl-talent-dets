@@ -1,0 +1,14 @@
+estimator,trend_spec,event_time,att,true_att,error
+Manual untreated-only benchmark,Cohort linear trends,-60,-0.002455924565005309,0,-0.002455924565005309
+Manual untreated-only benchmark,Cohort linear trends,-50,1.072653756083738e-4,0,1.072653756083738e-4
+Manual untreated-only benchmark,Cohort linear trends,-40,-0.0022891593288132603,0,-0.0022891593288132603
+Manual untreated-only benchmark,Cohort linear trends,-30,0.002959524271287385,0,0.002959524271287385
+Manual untreated-only benchmark,Cohort linear trends,-20,-0.009329789707949527,0,-0.009329789707949527
+Manual untreated-only benchmark,Cohort linear trends,-10,0.009880272356139955,0,0.009880272356139955
+Manual untreated-only benchmark,Cohort linear trends,0,0.0015389711789882243,0,0.0015389711789882243
+Manual untreated-only benchmark,Cohort linear trends,10,1.4896209678661083,1.5,-0.01037903213389161
+Manual untreated-only benchmark,Cohort linear trends,20,2.9893345353466994,3,-0.01066546465330078
+Manual untreated-only benchmark,Cohort linear trends,30,4.4976039736996265,4.5,-0.0023960263003733055
+Manual untreated-only benchmark,Cohort linear trends,40,5.993941974769631,6,-0.006058025230369588
+Manual untreated-only benchmark,Cohort linear trends,50,7.509470176349821,7.5,0.009470176349821193
+Manual untreated-only benchmark,Cohort linear trends,60,8.999175418682757,9,-8.245813172425523e-4

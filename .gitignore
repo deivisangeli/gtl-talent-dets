@@ -14,3 +14,13 @@ Rplots.pdf
 # OS
 .DS_Store
 Thumbs.db
+
+# Local Claude / agent state
+.claude/
+
+# Python build artifacts
+**/__pycache__/
+
+# Run logs
+analysis/*.log
+prep/*.log
