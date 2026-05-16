@@ -2,6 +2,7 @@ suppressPackageStartupMessages({
   library(tidyverse)
   library(sf)
 })
+source("../paths.R")
 
 # Brooklyn (Kings County NY) 2020 boundary
 counties_shp <- file.path(
@@ -12,7 +13,7 @@ counties_sf <- st_read(counties_shp, quiet=TRUE) %>%
   filter(GEOID == "36047") %>%
   st_transform(4326)
 
-cv <- read_csv("../prep/input/cross-verified-database.csv", show_col_types=FALSE)
+cv <- read_csv(file.path(DATA_INPUT, "cross-verified-database.csv"), show_col_types=FALSE)
 
 cat("Total rows in CV: ", nrow(cv), "\n")
 
@@ -21,7 +22,7 @@ cat("Sample citizenship values: ", paste(head(unique(cv$citizenship_1_b), 20), c
 cat("Sample early years bpla1/bplo1 non-NA: ",
     cv %>% filter(birth >= 1800, birth <= 1819, !is.na(bpla1)) %>% nrow(), "\n\n")
 
-stem <- read_csv("../prep/output/crossverified_with_stem.csv", show_col_types=FALSE) %>%
+stem <- read_csv(file.path(DATA_OUTPUT, "crossverified_with_stem.csv"), show_col_types=FALSE) %>%
   select(wikidata_code, stem)
 
 cv_brooklyn <- cv %>%

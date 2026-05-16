@@ -1,4 +1,0 @@
-batch_id,state,state_abbr,school,city,proposed_action,merge_status,frame_status,founding_year_candidate,priority,reason,source_url,review_status
-B02,District of Columbia,DC,M Street High School,Washington,benchmark_nonstate,do_not_merge,nonstate_jurisdiction,1870,high,Predecessor to Dunbar and important benchmark for the broader historical mechanism.,,queued_boundary_note
-B03,Florida,FL,Ransom Everglades School,Coconut Grove,split_lineage,needs_source_review,in_frame_1800_1930,1903,medium,Current institution is a later merger using predecessor roots rather than a single continuous school.,,queued
-B03,Georgia,GA,Westminster Schools,Atlanta,split_lineage,needs_source_review,in_frame_1800_1930,1873,medium,Current institution is a later merger using predecessor roots rather than a single continuous school.,,queued

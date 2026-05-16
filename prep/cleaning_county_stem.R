@@ -24,8 +24,9 @@ initial_time <- Sys.time()
 # 1. Load and classify data
 ###############################################################################
 source("stem_labels.R")
+source("../paths.R")
 
-raw_data <- read_csv("input/cross-verified-database.csv", show_col_types = FALSE)
+raw_data <- read_csv(file.path(DATA_INPUT, "cross-verified-database.csv"), show_col_types = FALSE)
 
 data_clean <- raw_data %>%
   drop_na(birth, bplo1, bpla1) %>%
@@ -70,7 +71,7 @@ stem_agg <- inventors_county %>%
 ###############################################################################
 # 5. Load existing panel and merge stem counts onto it
 ###############################################################################
-panel_base <- read_csv("output/us_panel_county.csv", show_col_types = FALSE)
+panel_base <- read_csv(file.path(DATA_OUTPUT, "us_panel_county.csv"), show_col_types = FALSE)
 
 panel_stem <- panel_base %>%
   left_join(stem_agg, by = c("GEOID", "decade")) %>%
@@ -85,7 +86,7 @@ panel_stem <- panel_base %>%
 ###############################################################################
 # 6. Export
 ###############################################################################
-write.csv(panel_stem, "output/us_panel_county_stem.csv", row.names = FALSE)
+write.csv(panel_stem, file.path(DATA_OUTPUT, "us_panel_county_stem.csv"), row.names = FALSE)
 
 cat("\n=== County stem panel complete ===\n")
 cat("Rows:", nrow(panel_stem), "\n")

@@ -22,13 +22,15 @@ library("fixest")
 
 initial_time <- Sys.time()
 
+source("../paths.R")
+
 ###############################################################################
 # Load data
 ###############################################################################
-data <- read_csv("../prep/output/data_final_stem.csv", show_col_types = FALSE) %>%
+data <- read_csv(file.path(DATA_OUTPUT, "data_final_stem.csv"), show_col_types = FALSE) %>%
   rename(n_inventors = n_stem)   # align column name with analysis_jan26.R
 
-facilities <- read_csv2("../prep/output/scientific_facilities.csv",
+facilities <- read_csv2(file.path(DATA_OUTPUT, "scientific_facilities.csv"),
                         show_col_types = FALSE)
 
 ###############################################################################

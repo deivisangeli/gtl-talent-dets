@@ -3,12 +3,14 @@ suppressPackageStartupMessages({
 })
 options(tigris_use_cache = TRUE, timeout = 1000)
 
-data_full <- read_csv("../prep/output/us_panel_county_stem.csv", show_col_types = FALSE) %>%
+source("../paths.R")
+
+data_full <- read_csv(file.path(DATA_OUTPUT, "us_panel_county_stem.csv"), show_col_types = FALSE) %>%
   mutate(stem_per_100k = replace_na(stem_per_100k, 0))
 
-facilities     <- read_delim("../prep/output/facilities_us.csv",     delim = ";",
+facilities     <- read_delim(file.path(DATA_OUTPUT, "facilities_us.csv"),     delim = ";",
                               locale = locale(decimal_mark = "."), show_col_types = FALSE)
-facilities_alt <- read_delim("../prep/output/facilities_us_alt.csv", delim = ";",
+facilities_alt <- read_delim(file.path(DATA_OUTPUT, "facilities_us_alt.csv"), delim = ";",
                               locale = locale(decimal_mark = "."), show_col_types = FALSE)
 
 counties_poly <- suppressMessages(
@@ -74,7 +76,7 @@ agg_res(run_cs(weston, "g_weston"), "Weston vs shortlisted")
 
 # Also compare to all-sci outcome for context
 cat("\n=== Same specs on all Discovery/Science (inv_per_100k) ===\n")
-data_allsci <- read_csv("../prep/output/us_panel_county.csv", show_col_types = FALSE) %>%
+data_allsci <- read_csv(file.path(DATA_OUTPUT, "us_panel_county.csv"), show_col_types = FALSE) %>%
   mutate(inv_per_100k = replace_na(inv_per_100k, 0))
 
 run_cs_all <- function(data, gname) suppressWarnings(

@@ -22,11 +22,12 @@ initial_time <- Sys.time()
 # Source STEM helper (defines stem_occ, stem_regex, add_stem_dummy)
 ###############################################################################
 source("stem_labels.R")
+source("../paths.R")
 
 ###############################################################################
 # Read raw data
 ###############################################################################
-raw_data <- read.csv("input/cross-verified-database.csv")
+raw_data <- read.csv(file.path(DATA_INPUT, "cross-verified-database.csv"))
 
 ###############################################################################
 # Filter: Discovery/Science, birth >= 1800, drop NA on birth/bplo1/bpla1
@@ -81,7 +82,7 @@ write.csv(
   data_clean_final %>%
     select(wikidata_code, birth, death, citizenship_1_b, country, iso3,
            level3_occ, stem),
-  "output/crossverified_with_stem.csv",
+  file.path(DATA_OUTPUT, "crossverified_with_stem.csv"),
   row.names = FALSE
 )
 
@@ -104,9 +105,9 @@ data_clean_allsci_agg <- data_clean_final %>%
 ###############################################################################
 # Demographics (Gapminder)
 ###############################################################################
-new_births      <- read.csv("input/new_births_total_number_estimated.csv")
-child_mortality <- read.csv("input/child_mortality_0_5_year_olds_dying_per_1000_born.csv")
-child_deaths    <- read.csv("input/number_of_child_deaths.csv")
+new_births      <- read.csv(file.path(DATA_INPUT, "new_births_total_number_estimated.csv"))
+child_mortality <- read.csv(file.path(DATA_INPUT, "child_mortality_0_5_year_olds_dying_per_1000_born.csv"))
+child_deaths    <- read.csv(file.path(DATA_INPUT, "number_of_child_deaths.csv"))
 
 to_long <- function(df, value_name) {
   df %>%
@@ -181,8 +182,8 @@ final_allsci <- data_clean_allsci_agg %>%
 ###############################################################################
 # Export
 ###############################################################################
-write.csv(final_stem,   "output/data_final_stem.csv",   row.names = FALSE)
-write.csv(final_allsci, "output/data_final_allsci.csv", row.names = FALSE)
+write.csv(final_stem,   file.path(DATA_OUTPUT, "data_final_stem.csv"),   row.names = FALSE)
+write.csv(final_allsci, file.path(DATA_OUTPUT, "data_final_allsci.csv"), row.names = FALSE)
 
 ###############################################################################
 # Summary

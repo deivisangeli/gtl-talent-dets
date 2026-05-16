@@ -23,15 +23,25 @@ suppressPackageStartupMessages({
   library("tidyverse")
 })
 
+source("../paths.R")
+
 initial_time <- Sys.time()
 
 ###############################################################################
-# Load NHGIS (1850-2020 decennial) and pivot to long
+# Load NHGIS (1790-2020 decennial total population, time-series table A00,
+# long format with one row per county-decade). The NHGIS extract uses
+# nominal historical boundaries — i.e. each decade reflects the county as
+# enumerated at that Census. Boundary mismatches with 2020 GEOIDs (e.g.
+# pre-1851 Baltimore County included Baltimore City; pre-1899 Queens
+# included Nassau) are corrected via manual_patches below.
 ###############################################################################
 
 nhgis_raw <- read_csv(
-  "input/nhgis0001_ts_nominal_county.csv",
-  show_col_types = FALSE
+  file.path(DATA_INPUT, "nhgis0005_ts_nominal_county.csv"),
+  show_col_types = FALSE,
+  skip = 2,
+  col_names = c("GISJOIN", "YEAR", "STATE", "STATEFP", "STATENH",
+                "COUNTY", "COUNTYFP", "COUNTYNH", "NAME", "A00AA")
 )
 
 nhgis_long <- nhgis_raw %>%
@@ -39,13 +49,9 @@ nhgis_long <- nhgis_raw %>%
     GEOID = paste0(
       str_pad(STATEFP, 2, "left", "0"),
       str_pad(COUNTYFP, 3, "left", "0")
-    )
-  ) %>%
-  select(GEOID, starts_with("A00AA")) %>%
-  pivot_longer(-GEOID, names_to = "col", values_to = "population_nhgis") %>%
-  mutate(
-    decade = as.integer(str_extract(col, "\\d{4}")),
-    population_nhgis = suppressWarnings(as.numeric(population_nhgis))
+    ),
+    decade = as.integer(YEAR),
+    population_nhgis = suppressWarnings(as.numeric(A00AA))
   ) %>%
   filter(!is.na(decade), decade >= 1800, decade <= 2000) %>%
   select(GEOID, decade, population_nhgis)
@@ -58,16 +64,23 @@ cat("NHGIS distinct counties: ", n_distinct(nhgis_long$GEOID), "\n", sep = "")
 # was newly incorporated; the Census actually counted SF at 34,776.
 ###############################################################################
 
+# Manual patches retained ONLY where the NHGIS time-series fails to
+# represent the 2020 county boundary used downstream. NHGIS now covers
+# 1790-2020 directly for >99% of cells, so all patches that merely filled
+# in HYDE-bad early decades have been removed.
+#
+# The remaining patches are corrections for documented historical
+# boundary changes between the enumerated unit and the modern GEOID.
 manual_patches <- tribble(
   ~GEOID,  ~decade, ~population_manual,
-  # SF Gold Rush 1850: NHGIS leaves blank because the county was newly
-  # incorporated; Census recorded 34,776.
-  "06075", 1850L,   34776,
-  # DC pre-1870 (NHGIS blank because Washington City + Georgetown + Rural
-  # Washington county were separate jurisdictions until 1871). Census
-  # totals across the three jurisdictions for the area now in DC. The
-  # 1800-1840 figures include the pre-1846 retrocession (Alexandria area
-  # south of Potomac), modestly inflating those decades.
+
+  # ---- DC 11001 ----
+  # NHGIS has DC only from 1870 onward and gaps at 1880 + 1900. Pre-1871
+  # the area was three separate jurisdictions (Washington City + Georgetown
+  # + rural Washington County). We use Census totals across the three
+  # jurisdictions for the area now in DC. The 1800-1840 figures include
+  # the pre-1846 retrocession (Alexandria area south of the Potomac),
+  # modestly inflating those decades.
   "11001", 1800L,   14093,
   "11001", 1810L,   24023,
   "11001", 1820L,   33039,
@@ -75,56 +88,56 @@ manual_patches <- tribble(
   "11001", 1840L,   43712,
   "11001", 1850L,   51687,
   "11001", 1860L,   75080,
-  # NHGIS leaves blank for DC at 1880 and 1900 too.
   "11001", 1880L,  177624,
   "11001", 1900L,  278718,
-  # NY County (Manhattan) pre-1850 — HYDE undercounts by 95% (HYDE 1800 =
-  # 2,972 vs Census 60,489). NHGIS does not extend before 1850. Census
-  # totals for Manhattan as a single jurisdiction.
-  "36061", 1800L,   60489,
-  "36061", 1810L,   96373,
-  "36061", 1820L,  123706,
-  "36061", 1830L,  202589,
-  "36061", 1840L,  312710,
-  # Kings County (Brooklyn) pre-1850 — HYDE actually overcounts (HYDE
-  # 1800 = 9,124 vs Census 5,740) because the gridded interpolation
-  # misallocates population to the future-Brooklyn area; post-1850 HYDE
-  # undercounts. Census patches restore the historical record.
-  "36047", 1800L,    5740,
-  "36047", 1810L,    8303,
-  "36047", 1820L,   11187,
-  "36047", 1830L,   20535,
-  "36047", 1840L,   47613,
-  # Queens County NY pre-1850 (current Queens boundary; pre-1898 Queens
-  # included parts that became Nassau Co in 1899, so these are
-  # approximate for the 2020 boundary). Census totals for old Queens.
+
+  # ---- SF 06075 ----
+  # NHGIS has SF only from 1860 onward; the county was created in 1850.
+  # Census 1850 enumerated 34,776.
+  "06075", 1850L,   34776,
+
+  # ---- Hamilton County OH 39061 ----
+  # NHGIS missing 1790, 1800 (county was in the Northwest Territory and
+  # was not separately enumerated in 1790; 1800 was the first US Census
+  # for the area). Census 1800 = 14,692.
+  "39061", 1800L,   14692,
+
+  # ---- Baltimore City 24510 ----
+  # Baltimore was part of Baltimore County until formal separation in
+  # 1851. NHGIS has Baltimore City entries 1790-1830 and 1860+, but is
+  # blank at 1840 and 1850. Census enumerations of Baltimore Town/City
+  # as a distinct unit:
+  "24510", 1840L,  102313,
+  "24510", 1850L,  169054,
+
+  # ---- Baltimore County 24005 ----
+  # NHGIS Baltimore County figures pre-1851 (and at 1840, 1850, 1870)
+  # alternate between including and excluding the city, producing wild
+  # decade-to-decade swings (29k -> 134k -> 211k -> 54k -> 331k). For
+  # a 2020-boundary BaltCo we want the rural area only (Baltimore City
+  # is GEOID 24510). Census enumerations excluding the city:
+  "24005", 1810L,    29255,  # NHGIS value is correct for this decade
+  "24005", 1820L,    33463,  # NHGIS value is correct
+  "24005", 1830L,    40250,  # NHGIS value is correct
+  "24005", 1840L,    32066,  # 134,379 NHGIS includes town; subtract 102,313
+  "24005", 1850L,    41592,  # 210,646 NHGIS includes town; subtract 169,054
+  "24005", 1870L,    63387,  # 330,741 NHGIS appears to include town; subtract 267,354
+
+  # ---- Queens County NY 36081 ----
+  # Pre-1899 NHGIS Queens enumerations include the territory that became
+  # Nassau County in 1899 (Hempstead, North Hempstead, Oyster Bay), which
+  # roughly doubles the count vs the 2020 Queens-borough boundary. Census
+  # for the 2020-Queens portion (Newtown, Flushing, Jamaica towns) only:
   "36081", 1800L,    6642,
   "36081", 1810L,    7444,
   "36081", 1820L,    8246,
   "36081", 1830L,    9049,
   "36081", 1840L,   14480,
-  # Richmond County NY (Staten Island) pre-1850 Census totals.
-  "36085", 1800L,    4564,
-  "36085", 1810L,    5347,
-  "36085", 1820L,    6135,
-  "36085", 1830L,    7082,
-  "36085", 1840L,   10965,
-  # Hamilton County OH (Cincinnati) pre-1850 — HYDE 1800 = 1,517 vs
-  # Census ~14,692 in 1810 (county established 1790; 1800 not separately
-  # tabulated). HYDE undercounts the early Cincinnati boom.
-  "39061", 1800L,    14692,  # Census 1800 estimate (county was tabulated)
-  "39061", 1810L,    15258,
-  "39061", 1820L,    31764,
-  "39061", 1830L,    52317,
-  "39061", 1840L,    80145,
-  # Baltimore County MD pre-1850. HYDE has values but they are noisy
-  # (see HYDE/NHGIS ratio 0.4-3.7x). Census totals (excluding Baltimore
-  # city, which is separate after 1851).
-  "24005", 1800L,    32500,
-  "24005", 1810L,    37500,
-  "24005", 1820L,    44000,
-  "24005", 1830L,    51000,
-  "24005", 1840L,    71800
+  "36081", 1850L,   18593,
+  "36081", 1860L,   32903,
+  "36081", 1870L,   45468,
+  "36081", 1880L,   56559,
+  "36081", 1890L,   87050
 )
 
 ###############################################################################
@@ -132,7 +145,7 @@ manual_patches <- tribble(
 ###############################################################################
 
 hyde <- read_csv(
-  "output/county_hyde_population.csv",
+  file.path(DATA_OUTPUT, "county_hyde_population.csv"),
   show_col_types = FALSE
 ) %>%
   mutate(
@@ -145,11 +158,19 @@ cat("HYDE distinct counties: ", n_distinct(hyde$GEOID), "\n", sep = "")
 
 ###############################################################################
 # Merge: prefer NHGIS where available (and > 0), else HYDE.
-# Manual patches override NHGIS.
+# Manual patches override everything.
+#
+# Build from a full skeleton (1790-2000) so manual patches can introduce 1790
+# rows even for counties absent from HYDE (which starts at 1800).
 ###############################################################################
 
-combined <- hyde %>%
-  left_join(nhgis_long, by = c("GEOID", "decade")) %>%
+all_geoids <- unique(hyde$GEOID)
+all_decades <- seq(1800L, 2000L, by = 10L)
+skeleton <- expand_grid(GEOID = all_geoids, decade = all_decades)
+
+combined <- skeleton %>%
+  left_join(hyde,        by = c("GEOID", "decade")) %>%
+  left_join(nhgis_long,  by = c("GEOID", "decade")) %>%
   left_join(manual_patches, by = c("GEOID", "decade")) %>%
   mutate(
     population = case_when(
@@ -165,7 +186,6 @@ combined <- hyde %>%
       TRUE                                                   ~ "missing"
     )
   ) %>%
-  filter(decade >= 1800, decade <= 2000) %>%
   filter(!is.na(GEOID), !is.na(decade)) %>%
   select(GEOID, decade, population, source)
 
@@ -183,8 +203,8 @@ print(combined %>% count(source))
 # Sanity checks for our 7 high-access counties
 ###############################################################################
 
-cat("\n=== Source breakdown for 7 high-access counties ===\n")
-high_access <- c("06075","11001","24005","36005","36047","36061","39061")
+cat("\n=== Source breakdown for 9 high-access counties ===\n")
+high_access <- c("06075","11001","24005","24510","36005","36047","36061","39061","42101")
 combined %>%
   filter(GEOID %in% high_access) %>%
   count(GEOID, source) %>%
@@ -197,7 +217,7 @@ combined %>%
   pivot_wider(names_from = decade, values_from = population) %>%
   print()
 
-write_csv(combined, "output/county_population.csv")
+write_csv(combined, file.path(DATA_OUTPUT, "county_population.csv"))
 
 elapsed <- difftime(Sys.time(), initial_time, units = "secs")
 cat("\nDone in ", round(as.numeric(elapsed), 1),

@@ -1,8 +1,10 @@
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(fixest))
 
-stem   <- read_csv("../prep/output/data_final_stem.csv",   show_col_types=FALSE)
-allsci <- read_csv("../prep/output/data_final_allsci.csv", show_col_types=FALSE)
+source("../paths.R")
+
+stem   <- read_csv(file.path(DATA_OUTPUT, "data_final_stem.csv"),   show_col_types=FALSE)
+allsci <- read_csv(file.path(DATA_OUTPUT, "data_final_allsci.csv"), show_col_types=FALSE)
 
 # USSR membership (same as analysis_main.R)
 ussr_countries <- c("Russia","Ukraine","Belarus","Moldova","Lithuania","Latvia",

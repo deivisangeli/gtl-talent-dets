@@ -21,6 +21,8 @@ library("geodata")
 library("terra")
 library("FNN")
 
+source("../paths.R")
+
 # Recording Initial Time
 initial_time <- Sys.time()
 
@@ -40,8 +42,7 @@ download.file(url_wikipedia, temp_file, mode = "wb")
 raw_data <- fread(temp_file)
 
 # Population from Hyde (already treated)
-# NOTE: original script had a hardcoded absolute path; now uses relative input/ path
-hyde_dir <- "input/hyde_pop_asc"
+hyde_dir <- file.path(DATA_INPUT, "hyde_pop_asc")
 hyde_files <- list.files(hyde_dir,pattern = "^popc_.*\\.asc$",full.names = TRUE)
 ## Function to exctract year (decade) from the file
 get_year <- function(x) as.integer(gsub(".*([0-9]{4})AD.*", "\\1", x))
@@ -232,8 +233,8 @@ plot_diff <- ggplot() +
 ###############################################################################
 # Exporting
 ###############################################################################
-write.csv(panel, "output/us_panel.csv", row.names = FALSE)
-write.csv(panel_fixed, "output/us_panel_fixed.csv", row.names = FALSE)
+write.csv(panel, file.path(DATA_OUTPUT, "us_panel.csv"), row.names = FALSE)
+write.csv(panel_fixed, file.path(DATA_OUTPUT, "us_panel_fixed.csv"), row.names = FALSE)
 
-ggsave(filename = "output/fixing_error.png", plot = plot_diff, width = 8,
+ggsave(filename = file.path(DATA_OUTPUT, "fixing_error.png"), plot = plot_diff, width = 8,
        height = 6, dpi = 300)

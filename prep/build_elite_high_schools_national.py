@@ -1,23 +1,30 @@
+import os
 from pathlib import Path
 
 import pandas as pd
 
 
-ROOT = Path(__file__).resolve().parents[1]
-MANUAL = ROOT / "prep" / "input" / "elite_high_schools_national_manual.csv"
-ADDITIONS = ROOT / "prep" / "input" / "elite_high_schools_revision_additions.csv"
-REVISION_DECISIONS = ROOT / "prep" / "input" / "elite_high_schools_revision_decisions.csv"
-REVISION_QUEUE = ROOT / "prep" / "input" / "elite_high_schools_revision_queue.csv"
-STATE_BATCHES = ROOT / "prep" / "input" / "elite_high_schools_state_review_batches.csv"
-COUNTIES = ROOT / "prep" / "output" / "national_county2020.txt"
-COUNTY_PANEL = ROOT / "prep" / "output" / "us_panel_county.csv"
-OUT_SCHOOLS = ROOT / "prep" / "output" / "elite_high_schools_national_1800_1930.csv"
-OUT_CORE = ROOT / "prep" / "output" / "elite_high_schools_core_1800_1930.csv"
-OUT_EXPANDED = ROOT / "prep" / "output" / "elite_high_schools_expanded_1800_1930.csv"
-OUT_ROBUSTNESS = ROOT / "prep" / "output" / "elite_high_schools_robustness_only_1800_1930.csv"
-OUT_BOUNDARIES = ROOT / "prep" / "output" / "elite_high_schools_benchmarks_and_boundaries.csv"
-OUT_STATES = ROOT / "prep" / "output" / "elite_high_schools_state_coverage_1800_1930.csv"
-ENROLLMENT = ROOT / "prep" / "output" / "elite_high_schools_enrollment.tsv"
+TALENT_DETS_DATA_DIR = Path(os.environ.get("TALENT_DETS_DATA_DIR",
+                             r"C:\Users\deivi\Globtalent Dropbox\gtl_talent_dets"))
+DATA_INPUT     = TALENT_DETS_DATA_DIR / "input"
+DATA_OUTPUT    = TALENT_DETS_DATA_DIR / "output"
+SCHOOLS_INPUT  = DATA_INPUT  / "elite_schools"
+SCHOOLS_OUTPUT = DATA_OUTPUT / "elite_schools"
+
+MANUAL             = SCHOOLS_INPUT  / "elite_high_schools_national_manual.csv"
+ADDITIONS          = SCHOOLS_INPUT  / "elite_high_schools_revision_additions.csv"
+REVISION_DECISIONS = SCHOOLS_INPUT  / "elite_high_schools_revision_decisions.csv"
+REVISION_QUEUE     = SCHOOLS_INPUT  / "elite_high_schools_revision_queue.csv"
+STATE_BATCHES      = SCHOOLS_INPUT  / "elite_high_schools_state_review_batches.csv"
+COUNTIES           = DATA_OUTPUT    / "national_county2020.txt"
+COUNTY_PANEL       = DATA_OUTPUT    / "us_panel_county.csv"
+OUT_SCHOOLS        = SCHOOLS_OUTPUT / "elite_high_schools_national_1800_1930.csv"
+OUT_CORE           = SCHOOLS_OUTPUT / "elite_high_schools_core_1800_1930.csv"
+OUT_EXPANDED       = SCHOOLS_OUTPUT / "elite_high_schools_expanded_1800_1930.csv"
+OUT_ROBUSTNESS     = SCHOOLS_OUTPUT / "elite_high_schools_robustness_only_1800_1930.csv"
+OUT_BOUNDARIES     = SCHOOLS_OUTPUT / "elite_high_schools_benchmarks_and_boundaries.csv"
+OUT_STATES         = SCHOOLS_OUTPUT / "elite_high_schools_state_coverage_1800_1930.csv"
+ENROLLMENT         = SCHOOLS_OUTPUT / "elite_high_schools_enrollment.tsv"
 
 
 STATE_ORDER = [
@@ -97,6 +104,8 @@ GRADES_TEST_COMBO_SCHOOLS = {
     "Baltimore Polytechnic Institute",
     "duPont Manual High School",
     "Walnut Hills High School",
+    "Girls' High School Philadelphia",
+    "Western High School",
 }
 
 LOTTERY_SCHOOLS = {
@@ -111,6 +120,12 @@ OPEN_ACCESS_SCHOOLS = {
     "Booker T. Washington High School",
     "Pearl High School",
     "Howard High School",
+    # New schools added after audit: open-admission city flagship public HSes
+    # that are documented in the list to confirm Wayne/Hamilton/NY counties
+    # had major urban high schools but NOT selective ones (except Walnut Hills).
+    "De Witt Clinton High School",
+    "Detroit Central High School",
+    "Hughes High School",
 }
 
 SENDING_TOWN_OPEN_SCHOOLS = {
@@ -439,12 +454,16 @@ HISTORICALLY_SELECTIVE_PUBLIC = {
     "Lowell High School",
     "Central High School",
     "Baltimore City College",
-    "Baltimore Polytechnic Institute",
+    # Baltimore Polytechnic removed — founded 1883 as Baltimore Manual Training
+    # School (vocational); flagged historically_unclear below.
     "Walnut Hills High School",
     # Dunbar's founding-era model was a selective Black academic HS (1870-1955)
     # with rigorous admission standards. Flagged historically_unclear because
     # selectivity was lost after 1955 integration.
     "Paul Laurence Dunbar High School",
+    # Girls' high schools with documented exam-based admission from founding.
+    "Girls' High School Philadelphia",
+    "Western High School",
 }
 
 # Founding-era admission model is unclear or transitioned (selective today
@@ -493,6 +512,37 @@ HISTORICALLY_UNCLEAR_NOTES = {
         "McDonogh bequest; transitioned to a tuition-charging private elite "
         "school by the early 20th century. Default: tuition-free historically "
         "(founding-era model)."
+    ),
+    # Added after independent audit ------------------------------------------------
+    "Baltimore Polytechnic Institute": (
+        "Founded 1883 as Baltimore Manual Training School (vocational, "
+        "open-admission); parallel founding story to Lane Tech (Chicago 1908). "
+        "Became selective college-prep school in later decades. Default: not "
+        "selective historically (vocational founding model)."
+    ),
+    "Walnut Hills High School": (
+        "Founded 1895 as Cincinnati's dedicated college-preparatory public "
+        "school; founding-era selectivity strongly implied by design but "
+        "independent historical enrollment records not consulted. Default: "
+        "selective historically (founding college-prep purpose)."
+    ),
+    "De Witt Clinton High School": (
+        "Opened 1897 in Manhattan as a citywide academic boys' high school; "
+        "open-admission formally (no entrance exam at founding) but drew a "
+        "highly self-selected academically ambitious student body. Default: "
+        "not selective historically (open-admission public model)."
+    ),
+    "Girls' High School Philadelphia": (
+        "Founded 1848 as Philadelphia's selective public girls' high school; "
+        "exam-based admission documented historically but independent "
+        "enrollment records not consulted. Default: selective historically "
+        "(founding exam-admission model)."
+    ),
+    "Western High School": (
+        "Founded 1844 as Baltimore's selective public girls' high school; "
+        "counterpart to Baltimore City College (boys); exam-based admission "
+        "from founding documented by parallel history with BCC but independent "
+        "records not consulted. Default: selective historically."
     ),
 }
 
@@ -595,6 +645,36 @@ def derive_historically_unclear(row: pd.Series) -> str:
 
 def derive_historically_unclear_note(row: pd.Series) -> str:
     return HISTORICALLY_UNCLEAR_NOTES.get(row["school"], "")
+
+
+def derive_contaminates_county(row: pd.Series) -> str:
+    """
+    Returns 'yes' for pre-1800 schools that pass every high-access criterion
+    except crit_in_frame.  Only PUBLIC tuition-free selective secondary schools
+    qualify (currently: Boston Latin 1635).  Private tuition schools such as
+    Phillips Andover, Collegiate, and Trinity fail crit_tuition_free_historical
+    and therefore do NOT contaminate their county for the high-access treatment
+    — those counties remain valid as never-treated controls.
+
+    Counties with contaminates_county='yes' are excluded entirely from the
+    analysis: they are always-treated and cannot serve as clean controls, and
+    they have no usable pre-treatment window as treated units.
+    """
+    if row["crit_in_frame_1800_1940"] == "yes":
+        return "no"
+    if row["crit_secondary_school"] != "yes":
+        return "no"
+    if row["crit_active_20yr"] != "yes":
+        return "no"
+    if row["crit_first_decade_size_ge_50"] == "no":
+        return "no"
+    if row["crit_tuition_free_historical"] != "yes":
+        return "no"
+    if row["crit_selective_historical"] != "yes":
+        return "no"
+    if row["crit_not_special_model"] != "yes":
+        return "no"
+    return "yes"
 
 
 def derive_default_revision_note(row: pd.Series) -> str:
@@ -709,6 +789,7 @@ def main() -> None:
     merged["crit_selective_historical"] = merged.apply(derive_crit_selective_historical, axis=1)
     merged["crit_not_special_model"] = merged.apply(derive_crit_not_special_model, axis=1)
     merged["crit_high_access_strict"] = merged.apply(derive_crit_high_access_strict, axis=1)
+    merged["contaminates_county"] = merged.apply(derive_contaminates_county, axis=1)
     merged["historically_unclear"] = merged.apply(derive_historically_unclear, axis=1)
     merged["historically_unclear_note"] = merged.apply(derive_historically_unclear_note, axis=1)
 

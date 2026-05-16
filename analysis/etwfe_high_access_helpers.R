@@ -25,6 +25,7 @@ suppressPackageStartupMessages({
   library("tidyverse")
   library("fixest")
   library("purrr")
+  library("did")
 })
 
 first_full_exposure_decade <- function(open_year, school_age = 14L) {
@@ -89,13 +90,21 @@ build_panel_spec_C <- function(panel, treatment) {
     filter(!is.na(g))
 }
 
-# Detrend the outcome by a county-specific linear fit on pre-treatment cells.
-# Returns the input panel with extra columns y_resid (detrended outcome) and
-# detrended (TRUE if the linear fit was applied; FALSE if the county had
-# fewer than min_pre_obs pre-treatment outcome observations and was therefore
-# not detrended). The caller should typically filter to detrended == TRUE
-# before passing the panel to the event-study regression.
-detrend_county <- function(data, outcome_var, min_pre_obs = 4L) {
+# Detrend the outcome by a cohort-specific linear fit on pre-treatment
+# county-decade cells. For a treated cohort g > 0, the pre-period is
+# decade < g; for the never-treated control group g = 0 the entire panel
+# is the pre-period. The OLS fit pools across all counties in the cohort,
+# yielding a single intercept and slope per cohort. The cohort's fitted
+# path is then subtracted from every county-decade observation in that
+# cohort. This replaces the county-specific detrend, trading lower noise
+# (more observations per fit) for the assumption that all counties in a
+# cohort share the same linear pre-trend.
+#
+# Returns the input panel with y_resid and detrended columns. detrended
+# is FALSE if the cohort had fewer than min_pre_obs pre-treatment cells
+# in total (rare with cohort-level pooling), in which case y_resid is
+# the original outcome.
+detrend_cohort <- function(data, outcome_var, min_pre_obs = 3L) {
   fit_one <- function(df) {
     y_orig  <- df[[outcome_var]]
     pre_idx <- which(df$is_pre & !is.na(y_orig))
@@ -112,7 +121,7 @@ detrend_county <- function(data, outcome_var, min_pre_obs = 4L) {
   }
   data %>%
     mutate(is_pre = (g == 0L | decade < g)) %>%
-    group_split(GEOID_num) %>%
+    group_split(g) %>%
     map_dfr(fit_one)
 }
 
@@ -162,6 +171,96 @@ run_sa_event <- function(data, outcome_var, window_years, event_grid,
   out %>% arrange(event_time)
 }
 
+# Callaway-Sant'Anna staggered DID via did::att_gt + aggte. Returns the
+# dynamic event-study aggregation in the same (event_time, att, se) shape
+# as run_sa_event so the downstream plotting code can consume it.
+#
+# A time-invariant covariate vector (typically each county's 1820
+# population) is passed via xformla. Counties with NA on the covariate
+# are dropped from the regression. Control group is "nevertreated" when
+# any g == 0 unit is present in `data`, otherwise "notyettreated".
+#
+# fixest::sunab and did::att_gt use slightly different conventions for
+# the partial-exposure decade. CS DID's "ATT(g, t)" pairs decade t with
+# cohort g and emits event time e = t - g, so e = 0 is the school-opening
+# decade (same as our convention). The reference period is e = -1 in CS
+# DID's internal aggregation; we shift to e = -10 to match sunab by
+# subtracting the e = -10 estimate from every event time, so ATT(-10) = 0
+# by construction in both estimators.
+run_csdid_event <- function(data, outcome_var, window_years, event_grid,
+                            covariates = NULL, ref_event = -10L) {
+  has_never_treated <- any(data$g == 0L, na.rm = TRUE)
+  control_group <- if (has_never_treated) "nevertreated" else "notyettreated"
+
+  # Force a balanced panel: drop any county with NA in the outcome or in
+  # any covariate at any decade. did::att_gt is then called with the
+  # default panel = TRUE, allow_unbalanced_panel = FALSE so structural
+  # gaps surface as errors instead of being silently absorbed.
+  required_vars <- c(outcome_var, if (!is.null(covariates)) all.vars(covariates))
+  bad_ids <- data %>%
+    group_by(GEOID_num) %>%
+    summarise(any_na = any(if_any(all_of(required_vars), is.na)), .groups = "drop") %>%
+    filter(any_na) %>%
+    pull(GEOID_num)
+  reg_data <- data %>% filter(!GEOID_num %in% bad_ids)
+
+  if (n_distinct(reg_data$GEOID_num[reg_data$g > 0]) == 0) {
+    stop("CS DID: no treated units remain after balancing the panel")
+  }
+
+  # est_method = "reg" (outcome regression). The default "dr" (doubly
+  # robust) fails on this design because it fits a propensity score by
+  # cohort, and several treated cohorts contain only 1-2 counties — the
+  # pre-treatment propensity-score design matrix is then singular. "reg"
+  # only fits the outcome model on never-treated controls, where the
+  # cross-sectional variation in the covariate is plentiful.
+  # allow_unbalanced_panel = TRUE because dropping HYDE-sourced rows
+  # legitimately leaves some counties without observations in their
+  # earliest decades. This is intentional, not a data error.
+  fit <- did::att_gt(
+    yname         = outcome_var,
+    tname         = "decade",
+    idname        = "GEOID_num",
+    gname         = "g",
+    xformla       = covariates,
+    data          = as.data.frame(reg_data),
+    control_group = control_group,
+    est_method    = if (is.null(covariates)) "dr" else "reg",
+    panel         = TRUE,
+    allow_unbalanced_panel = TRUE,
+    bstrap        = FALSE,
+    cband         = FALSE,
+    base_period   = "universal"
+  )
+
+  agg <- did::aggte(fit, type = "dynamic", na.rm = TRUE,
+                    bstrap = FALSE, cband = FALSE)
+
+  out <- tibble(
+    event_time = as.integer(agg$egt),
+    att        = as.numeric(agg$att.egt),
+    se         = as.numeric(agg$se.egt)
+  )
+
+  # Re-anchor reference period from did's internal e = -1 to our e = -10
+  # by shifting all ATTs and zero-ing the new reference.
+  shift <- out$att[out$event_time == ref_event]
+  if (length(shift) == 1 && !is.na(shift)) {
+    out <- out %>% mutate(att = att - shift)
+  }
+
+  out <- out %>% filter(event_time %in% event_grid)
+  if (!ref_event %in% out$event_time) {
+    out <- bind_rows(out, tibble(event_time = ref_event, att = 0, se = 0))
+  }
+  # Reset SE at the reference period to 0 so the plot anchors there.
+  out <- out %>%
+    mutate(att = if_else(event_time == ref_event, 0, att),
+           se  = if_else(event_time == ref_event, 0, se)) %>%
+    arrange(event_time)
+  out
+}
+
 ensure_reference_zero <- function(dyn, ref_event = -10L) {
   if (any(dyn$event_time == ref_event, na.rm = TRUE)) return(dyn)
   bind_rows(dyn, tibble(event_time = ref_event, att = 0, se = 0)) %>%
@@ -171,7 +270,7 @@ ensure_reference_zero <- function(dyn, ref_event = -10L) {
 # Drop counties that do not have at least min_pre_obs non-missing
 # pre-treatment observations of the outcome. Applied identically to both
 # the plain and detrend specifications so the samples are comparable.
-filter_min_pre_obs <- function(data, outcome_var, min_pre_obs = 4L) {
+filter_min_pre_obs <- function(data, outcome_var, min_pre_obs = 3L) {
   keep_ids <- data %>%
     mutate(is_pre = (g == 0L | decade < g)) %>%
     group_by(GEOID_num) %>%
@@ -186,11 +285,17 @@ filter_min_pre_obs <- function(data, outcome_var, min_pre_obs = 4L) {
 
 compute_dynamic <- function(data, outcome_var, spec_label, outcome_label,
                             estimator_label, window_years, event_grid,
-                            detrend = FALSE, min_pre_obs = 4L,
-                            ref_event = -10L) {
+                            detrend = FALSE, min_pre_obs = 3L,
+                            ref_event = -10L,
+                            engine = c("sunab", "csdid"),
+                            covariates = NULL) {
+  engine <- match.arg(engine)
   d <- filter_min_pre_obs(data, outcome_var, min_pre_obs = min_pre_obs)
-  if (detrend) {
-    d   <- detrend_county(d, outcome_var, min_pre_obs = min_pre_obs)
+  if (engine == "csdid") {
+    dyn <- run_csdid_event(d, outcome_var, window_years, event_grid,
+                           covariates = covariates, ref_event = ref_event)
+  } else if (detrend) {
+    d   <- detrend_cohort(d, outcome_var, min_pre_obs = min_pre_obs)
     dyn <- run_sa_event(d, "y_resid", window_years, event_grid,
                         ref_event = ref_event)
   } else {
@@ -271,7 +376,7 @@ make_cohort_means <- function(data, outcome_var) {
 }
 
 count_support <- function(data, spec_label, outcome_label,
-                          min_pre_obs = 4L, outcome_var = NULL) {
+                          min_pre_obs = 3L, outcome_var = NULL) {
   has_treated <- any(data$g > 0)
 
   kept_ids <- character(0)

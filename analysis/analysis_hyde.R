@@ -24,11 +24,13 @@ library("fixest")
 # Recording Initial Time
 initial_time <- Sys.time()
 
+source("../paths.R")
+
 ###############################################################################
 # Uploading databases
 ###############################################################################
-data <- read_csv("../prep/output/agg_hyde.csv", show_col_types = FALSE)
-facilities <- read_delim("../prep/output/scientific_facilities.csv", delim = ";",
+data <- read_csv(file.path(DATA_OUTPUT, "agg_hyde.csv"), show_col_types = FALSE)
+facilities <- read_delim(file.path(DATA_OUTPUT, "scientific_facilities.csv"), delim = ";",
                          locale = locale( decimal_mark = ".", grouping_mark = ""),
                          show_col_types = FALSE)
 

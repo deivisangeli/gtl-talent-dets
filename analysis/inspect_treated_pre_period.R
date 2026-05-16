@@ -1,17 +1,18 @@
 suppressPackageStartupMessages(library(tidyverse))
+source("../paths.R")
 
-panel <- read_csv("../prep/output/us_panel_county_stem_1800.csv", show_col_types=FALSE) %>%
+panel <- read_csv(file.path(DATA_OUTPUT, "us_panel_county_stem_1800.csv"), show_col_types=FALSE) %>%
   mutate(GEOID = str_pad(as.character(GEOID), 5, "left", "0"),
          decade = as.integer(decade))
 
-pop <- read_csv("../prep/output/county_population.csv", show_col_types=FALSE) %>%
+pop <- read_csv(file.path(DATA_OUTPUT, "county_population.csv"), show_col_types=FALSE) %>%
   mutate(GEOID = str_pad(as.character(GEOID), 5, "left", "0"),
          decade = as.integer(decade))
 
 panel <- panel %>% select(-population) %>%
   left_join(pop, by=c("GEOID","decade"))
 
-us_births <- read_csv("../prep/input/new_births_total_number_estimated.csv", show_col_types=FALSE) %>%
+us_births <- read_csv(file.path(DATA_INPUT, "new_births_total_number_estimated.csv"), show_col_types=FALSE) %>%
   filter(geo == "usa") %>% select(-geo, -name) %>%
   pivot_longer(everything(), names_to="year", values_to="b") %>%
   mutate(year=as.integer(year), decade=(year %/% 10)*10) %>%

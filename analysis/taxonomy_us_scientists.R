@@ -5,8 +5,9 @@
 ###############################################################################
 
 library(tidyverse)
+source("../paths.R")
 
-data <- read_csv("../prep/input/cross-verified-database.csv",
+data <- read_csv(file.path(DATA_INPUT, "cross-verified-database.csv"),
                  show_col_types = FALSE)
 
 # US-born: citizenship at birth == United States

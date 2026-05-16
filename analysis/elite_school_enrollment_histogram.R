@@ -11,17 +11,18 @@ suppressPackageStartupMessages({
   library("ggplot2")
   library("scales")
 })
+source("../paths.R")
 
 results_dir <- file.path("results", "elite_school_event_studies",
                          "elite_school_enrollment")
 dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
 
-enroll <- read_tsv("../prep/output/elite_high_schools_enrollment.tsv",
+enroll <- read_tsv(file.path(SCHOOLS_OUTPUT, "elite_high_schools_enrollment.tsv"),
                    show_col_types = FALSE,
                    na = c("", "NA"))
 
 schools_meta <- read_csv(
-  "../prep/output/elite_high_schools_core_1800_1930.csv",
+  file.path(SCHOOLS_OUTPUT, "elite_high_schools_core_1800_1930.csv"),
   show_col_types = FALSE
 ) %>%
   select(school, state_abbr, poor_access_historical, school_type)

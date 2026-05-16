@@ -14,6 +14,8 @@ library("tidygeocoder")
 library("sf")
 library("rnaturalearth")
 
+source("../paths.R")
+
 # Recording Initial Time
 initial_time <- Sys.time()
 
@@ -25,7 +27,7 @@ initial_time <- Sys.time()
 ###############################################################################
 
 # Downloading the data
-raw_data <- read.csv("input/cross-verified-database.csv")
+raw_data <- read.csv(file.path(DATA_INPUT, "cross-verified-database.csv"))
 
 # Let's check the 49 variables available
 names(raw_data)
@@ -127,9 +129,9 @@ data_clean_final_agg <- data_clean_final %>%
 ## The files are on the input folder in the project.
 ###############################################################################
 
-new_births      <- read.csv("input/new_births_total_number_estimated.csv")
-child_mortality <- read.csv("input/child_mortality_0_5_year_olds_dying_per_1000_born.csv")
-child_deaths    <- read.csv("input/number_of_child_deaths.csv")
+new_births      <- read.csv(file.path(DATA_INPUT, "new_births_total_number_estimated.csv"))
+child_mortality <- read.csv(file.path(DATA_INPUT, "child_mortality_0_5_year_olds_dying_per_1000_born.csv"))
+child_deaths    <- read.csv(file.path(DATA_INPUT, "number_of_child_deaths.csv"))
 
 # Creating a function to clean the names of th variables and turn from wide to long dataframe
 # so we can do operation correctly for country and year variables
@@ -243,10 +245,10 @@ rate_births_wide <- rate_births_wide %>%
 ###############################################################################
 # Exporting
 ###############################################################################
-write.csv(final_agg, "output/data_final.csv", row.names = FALSE)
-write.csv(abs_wide, "output/abs_wide.csv", row.names = FALSE)
-write.csv(rate_m_wide, "output/rate_m_wide.csv", row.names = FALSE)
-write.csv(rate_d_wide, "output/rate_d_wide.csv", row.names = FALSE)
+write.csv(final_agg, file.path(DATA_OUTPUT, "data_final.csv"), row.names = FALSE)
+write.csv(abs_wide,  file.path(DATA_OUTPUT, "abs_wide.csv"),   row.names = FALSE)
+write.csv(rate_m_wide, file.path(DATA_OUTPUT, "rate_m_wide.csv"), row.names = FALSE)
+write.csv(rate_d_wide, file.path(DATA_OUTPUT, "rate_d_wide.csv"), row.names = FALSE)
 ###############################################################################
 # Recording Time
 ###############################################################################

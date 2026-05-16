@@ -6,14 +6,15 @@
 
 options(timeout = 600)
 
-input_dir <- "input"
+source("../paths.R")
+input_dir <- DATA_INPUT
 dir.create(input_dir, showWarnings = FALSE, recursive = TRUE)
 
 ###############################################################################
 # Cross-Verified Database of Notable People (Laouan et al., SciencesPo)
 # Source: https://data.sciencespo.fr/dataset.xhtml?persistentId=doi:10.7910/DVN/EEA236
 ###############################################################################
-cv_path <- file.path(input_dir, "cross-verified-database.csv")
+cv_path <- file.path(DATA_INPUT, "cross-verified-database.csv")
 
 if (!file.exists(cv_path)) {
   message("Downloading cross-verified database...")

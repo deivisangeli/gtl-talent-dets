@@ -22,6 +22,8 @@ library("terra")
 library("FNN")
 library("tigris")
 
+source("../paths.R")
+
 # Recording Initial Time
 initial_time <- Sys.time()
 
@@ -70,7 +72,7 @@ county_centroids <- counties_sf %>%
 # 3. Historical county population (1850-2000, decennial)
 ###############################################################################
 # Read the population CSV
-pop_raw <- read_csv("input/nhgis0001_ts_nominal_county.csv")
+pop_raw <- read_csv(file.path(DATA_INPUT, "nhgis0001_ts_nominal_county.csv"))
 
 # Pivot to long: one row per county x decade
 pop_long <- pop_raw %>%
@@ -179,7 +181,7 @@ print(plot_agg)
 ###############################################################################
 # Exporting
 ###############################################################################
-write.csv(panel, "output/us_panel_county.csv", row.names = FALSE)
+write.csv(panel, file.path(DATA_OUTPUT, "us_panel_county.csv"), row.names = FALSE)
 
-ggsave("output/county_density_aggregate.png", plot = plot_agg,
+ggsave(file.path(DATA_OUTPUT, "county_density_aggregate.png"), plot = plot_agg,
        width = 10, height = 6, dpi = 300)

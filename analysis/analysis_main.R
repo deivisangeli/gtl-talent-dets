@@ -19,11 +19,13 @@ library("modelsummary")
 # Recording Initial Time
 initial_time <- Sys.time()
 
+source("../paths.R")
+
 ###############################################################################
 # Uploading databases
 ###############################################################################
 
-data <- read_csv("../prep/output/data_final.csv", show_col_types = FALSE)
+data <- read_csv(file.path(DATA_OUTPUT, "data_final.csv"), show_col_types = FALSE)
 
 # Notice there are a lot of NAs, which is good to seeing dexcriptive statistics
 # however this NAs simply come from no obserrvations, so let's fill with 0 when

@@ -29,11 +29,13 @@ library("modelsummary")
 
 initial_time <- Sys.time()
 
+source("../paths.R")
+
 ###############################################################################
 # Read data
 ###############################################################################
-stem_raw   <- read_csv("../prep/output/data_final_stem.csv",   show_col_types = FALSE)
-allsci_raw <- read_csv("../prep/output/data_final_allsci.csv", show_col_types = FALSE)
+stem_raw   <- read_csv(file.path(DATA_OUTPUT, "data_final_stem.csv"),   show_col_types = FALSE)
+allsci_raw <- read_csv(file.path(DATA_OUTPUT, "data_final_allsci.csv"), show_col_types = FALSE)
 
 ###############################################################################
 # Join STEM and all-science panels on country, iso3, year

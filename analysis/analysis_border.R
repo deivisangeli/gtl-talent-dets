@@ -25,17 +25,19 @@ library("viridis")
 initial_time <- Sys.time()
 options(tigris_use_cache = TRUE)
 
+source("../paths.R")
+
 ###############################################################################
 # Uploading databases
 ###############################################################################
 
-data_full <- read_csv("../prep/output/us_panel_county.csv", show_col_types = FALSE)
+data_full <- read_csv(file.path(DATA_OUTPUT, "us_panel_county.csv"), show_col_types = FALSE)
 
-facilities <- read_delim("../prep/output/facilities_us.csv", delim = ";",
+facilities <- read_delim(file.path(DATA_OUTPUT, "facilities_us.csv"), delim = ";",
                          locale = locale(decimal_mark = ".", grouping_mark = ""),
                          show_col_types = FALSE)
 
-facilities_alt <- read_delim("../prep/output/facilities_us_alt.csv", delim = ";",
+facilities_alt <- read_delim(file.path(DATA_OUTPUT, "facilities_us_alt.csv"), delim = ";",
                              locale = locale(decimal_mark = ".", grouping_mark = ""),
                              show_col_types = FALSE)
 

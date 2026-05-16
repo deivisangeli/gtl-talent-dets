@@ -23,7 +23,9 @@ suppressPackageStartupMessages({
 
 initial_time <- Sys.time()
 
-hyde_dir <- "C:/Users/deivi/Globtalent Dropbox/gtl_talent_dets/input/hyde_pop_asc"
+source("../paths.R")
+
+hyde_dir <- file.path(TALENT_DETS_DATA_DIR, "input", "hyde_pop_asc")
 
 county_shp <- file.path(
   Sys.getenv("LOCALAPPDATA"),
@@ -97,13 +99,13 @@ cat("\n=== HYDE population diagnostics by decade ===\n")
 print(diag_decade)
 
 write_csv(diag_decade,
-          "output/county_hyde_population_diagnostics.csv")
+          file.path(DATA_OUTPUT, "county_hyde_population_diagnostics.csv"))
 
 ###############################################################################
 # Cross-check against existing NHGIS-derived us_panel_county_stem_1800.csv
 ###############################################################################
 
-nhgis_panel <- read_csv("output/us_panel_county_stem_1800.csv",
+nhgis_panel <- read_csv(file.path(DATA_OUTPUT, "us_panel_county_stem_1800.csv"),
                         show_col_types = FALSE) %>%
   mutate(
     GEOID  = str_pad(as.character(GEOID), width = 5, side = "left", pad = "0"),
@@ -129,13 +131,13 @@ cat("\n=== HYDE vs NHGIS comparison (overlapping decades) ===\n")
 print(compare_decade)
 
 write_csv(compare_decade,
-          "output/county_hyde_population_vs_nhgis.csv")
+          file.path(DATA_OUTPUT, "county_hyde_population_vs_nhgis.csv"))
 
 ###############################################################################
 # Export
 ###############################################################################
 
-write_csv(panel_hyde, "output/county_hyde_population.csv")
+write_csv(panel_hyde, file.path(DATA_OUTPUT, "county_hyde_population.csv"))
 
 cat("\nDone in ", round(as.numeric(Sys.time() - initial_time, units = "mins"), 2),
     " minutes. Output: prep/output/county_hyde_population.csv\n", sep = "")

@@ -24,11 +24,13 @@ library("fixest")
 # Recording Initial Time
 initial_time <- Sys.time()
 
+source("../paths.R")
+
 ###############################################################################
 # Uploading databases
 ###############################################################################
-data <- read_csv("../prep/output/data_final_new.csv", show_col_types = FALSE)
-facilities <- read_csv2("../prep/output/scientific_facilities.csv", show_col_types = FALSE)
+data <- read_csv(file.path(DATA_OUTPUT, "data_final_new.csv"), show_col_types = FALSE)
+facilities <- read_csv2(file.path(DATA_OUTPUT, "scientific_facilities.csv"), show_col_types = FALSE)
 
 ###############################################################################
 # Ajusting the data

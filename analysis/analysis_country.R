@@ -24,14 +24,16 @@ library("fixest")
 # Recording Initial Time
 initial_time <- Sys.time()
 
+source("../paths.R")
+
 ###############################################################################
 # Uploading databases
 # NOTE: Country analysis is self-contained; its Output/ data is in prep/output/.
 # data_final_new.csv is produced by new_cleaning.R; scientific_facilities.csv
 # is in prep/output/ (merged from Project/Output and HYDE/Output).
 ###############################################################################
-data <- read_csv("../prep/output/data_final_new.csv", show_col_types = FALSE)
-facilities <- read_csv2("../prep/output/scientific_facilities.csv", show_col_types = FALSE)
+data <- read_csv(file.path(DATA_OUTPUT, "data_final_new.csv"), show_col_types = FALSE)
+facilities <- read_csv2(file.path(DATA_OUTPUT, "scientific_facilities.csv"), show_col_types = FALSE)
 
 ###############################################################################
 # Ajusting the data

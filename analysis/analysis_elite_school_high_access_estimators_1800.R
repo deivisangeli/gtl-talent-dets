@@ -11,20 +11,19 @@
 #      Treated = high-access ever-treated counties.
 #      Control = low-access ever-treated counties.
 #
-# Two estimators per specification:
-#   1. Plain Wooldridge ETWFE (etwfe::etwfe + emfx, type = "event").
-#      Wooldridge-Mundlak equivalent of Sun-Abraham, with ATT(e = 0)
-#      mechanically zero by the omitted-reference convention.
-#   2. ETWFE with county-specific linear pre-treatment trends.
-#      Step 1: for each county fit y_it = a_i + b_i * decade by OLS using
-#              only pre-treatment cells (decade < g for treated counties;
-#              all decades for control counties with g = 0).
-#      Step 2: subtract the predicted linear path from y to obtain
-#              y_resid = y - (a_i + b_i * decade).
-#      Step 3: run plain ETWFE on y_resid.
-#      Counties with fewer than 3 pre-treatment outcome observations are
-#      not detrended; their original y is passed through unchanged.
-#      Note: standard errors do not propagate first-step uncertainty.
+# Three estimators per specification:
+#   1. Plain Wooldridge ETWFE via fixest::sunab. Wooldridge-Mundlak
+#      equivalent of Sun-Abraham, ATT(e = -10) = 0 by convention.
+#   2. Callaway-Sant'Anna staggered DID (did::att_gt + aggte), with
+#      control_group = "nevertreated" when never-treated units exist and
+#      "notyettreated" otherwise. With never-treated controls and no
+#      covariates this is algebraically equivalent to (1) up to weighting
+#      of the cohort x event-time cells; differences typically reflect
+#      different finite-sample weights.
+#   3. CS DID with each county's log 1820 population as a time-invariant
+#      covariate (xformla = ~ log_pop_1820, est_method = "reg"). Adjusts
+#      for cross-sectional differences in initial size that might predict
+#      both treatment timing and STEM-talent production.
 #
 # Outcomes:
 #   - n_stem                STEM births (count)
@@ -52,6 +51,7 @@
 rm(list = ls())
 
 source("etwfe_high_access_helpers.R")
+source("../paths.R")
 suppressPackageStartupMessages(library("ggplot2"))
 
 initial_time <- Sys.time()
@@ -122,89 +122,57 @@ dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
 
 ###############################################################################
 # Load panel and school list
+#
+# Panel selection: ELITE_MERGE_NYC=TRUE picks the NYC-merged variant in which
+# the five boroughs are collapsed into the synthetic GEOID "36000". Both
+# panels are built upstream by prep/cleaning_county_1800.R and ship with
+# population, county_births_estimate_decade, stem_per_1000_pop, and
+# stem_per_1000_births already computed; this script only consumes them.
 ###############################################################################
 
-panel <- read_csv("../prep/output/us_panel_county_stem_1800.csv",
-                  show_col_types = FALSE) %>%
+panel_path <- if (merge_nyc) {
+  file.path(DATA_OUTPUT, "us_panel_county_stem_1800_nyc_merged.csv")
+} else {
+  file.path(DATA_OUTPUT, "us_panel_county_stem_1800.csv")
+}
+
+panel <- read_csv(panel_path, show_col_types = FALSE) %>%
   mutate(
     GEOID  = str_pad(as.character(GEOID), width = 5, side = "left", pad = "0"),
     decade = as.integer(decade)
   )
-
-# Replace population with the unified county-decade population panel built
-# in prep/build_county_population.R. That script prefers NHGIS Census
-# (1850-2020) where available and falls back to HYDE (1800-2000) for
-# 1800-1840 and for counties not yet in NHGIS for a given decade. HYDE
-# alone is known to undercount urban density during rapid urban growth
-# (Manhattan 1850-1910 by 13-17x; Brooklyn 1860-1940 by 2-3x; SF Gold
-# Rush 1850 by 200x), so the unified panel is materially more accurate
-# for high-access urban counties. The source for each cell is recorded
-# in the `population_source` column.
-pop_panel <- read_csv("../prep/output/county_population.csv",
-                      show_col_types = FALSE) %>%
-  mutate(
-    GEOID  = str_pad(as.character(GEOID), width = 5, side = "left", pad = "0"),
-    decade = as.integer(decade)
-  ) %>%
-  rename(population_source = source)
-
-panel <- panel %>%
-  select(-population) %>%
-  left_join(pop_panel, by = c("GEOID", "decade"))
 
 if (length(drop_state_fips) > 0) {
   panel <- panel %>%
     filter(!(substr(GEOID, 1, 2) %in% drop_state_fips))
 }
 
-###############################################################################
-# Build estimated county births from country-level US annual births
-#   For each decade, county_births = county_pop * (US_total_births_in_decade
-#   / US_total_pop_in_decade). This applies the national US birth rate to
-#   each county's population. Captures temporal variation in fertility but
-#   no cross-county variation in birth rates.
-###############################################################################
+# Drop every cell whose population comes from HYDE gridded interpolation.
+# HYDE is unreliable for county-decade pre-organization periods (Western
+# counties not yet established, Bronx pre-1914 etc.) and we agreed that
+# no analysis cell should rely on it. Cells with source in {"nhgis",
+# "manual", "merged_nyc"} are retained. This makes the panel mildly
+# unbalanced for counties whose early decades were HYDE-filled.
+n_before <- nrow(panel)
+n_geoid_before <- n_distinct(panel$GEOID)
+panel <- panel %>% filter(population_source != "hyde")
+cat("\nDropping HYDE-sourced rows: ", n_before - nrow(panel),
+    " cells (", n_geoid_before - n_distinct(panel$GEOID),
+    " counties lose all rows).\n", sep = "")
 
-us_births_raw <- read_csv(
-  "../prep/input/new_births_total_number_estimated.csv",
-  show_col_types = FALSE
-) %>%
-  filter(geo == "usa")
+# Time-invariant covariate for CS DID: each county's 1820 population
+# (logged for scale stability). 1820 is chosen because it is in the
+# pre-treatment window for every retained treated cohort (g >= 1830) and
+# captures cross-sectional differences in initial size that may correlate
+# with both treatment timing and STEM-talent production. Counties with
+# missing 1820 population (e.g., not yet established in 1820) drop out
+# of the CS DID sample.
+pop_1820 <- panel %>%
+  filter(decade == 1820L) %>%
+  transmute(GEOID, pop_1820 = population, log_pop_1820 = log1p(population))
+panel <- panel %>% left_join(pop_1820, by = "GEOID")
 
-us_births_decade <- us_births_raw %>%
-  select(-geo, -name) %>%
-  pivot_longer(everything(), names_to = "year", values_to = "us_births_year") %>%
-  mutate(
-    year   = as.integer(year),
-    decade = (year %/% 10L) * 10L
-  ) %>%
-  group_by(decade) %>%
-  summarise(us_births_in_decade = sum(us_births_year, na.rm = TRUE),
-            .groups = "drop")
-
-us_pop_decade <- panel %>%
-  group_by(decade) %>%
-  summarise(us_pop_decade = sum(population, na.rm = TRUE), .groups = "drop")
-
-panel <- panel %>%
-  left_join(us_births_decade, by = "decade") %>%
-  left_join(us_pop_decade,    by = "decade") %>%
-  mutate(
-    us_birth_rate_decade           = us_births_in_decade / us_pop_decade,
-    county_births_estimate_decade  = population * us_birth_rate_decade,
-    stem_per_1000_pop = if_else(
-      population > 0,
-      1000 * n_stem / population,
-      NA_real_
-    ),
-    stem_per_1000_births = if_else(
-      !is.na(county_births_estimate_decade) & county_births_estimate_decade > 0,
-      1000 * n_stem / county_births_estimate_decade,
-      NA_real_
-    )
-  )
-
-schools <- read_csv("../prep/output/elite_high_schools_core_1800_1930.csv",
+schools <- read_csv(file.path(SCHOOLS_OUTPUT, "elite_high_schools_core_1800_1930.csv"),
                     show_col_types = FALSE) %>%
   mutate(
     county_geoid       = str_pad(as.character(county_geoid), width = 5, side = "left", pad = "0"),
@@ -212,53 +180,68 @@ schools <- read_csv("../prep/output/elite_high_schools_core_1800_1930.csv",
     g_full             = first_full_exposure_decade(founding_year_used, school_age)
   )
 
-# Optional: merge the 5 NYC boroughs (Bronx, Kings, NY, Queens, Richmond) into
-# one synthetic county. Substantively NYC is one labor market and one elite-
-# educational ecosystem; the staggered borough-school timing (Hunter 1869,
-# Stuyvesant 1904, Brooklyn Tech 1922, Bronx Sci 1938) does not isolate clean
-# treatment-introduction effects because Brooklyn and the Bronx already had
-# substantial pre-existing infrastructure tied to Manhattan. Merging treats
-# NYC as a single unit treated at its earliest high-access school (Hunter HS
-# 1869 -> g = 1860).
+###############################################################################
+# Exclude counties contaminated by a pre-1800 high-access school.
+#
+# A county is contaminated when it contains a school that passes every
+# high-access criterion except crit_in_frame — i.e., a pre-1800 tuition-free
+# selective secondary school. Such counties are always-treated for our
+# treatment and have no usable pre-treatment window.
+#
+# Under the corrected logic ONLY public tuition-free schools contaminate.
+# Private tuition schools (Phillips Andover, Collegiate, Trinity, etc.) do NOT
+# contaminate their counties because they fail crit_tuition_free_historical and
+# therefore do not represent the same treatment. Currently: Suffolk County MA
+# (Boston Latin, founded 1635) is the only contaminated county.
+###############################################################################
+
+contaminated_geoids <- schools %>%
+  filter(contaminates_county == "yes") %>%
+  pull(county_geoid) %>%
+  unique()
+
+if (length(contaminated_geoids) > 0) {
+  cat("\nExcluding", length(contaminated_geoids),
+      "county/counties always-treated by pre-1800 high-access school:\n")
+  schools %>%
+    filter(contaminates_county == "yes") %>%
+    select(school, county_geoid, county_name, state_abbr, founding_year_used) %>%
+    print()
+  panel   <- panel   %>% filter(!GEOID %in% contaminated_geoids)
+  schools <- schools %>% filter(!county_geoid %in% contaminated_geoids)
+}
+
+# Counties whose pre-treatment period is not a meaningful US administrative
+# unit are excluded outright:
+#   - Bronx (36005) is excluded from the boroughs-separate spec (kept in
+#     merge_nyc, absorbed into synthetic NYC). Pre-1873 the area was rural
+#     southern Westchester (no separate enumeration); 1874-1898 it was
+#     annexed to New York County; 1898-1914 it was the Bronx subdivision
+#     of NYC; 1914 it became Bronx County. NHGIS has no pre-1920 row, so
+#     any standalone pre-trend would rely on HYDE gridded values.
+#   - San Francisco (06075) is excluded everywhere. The area was Mexican
+#     Alta California until 1848 and the US county was created in 1850;
+#     pre-1850 HYDE cells estimate ~100 people in the footprint, which
+#     are not a meaningful pre-treatment baseline for a US elite school.
+#     Lowell HS (1856) was the only high-access school in SF, so dropping
+#     SF removes the g=1850 cohort entirely.
+counties_without_pre_period <- c("06075")   # SF — always excluded
+if (!merge_nyc) {
+  counties_without_pre_period <- c(counties_without_pre_period, "36005")  # Bronx
+  cat("\nExcluding Bronx (36005) from boroughs-separate spec; pre-1914 not a meaningful unit.\n")
+}
+cat("Excluding San Francisco (06075) from all specs; pre-1850 not a US unit.\n")
+panel   <- panel   %>% filter(!GEOID %in% counties_without_pre_period)
+schools <- schools %>% filter(!county_geoid %in% counties_without_pre_period)
+
+# When the NYC-merged panel is in use, reassign the 5 boroughs' schools to
+# the synthetic GEOID "36000" so the treatment join below picks them up.
+# (The panel rows for the merged unit are produced upstream by
+# prep/cleaning_county_1800.R; only the schools file needs remapping here.)
 if (merge_nyc) {
-  nyc_boroughs <- c("36005","36047","36061","36081","36085")
+  nyc_boroughs        <- c("36005", "36047", "36061", "36081", "36085")
   nyc_synthetic_geoid <- "36000"
 
-  panel_nyc <- panel %>%
-    filter(GEOID %in% nyc_boroughs) %>%
-    group_by(decade) %>%
-    summarise(
-      GEOID                          = nyc_synthetic_geoid,
-      n_inventors                    = sum(n_inventors, na.rm = TRUE),
-      n_stem                         = sum(n_stem, na.rm = TRUE),
-      any_stem                       = as.integer(any(any_stem == 1L, na.rm = TRUE)),
-      any_stem_pct                   = 100 * as.integer(any(any_stem == 1L, na.rm = TRUE)),
-      population                     = sum(population, na.rm = TRUE),
-      county_births_estimate_decade  = sum(county_births_estimate_decade, na.rm = TRUE),
-      lon_county                     = mean(lon_county, na.rm = TRUE),
-      lat_county                     = mean(lat_county, na.rm = TRUE),
-      population_source              = "merged_nyc",
-      .groups                        = "drop"
-    ) %>%
-    mutate(
-      inv_per_100k         = if_else(population > 0, 1e5 * n_inventors / population, NA_real_),
-      stem_per_100k        = if_else(population > 0, 1e5 * n_stem / population,      NA_real_),
-      log1p_n_inventors    = log1p(n_inventors),
-      log1p_n_stem         = log1p(n_stem),
-      stem_per_1000_pop    = if_else(population > 0, 1000 * n_stem / population, NA_real_),
-      stem_per_1000_births = if_else(
-        !is.na(county_births_estimate_decade) & county_births_estimate_decade > 0,
-        1000 * n_stem / county_births_estimate_decade,
-        NA_real_
-      )
-    )
-
-  panel <- bind_rows(
-    panel %>% filter(!GEOID %in% nyc_boroughs),
-    panel_nyc
-  )
-
-  # Reassign the 5 boroughs' schools to the merged NYC GEOID.
   schools <- schools %>%
     mutate(
       county_geoid = if_else(county_geoid %in% nyc_boroughs,
@@ -269,7 +252,7 @@ if (merge_nyc) {
                              "NY", state_abbr)
     )
 
-  cat("\nELITE_MERGE_NYC: merged 5 NYC boroughs into GEOID ",
+  cat("\nELITE_MERGE_NYC: schools in 5 NYC boroughs reassigned to GEOID ",
       nyc_synthetic_geoid, "\n", sep = "")
 }
 
@@ -342,52 +325,52 @@ specs <- list(
 )
 
 outcomes <- list(
-  list(var = "n_stem",               label = "STEM births (count)",                 short = "stem_count"),
-  list(var = "any_stem_pct",         label = "Any STEM birth (pp)",                 short = "any_stem_pct"),
-  list(var = "stem_per_1000_pop",    label = "STEM births per 1,000 population",    short = "stem_per_pop"),
-  list(var = "stem_per_1000_births", label = "STEM births per 1,000 est. births",   short = "stem_per_birth"),
-  list(var = "population",           label = "County population",                   short = "pop")
+  # ---- Hard-STEM subset of Discovery/Science ----
+  list(var = "n_stem",                   label = "STEM births (count)",                       short = "stem_count"),
+  list(var = "any_stem_pct",             label = "Any STEM birth (pp)",                       short = "any_stem_pct"),
+  list(var = "stem_per_1000_pop",        label = "STEM births per 1,000 population",          short = "stem_per_pop"),
+  list(var = "stem_per_1000_births",     label = "STEM births per 1,000 est. births",         short = "stem_per_birth"),
+  # ---- All Discovery/Science (all scientific) ----
+  list(var = "n_inventors",              label = "Scientific births (count)",                 short = "allsci_count"),
+  list(var = "any_allsci_pct",           label = "Any scientific birth (pp)",                 short = "any_allsci_pct"),
+  list(var = "allsci_per_1000_pop",      label = "Scientific births per 1,000 population",    short = "allsci_per_pop"),
+  list(var = "allsci_per_1000_births",   label = "Scientific births per 1,000 est. births",   short = "allsci_per_birth"),
+  # ---- All Wikipedia notable births ----
+  list(var = "n_all_wiki",               label = "Wikipedia births (count)",                  short = "allwiki_count"),
+  list(var = "any_all_wiki_pct",         label = "Any Wikipedia birth (pp)",                  short = "any_allwiki_pct"),
+  list(var = "all_wiki_per_1000_pop",    label = "Wikipedia births per 1,000 population",     short = "allwiki_per_pop"),
+  list(var = "all_wiki_per_1000_births", label = "Wikipedia births per 1,000 est. births",    short = "allwiki_per_birth"),
+  # ---- STEM share of all Wikipedia births in the county-decade ----
+  list(var = "stem_over_allwiki_pct",    label = "STEM share of Wikipedia births (pp)",       short = "stem_over_allwiki"),
+  # ---- Auxiliary level outcome ----
+  list(var = "population",               label = "County population",                         short = "pop")
 )
 
 estimator_colors <- c(
-  "Wooldridge ETWFE"                            = "#023047",
-  "Wooldridge ETWFE + county pre-period trend"  = "#bc4749"
+  "Callaway-Sant'Anna"                          = "#e9a200",
+  "Callaway-Sant'Anna + log 1820 pop"           = "#2a9d8f"
 )
 
 methodology_notes <- function() {
   cat("Panel decades: ", min(panel$decade), " to ", max(panel$decade), "\n", sep = "")
   cat("School age assumption: ", school_age, "\n", sep = "")
-  cat("School file: ../prep/output/elite_high_schools_core_1800_1930.csv\n\n")
+  cat("School file: ", file.path(SCHOOLS_OUTPUT, "elite_high_schools_core_1800_1930.csv"), "\n\n")
 
-  cat("Sample restriction (applies to BOTH estimators)\n")
-  cat("- Counties with fewer than 4 non-missing pre-treatment outcome\n")
-  cat("  observations are dropped before any regression. The trend\n")
-  cat("  specification needs at least 4 pre-period cells to identify a\n")
-  cat("  county-specific slope with 2 residual degrees of freedom; we apply\n")
-  cat("  the same sample restriction to the plain estimator so the two lines\n")
-  cat("  in each figure are directly comparable.\n\n")
+  cat("Sample restriction\n")
+  cat("- Counties with fewer than 3 non-missing pre-treatment outcome\n")
+  cat("  observations are dropped before any regression.\n\n")
 
   cat("Estimators\n")
-  cat("- Wooldridge ETWFE:\n")
-  cat("    Implemented as fixest::sunab(g, decade, ref.p = -10) with county\n")
-  cat("    and decade fixed effects. Sun and Abraham's saturated cohort x\n")
-  cat("    event-time regression is the same model as Wooldridge's ETWFE\n")
-  cat("    with anti-treatment leads. The reference event time is fixed at\n")
-  cat("    e = -10 (one decade before the school opens), so ATT(e = -10) =\n")
-  cat("    0 by construction. e = 0 is the partial-exposure decade (school\n")
-  cat("    opens this decade; cohorts born early in the decade reach age 14\n")
-  cat("    just as the school opens, so they receive partial exposure).\n")
-  cat("    e = +10 is the first fully-exposed decade. e = -20, -30, ... are\n")
-  cat("    honest pre-period placebo estimates of the pre-trend.\n")
-  cat("    Standard errors are clustered at the county level.\n\n")
-  cat("- Wooldridge ETWFE + county pre-period trend:\n")
-  cat("    Step 1 fits y_it = a_i + b_i * decade by OLS for each county on\n")
-  cat("    pre-treatment cells only (decade < g for treated counties; all\n")
-  cat("    decades for control counties with g = 0).\n")
-  cat("    Step 2 subtracts the fitted path from y to obtain y_resid.\n")
-  cat("    Step 3 feeds y_resid into the same sunab regression as the plain\n")
-  cat("    estimator above.\n")
-  cat("    Caveat: standard errors do not propagate first-step uncertainty.\n\n")
+  cat("- Wooldridge ETWFE: fixest::sunab(g, decade, ref.p = -10) with\n")
+  cat("  county and decade fixed effects. Cluster-robust SEs at county.\n")
+  cat("- Callaway-Sant'Anna: did::att_gt + aggte, control_group =\n")
+  cat("  'nevertreated' when available else 'notyettreated', universal\n")
+  cat("  base period e = -10.\n")
+  cat("- CS DID + log 1820 pop: same as above with xformla =\n")
+  cat("  ~ log_pop_1820 and est_method = 'reg'. Outcome regression on\n")
+  cat("  the never-treated controls projects the counterfactual; we use\n")
+  cat("  regression rather than dr because the propensity-score step is\n")
+  cat("  singular when treated cohorts are tiny.\n\n")
 }
 
 for (spec in specs) {
@@ -410,25 +393,31 @@ for (spec in specs) {
 
     spec_support_list[[outcome$short]] <- count_support(
       out_panel, spec$label, outcome$label,
-      min_pre_obs = 4L, outcome_var = outcome$var
+      min_pre_obs = 3L, outcome_var = outcome$var
     )
 
-    plain <- tryCatch(
+    plain <- NULL   # Wooldridge ETWFE temporarily disabled per user request
+
+    csdid_plain <- tryCatch(
       compute_dynamic(out_panel, outcome$var, spec$label, outcome$label,
-                      "Wooldridge ETWFE",
-                      window_years, event_grid, detrend = FALSE),
+                      "Callaway-Sant'Anna",
+                      window_years, event_grid,
+                      engine = "csdid",
+                      covariates = NULL),
       error = function(e) {
-        message("Skipping plain ETWFE for ", spec$short, " / ",
+        message("Skipping CS DID (no controls) for ", spec$short, " / ",
                 outcome$short, ": ", conditionMessage(e))
         NULL
       }
     )
-    trend <- tryCatch(
+    csdid_pop <- tryCatch(
       compute_dynamic(out_panel, outcome$var, spec$label, outcome$label,
-                      "Wooldridge ETWFE + county pre-period trend",
-                      window_years, event_grid, detrend = TRUE),
+                      "Callaway-Sant'Anna + log 1820 pop",
+                      window_years, event_grid,
+                      engine = "csdid",
+                      covariates = ~ log_pop_1820),
       error = function(e) {
-        message("Skipping trend ETWFE for ", spec$short, " / ",
+        message("Skipping CS DID + 1820 pop for ", spec$short, " / ",
                 outcome$short, ": ", conditionMessage(e))
         NULL
       }
@@ -437,14 +426,17 @@ for (spec in specs) {
     if (!is.null(plain)) {
       spec_dynamic_list[[paste(outcome$short, "plain", sep = "|")]] <- plain
     }
-    if (!is.null(trend)) {
-      spec_dynamic_list[[paste(outcome$short, "trend", sep = "|")]] <- trend
+    if (!is.null(csdid_plain)) {
+      spec_dynamic_list[[paste(outcome$short, "csdid_plain", sep = "|")]] <- csdid_plain
     }
-    if (is.null(plain) && is.null(trend)) next
+    if (!is.null(csdid_pop)) {
+      spec_dynamic_list[[paste(outcome$short, "csdid_pop1820", sep = "|")]] <- csdid_pop
+    }
+    if (is.null(plain) && is.null(csdid_plain) && is.null(csdid_pop)) next
 
-    # Raw means use the same >=4 pre-obs sample as the regressions so the
+    # Raw means use the same >=3 pre-obs sample as the regressions so the
     # raw and adjusted plots are comparable.
-    rm_panel <- filter_min_pre_obs(out_panel, outcome$var, min_pre_obs = 4L)
+    rm_panel <- filter_min_pre_obs(out_panel, outcome$var, min_pre_obs = 3L)
     rm <- make_raw_means(rm_panel, outcome$var, event_grid)
     spec_raw_means_list[[outcome$short]] <- rm %>%
       mutate(outcome = outcome$label, .before = 1)
@@ -480,31 +472,23 @@ for (spec in specs) {
   write_csv(spec_raw_means,    file.path(spec_dir, "raw_means.csv"))
   write_csv(spec_cohort_means, file.path(spec_dir, "cohort_means.csv"))
 
-  for (outcome in outcomes) {
-    if (nrow(spec_dynamic) == 0) next
-    plot_df <- spec_dynamic %>% filter(outcome == !!outcome$label)
-    if (nrow(plot_df) == 0) next
-
+  make_es_plot <- function(plot_df, jitter_anchor, outcome_label, sample_text) {
+    estimators_in_plot <- unique(plot_df$estimator)
+    n_est <- length(estimators_in_plot)
+    # Spread error-bar markers symmetrically around the integer event time
+    # so overlapping CIs are readable. With 1 estimator no offset is needed,
+    # with k > 1 estimators the offsets are evenly spaced on [-w, +w] with
+    # the anchor pinned to the leftmost slot.
+    width <- 1.6
+    if (n_est <= 1) {
+      offsets <- setNames(0, estimators_in_plot)
+    } else {
+      ordered <- c(jitter_anchor, setdiff(estimators_in_plot, jitter_anchor))
+      offsets <- setNames(seq(-width, width, length.out = n_est), ordered)
+    }
     plot_df_jitter <- plot_df %>%
-      mutate(
-        x_jitter = event_time + if_else(
-          estimator == "Wooldridge ETWFE", -0.9, 0.9
-        )
-      )
-
-    support_row <- spec_support %>% filter(outcome == !!outcome$label)
-    n_treated   <- if (nrow(support_row) > 0) support_row$treated_counties_used[1] else NA_integer_
-    n_control   <- if (nrow(support_row) > 0) support_row$control_counties_used[1] else NA_integer_
-    n_total     <- if (nrow(support_row) > 0) support_row$sample_counties_used[1] else NA_integer_
-    n_decades   <- length(unique(panel$decade))
-    sample_text <- paste0(
-      "Treated counties: ", n_treated,
-      "  |  Control counties: ", n_control,
-      "  |  Total counties: ", n_total,
-      "  |  County-decade obs: ", format(n_total * n_decades, big.mark = ",")
-    )
-
-    p <- plot_df_jitter %>%
+      mutate(x_jitter = event_time + offsets[estimator])
+    plot_df_jitter %>%
       ggplot(aes(x = event_time, y = att,
                  color = estimator, fill = estimator)) +
       geom_hline(yintercept = 0, color = "gray50", linewidth = 0.4) +
@@ -519,7 +503,7 @@ for (spec in specs) {
       scale_fill_manual(values  = estimator_colors) +
       labs(
         x     = "Years relative to school-opening decade (e=0 is partial exposure)",
-        y     = paste0("ATT, ", outcome$label),
+        y     = paste0("ATT, ", outcome_label),
         color = NULL, fill = NULL,
         caption = sample_text
       ) +
@@ -527,11 +511,34 @@ for (spec in specs) {
         legend.position = "bottom",
         plot.caption    = element_text(hjust = 0.5, size = 9, color = "gray30")
       )
+  }
 
-    ggsave(
-      file.path(spec_dir, paste0("es_", outcome$short, ".png")),
-      p, width = 9, height = 5.25, dpi = 300
+  for (outcome in outcomes) {
+    if (nrow(spec_dynamic) == 0) next
+    plot_df <- spec_dynamic %>% filter(outcome == !!outcome$label)
+    if (nrow(plot_df) == 0) next
+
+    support_row <- spec_support %>% filter(outcome == !!outcome$label)
+    n_treated   <- if (nrow(support_row) > 0) support_row$treated_counties_used[1] else NA_integer_
+    n_control   <- if (nrow(support_row) > 0) support_row$control_counties_used[1] else NA_integer_
+    n_total     <- if (nrow(support_row) > 0) support_row$sample_counties_used[1] else NA_integer_
+    n_decades   <- length(unique(panel$decade))
+    sample_text <- paste0(
+      "Treated counties: ", n_treated,
+      "  |  Control counties: ", n_control,
+      "  |  Total counties: ", n_total,
+      "  |  County-decade obs: ", format(n_total * n_decades, big.mark = ",")
     )
+
+    # Single figure per outcome: vanilla CS DID and CS DID with log 1820
+    # pop as a covariate. Wooldridge ETWFE temporarily disabled.
+    if (nrow(plot_df) > 0) {
+      ggsave(
+        file.path(spec_dir, paste0("es_", outcome$short, ".png")),
+        make_es_plot(plot_df, "Callaway-Sant'Anna", outcome$label, sample_text),
+        width = 9, height = 5.25, dpi = 300
+      )
+    }
 
     rm_df <- spec_raw_means %>% filter(outcome == !!outcome$label)
     if (nrow(rm_df) == 0) next

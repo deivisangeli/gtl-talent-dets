@@ -1,5 +1,6 @@
 suppressPackageStartupMessages(library(tidyverse))
-data <- read_csv("../prep/input/cross-verified-database.csv", show_col_types=FALSE)
+source("../paths.R")
+data <- read_csv(file.path(DATA_INPUT, "cross-verified-database.csv"), show_col_types=FALSE)
 us <- data %>%
   filter(citizenship_1_b == "US", birth >= 1800, birth <= 1999)
 

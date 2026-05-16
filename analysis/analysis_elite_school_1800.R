@@ -37,6 +37,7 @@ suppressPackageStartupMessages({
   library("didimputation")
   library("ggplot2")
 })
+source("../paths.R")
 
 initial_time <- Sys.time()
 theme_set(theme_minimal(base_size = 13))
@@ -214,14 +215,14 @@ restrict_to_ever_treated <- function(data) {
 # Load panel and school list
 ###############################################################################
 
-panel <- read_csv("../prep/output/us_panel_county_stem_1800.csv", show_col_types = FALSE) %>%
+panel <- read_csv(file.path(DATA_OUTPUT, "us_panel_county_stem_1800.csv"), show_col_types = FALSE) %>%
   mutate(
     GEOID = str_pad(as.character(GEOID), width = 5, side = "left", pad = "0"),
     decade = as.integer(decade),
     log1p_population = log1p(population)
   )
 
-schools <- read_csv("../prep/output/elite_high_schools_core_1800_1930.csv",
+schools <- read_csv(file.path(SCHOOLS_OUTPUT, "elite_high_schools_core_1800_1930.csv"),
                     show_col_types = FALSE) %>%
   mutate(
     county_geoid = str_pad(as.character(county_geoid), width = 5, side = "left", pad = "0"),

@@ -1,10 +1,12 @@
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(httr2))
 
+source("../paths.R")
+
 # ---------------------------------------------------------------------------
 # Load data and apply reclassification (same logic as taxonomy_us_scientists.R)
 # ---------------------------------------------------------------------------
-data <- read_csv("../prep/input/cross-verified-database.csv", show_col_types=FALSE)
+data <- read_csv(file.path(DATA_INPUT, "cross-verified-database.csv"), show_col_types=FALSE)
 
 reclass_keywords <- c(
   "computer_scientist", "astrophysicist", "biochemist", "bacteriologist",
