@@ -29,8 +29,10 @@ options(timeout = 600)
 # Importing the Database from downloads
 ###############################################################################
 # Directories
-zip_dir <- "input/2016_beta_release/zip"
-asc_dir <- "input/hyde_pop_asc"
+source("raw_paths.R")
+
+zip_dir <- manual_input_path("2016_beta_release", "zip")
+asc_dir <- hyde_input_dir()
 
 dir.create(asc_dir, recursive = TRUE, showWarnings = FALSE)
 

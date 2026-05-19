@@ -1,4 +1,4 @@
-# CLAUDE.md — GTL Talent Determinants
+# AGENTS.md — GTL Talent Determinants
 
 ## Project Overview
 

@@ -23,23 +23,17 @@ initial_time <- Sys.time()
 
 # Parameters
 options(timeout = 600)
+source("raw_paths.R")
 
 ###############################################################################
 # Importing the Database
 ###############################################################################
 # Wikipedia
-## Getting the URL for the SciencePo website with the database
-url_wikipedia <- "https://data.sciencespo.fr/api/access/datafile/4432?format=original"
-## Downloading a tempfile for the compressed folder
-temp_file <- tempfile(fileext = ".gz")
-download.file(url_wikipedia, temp_file, mode = "wb")
-## Now reading the data, detecting the CSV format from the zip compression
-raw_data <- fread(temp_file)
+raw_data <- fread(ensure_wikipedia_csv())
 
 
 # New Births from GapMinder
-url_new_births <- "https://raw.githubusercontent.com/open-numbers/ddf--gapminder--systema_globalis/master/countries-etc-datapoints/ddf--datapoints--new_births_total_number_estimated--by--geo--time.csv"
-new_births_raw <- fread(url_new_births)
+new_births_raw <- fread(ensure_new_births_csv())
 
 ###############################################################################
 # Cleaning the Database
@@ -123,4 +117,4 @@ final_agg <- data_clean_final_agg %>%
 ###############################################################################
 # Exporting
 ###############################################################################
-write.csv(final_agg, "output/data_final_new.csv", row.names = FALSE)
+save_csv(final_agg, "data_final_new.csv")

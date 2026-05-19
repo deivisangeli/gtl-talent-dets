@@ -25,22 +25,17 @@ initial_time <- Sys.time()
 
 # Parameters
 options(timeout = 600)
+source("raw_paths.R")
 
 ###############################################################################
 # Importing the Database
 ###############################################################################
 # Wikipedia
-## Getting the URL for the SciencePo website with the database
-url_wikipedia <- "https://data.sciencespo.fr/api/access/datafile/4432?format=original"
-## Downloading a tempfile for the compressed folder
-temp_file <- tempfile(fileext = ".gz")
-download.file(url_wikipedia, temp_file, mode = "wb")
-## Now reading the data, detecting the CSV format from the zip compression
-raw_data <- fread(temp_file)
+raw_data <- fread(ensure_wikipedia_csv())
 
 
 # Population from Hyde (already treated)
-hyde_dir <- "input/hyde_pop_asc"
+hyde_dir <- hyde_input_dir()
 hyde_files <- list.files(hyde_dir,pattern = "^popc_.*\\.asc$",full.names = TRUE)
 ## Function to exctract year (decade) from the file
 get_year <- function(x) as.integer(gsub(".*([0-9]{4})AD.*", "\\1", x))
@@ -131,4 +126,4 @@ agg_cell_birth <- data_final_x %>%
 ###############################################################################
 # Exporting
 ###############################################################################
-write.csv(agg_cell_birth, "output/agg_hyde.csv", row.names = FALSE)
+save_csv(agg_cell_birth, "agg_hyde.csv")
