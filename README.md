@@ -23,8 +23,8 @@ Auto-downloadable raw files are stored outside the repo via `DET_DIR`, in
 Add to your `~/.Renviron`:
 
 ```r
-GTL_REPO="C:/Users/megaj/repos/gtl_talent_dets"
-DET_DIR="C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets"
+GTL_REPO="C:/Users/<username>/repos/gtl_talent_dets"
+DET_DIR="C:/Users/<username>/Globtalent Dropbox/gtl_talent_dets"
 ```
 
 - **`GTL_REPO`** — path to the repo root. All scripts resolve paths from here,

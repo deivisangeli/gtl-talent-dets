@@ -11,7 +11,7 @@ Two papers live in this repo:
 All project data lives in Dropbox, not in the git repo. The canonical current data root is:
 
 ```text
-C:\Users\deivi\Globtalent Dropbox\gtl_talent_dets\
+C:\Users\<username>\Globtalent Dropbox\gtl_talent_dets\
 ```
 
 Path variables are defined in `paths.R` at the repo root. Prep and analysis scripts that use the current convention source `../paths.R`.
@@ -42,7 +42,7 @@ Set `TALENT_DETS_DATA_DIR` to the local Dropbox project folder when running on a
 
 ```r
 TALENT_DETS_DATA_DIR <- Sys.getenv("TALENT_DETS_DATA_DIR",
-                             unset = "C:/Users/deivi/Globtalent Dropbox/gtl_talent_dets")
+                             unset = "C:/Users/<username>/Globtalent Dropbox/gtl_talent_dets")
 DATA_INPUT   <- file.path(TALENT_DETS_DATA_DIR, "input")
 DATA_OUTPUT  <- file.path(TALENT_DETS_DATA_DIR, "output")
 AMWS_INPUT   <- file.path(DATA_INPUT,  "amws")
@@ -68,8 +68,8 @@ Coauthors on a different machine should set `TALENT_DETS_DATA_DIR` in their own 
 Some scripts introduced on the remote side use `prep/raw_paths.R`, which requires these variables in `~/.Renviron`:
 
 ```r
-GTL_REPO="C:/Users/megaj/repos/gtl_talent_dets"
-DET_DIR="C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets"
+GTL_REPO="C:/Users/<username>/repos/gtl_talent_dets"
+DET_DIR="C:/Users/<username>/Globtalent Dropbox/gtl_talent_dets"
 ```
 
 - **`GTL_REPO`** — path to the repo root for scripts that need to resolve repo files from any working directory.
