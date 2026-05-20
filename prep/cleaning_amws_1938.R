@@ -20,8 +20,13 @@ suppressPackageStartupMessages({
   library(stringr)
 })
 
-source("state_alias.R")
-source("../paths.R")
+repo_root <- Sys.getenv("GTL_REPO", unset = "")
+if (!nzchar(repo_root)) {
+  stop("GTL_REPO is not set. Set it in .Renviron to the repository root.")
+}
+
+source(file.path(repo_root, "prep", "state_alias.R"))
+source(file.path(repo_root, "paths.R"))
 
 df <- read_dta(file.path(AMWS_INPUT, "amws_1938.dta"))
 

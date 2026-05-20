@@ -16,7 +16,7 @@ suppressPackageStartupMessages({
 source("../paths.R")
 
 out_root <- AMWS_OUTPUT
-in_root  <- DATA_INPUT
+in_root  <- AMWS_INPUT
 
 norm_last <- function(x) {
   x <- iconv(x, to = "ASCII//TRANSLIT", sub = "")
@@ -56,24 +56,12 @@ g38  <- fread(file.path(out_root, "amws_1938_us_geocoded_final.csv"))
 e38 <- merge(g38, cl38[, .(lineid, birth_year, last, first)], by = "lineid", all.x = TRUE)
 e38[, edition := 1938L]
 
-# ---- 1955: last+first from split.csv, birth_year parsed from cleaned.date ---
-sp55 <- fread(file.path(out_root, "amws_1955_split.csv"))[, .(lineid, last, first)]
-cl55 <- fread(file.path(out_root, "amws_1955_cleaned.csv"))[, .(lineid, date)]
-parse_year55 <- function(date_str) {
-  yr <- suppressWarnings(as.integer(sub(".*?([0-9]{1,4})\\s*$", "\\1", date_str)))
-  out <- rep(NA_integer_, length(date_str))
-  k4    <- !is.na(yr) & yr >= 1000
-  k1900 <- !is.na(yr) & yr >= 0  & yr <= 55
-  k1800 <- !is.na(yr) & yr >= 56 & yr <= 99
-  out[k4]    <- yr[k4]
-  out[k1900] <- 1900L + yr[k1900]
-  out[k1800] <- 1800L + yr[k1800]
-  out
-}
-cl55[, birth_year := parse_year55(date)]
+# ---- 1955: names and canonical birth_year from split.csv -------------------
+sp55 <- fread(file.path(out_root, "amws_1955_split.csv"))[, .(
+  lineid, last, first, birth_year
+)]
 g55 <- fread(file.path(out_root, "amws_1955_us_geocoded_final.csv"))
 e55 <- merge(g55, sp55, by = "lineid", all.x = TRUE)
-e55 <- merge(e55, cl55[, .(lineid, birth_year)], by = "lineid", all.x = TRUE)
 e55[, edition := 1955L]
 
 # ---- Stack and build person key --------------------------------------------

@@ -24,8 +24,13 @@ suppressPackageStartupMessages({
   library(stringr)
 })
 
-source("state_alias.R")
-source("../paths.R")
+repo_root <- Sys.getenv("GTL_REPO", unset = "")
+if (!nzchar(repo_root)) {
+  stop("GTL_REPO is not set. Set it in .Renviron to the repository root.")
+}
+
+source(file.path(repo_root, "prep", "state_alias.R"))
+source(file.path(repo_root, "paths.R"))
 
 raw <- as.data.table(read_excel(file.path(AMWS_INPUT, "amws_1906.xlsx"),
                                 sheet = 1, col_names = FALSE))
@@ -96,6 +101,11 @@ d[, flag    := vapply(parsed, `[[`, character(1), "flag")]
 
 # ---- Birth year (every YY -> 1800 + YY) ------------------------------------
 d[, birth_year := suppressWarnings(as.integer(year_yy_raw))]
+d[is.na(birth_year),
+  birth_year := suppressWarnings(as.integer(str_match(
+    birthplace_orig,
+    "(?i)\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\\.?\\s+\\d{1,2}\\.\\s*(\\d{2})\\b"
+  )[, 2]))]
 d[!is.na(birth_year), birth_year := 1800L + birth_year]
 
 # ---- Date string (Month DD, YY) --------------------------------------------
