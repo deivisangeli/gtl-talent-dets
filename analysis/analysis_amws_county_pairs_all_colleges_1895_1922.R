@@ -1,6 +1,7 @@
 ###############################################################################
 # Project: GTL Talent Determinants
-# Goal: AMWS event studies using Andrews college site-selection experiments
+# Goal: AMWS event studies using Andrews college site-selection experiments,
+#       restricted to experiments in 1895-1922.
 ###############################################################################
 
 rm(list = ls())
@@ -38,7 +39,10 @@ source(file.path(repo_root, "analysis", "amws_twfe_event_study_helpers.R"))
 
 options(tigris_use_cache = TRUE, tigris_cache_dir = tigris_cache_dir())
 
-results_subdir <- "amws_county_pairs_all_colleges"
+results_subdir <- "amws_county_pairs_all_colleges_1895_1922"
+
+event_year_min <- 1895L
+event_year_max <- 1922L
 
 results_subdir_path <- function(...) {
  results_file_path(results_subdir, ...)
@@ -112,6 +116,7 @@ plot_dynamic_event_study <- function(es, outcome, timing_name, y_limits) {
    title = str_wrap(
     paste(
      "AMWS event study - Andrews county pairs - all college types -",
+     paste0("events ", event_year_min, "-", event_year_max, "-"),
      outcome,
      timing_name
     ),
@@ -288,6 +293,10 @@ event_lookup <- pairs_long %>%
    floor(experiment_year / 10) * 10 + 10,
    floor(experiment_year / 10) * 10
   )
+ ) %>%
+ filter(
+  experiment_year >= event_year_min,
+  experiment_year <= event_year_max
  )
 
 treated_units <- event_lookup %>%
@@ -559,61 +568,6 @@ event_distribution <- bind_rows(
   select(distribution, value, n_events)
 )
 
-university_allocations_by_decade <- event_lookup %>%
- count(decade = g_std, name = "n_universities") %>%
- arrange(decade)
-
-stopifnot(sum(university_allocations_by_decade$n_universities) == nrow(event_lookup))
-
-write_csv(
- university_allocations_by_decade,
- results_subdir_path("university_allocations_by_decade.csv"),
- na = ""
-)
-
-plot_university_allocations_by_decade <- ggplot(
- university_allocations_by_decade,
- aes(x = decade, y = n_universities)
-) +
- geom_col(fill = "#2f7786", width = 8) +
- geom_text(
-  aes(label = n_universities),
-  vjust = -0.3,
-  size = 3.5
- ) +
- scale_x_continuous(
-  breaks = university_allocations_by_decade$decade,
-  labels = as.character(university_allocations_by_decade$decade)
- ) +
- scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
- labs(
-  x = "Decade",
-  y = "Number of universities allocated",
-  title = "Universities allocated by decade"
- ) +
- theme_classic() +
- theme(
-  plot.title = element_text(
-   color = "darkgray",
-   face = "bold",
-   size = 12
-  ),
-  axis.title = element_text(
-   color = "darkgray",
-   face = "bold",
-   size = 12
-  ),
-  axis.text.x = element_text(angle = 45, hjust = 1)
- )
-
-ggsave(
- filename = results_subdir_path("university_allocations_by_decade.png"),
- plot = plot_university_allocations_by_decade,
- width = 8,
- height = 6,
- dpi = 300
-)
-
 write_csv(
  event_distribution,
  results_subdir_path("amws_county_pairs_all_colleges_event_distribution.csv"),
@@ -670,7 +624,11 @@ write_csv(
 )
 
 notes_lines <- c(
- "AMWS event study using Andrews high-quality college site-selection experiments",
+ paste0(
+  "AMWS event study using Andrews high-quality college site-selection ",
+  "experiments, restricted to experiment years ",
+  event_year_min, "-", event_year_max
+ ),
  paste0("Source workbook: ", pairs_path),
  paste0("Generated on: ", Sys.Date()),
  "",
@@ -679,7 +637,8 @@ notes_lines <- c(
  paste0("AMWS panel decades used: ", first_panel_decade, "-",
         last_panel_decade),
  paste0("Dynamic window: +/-", window_years, " years"),
- paste0("Original Andrews events: ", nrow(event_lookup)),
+ paste0("Event-year restriction: ", event_year_min, "-", event_year_max),
+ paste0("Retained Andrews events: ", nrow(event_lookup)),
  paste0("Unresolved runner-up rows excluded: ", nrow(runner_unresolved_rows)),
  "",
  "Event-study outcomes:",

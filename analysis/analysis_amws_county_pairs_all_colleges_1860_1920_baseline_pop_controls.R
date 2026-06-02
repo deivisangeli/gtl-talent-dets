@@ -1,6 +1,8 @@
 ###############################################################################
 # Project: GTL Talent Determinants
-# Goal: AMWS event studies using Andrews college site-selection experiments
+# Goal: AMWS event studies using Andrews college site-selection experiments,
+#       restricted to experiments in 1860-1920, controlling for baseline
+#       county population.
 ###############################################################################
 
 rm(list = ls())
@@ -34,11 +36,13 @@ if (length(file_arg) > 0) {
 }
 
 source(file.path(repo_root, "prep", "raw_paths.R"))
-source(file.path(repo_root, "analysis", "amws_twfe_event_study_helpers.R"))
 
 options(tigris_use_cache = TRUE, tigris_cache_dir = tigris_cache_dir())
 
-results_subdir <- "amws_county_pairs_all_colleges"
+results_subdir <- "amws_county_pairs_all_colleges_1860_1920_baseline_pop_controls"
+
+event_year_min <- 1860L
+event_year_max <- 1920L
 
 results_subdir_path <- function(...) {
  results_file_path(results_subdir, ...)
@@ -73,9 +77,10 @@ normalize_county <- function(x) {
   str_squish()
 }
 
-extract_dynamic_att <- function(es, outcome, timing_name) {
+extract_dynamic_att <- function(es, outcome, spec_name, timing_name) {
  tibble(
   outcome = outcome,
+  spec = spec_name,
   timing = timing_name,
   event_time = es$egt,
   estimate = es$att.egt,
@@ -104,7 +109,17 @@ sanitize_filename <- function(x) {
  str_replace_all(x, "[^A-Za-z0-9]+", "_")
 }
 
-plot_dynamic_event_study <- function(es, outcome, timing_name, y_limits) {
+control_title <- function(spec_name) {
+ switch(
+  spec_name,
+  population_level = "Control: population_baseline",
+  population_log = "Control: log_population_baseline",
+  paste0("Control: ", spec_name)
+ )
+}
+
+plot_dynamic_event_study <- function(es, outcome, spec_name, timing_name,
+                                     y_limits) {
  did::ggdid(es) +
   labs(
    x = "Relative Time",
@@ -112,7 +127,9 @@ plot_dynamic_event_study <- function(es, outcome, timing_name, y_limits) {
    title = str_wrap(
     paste(
      "AMWS event study - Andrews county pairs - all college types -",
+     paste0("events ", event_year_min, "-", event_year_max, "-"),
      outcome,
+     control_title(spec_name),
      timing_name
     ),
     width = 72
@@ -121,18 +138,85 @@ plot_dynamic_event_study <- function(es, outcome, timing_name, y_limits) {
   coord_cartesian(ylim = y_limits)
 }
 
-run_event_study <- function(data, outcome, timing_name, window = 70) {
+complete_control_units <- function(data, controls) {
+ data %>%
+  distinct(stack_unit_num, across(all_of(controls))) %>%
+  filter(if_all(all_of(controls), ~ !is.na(.x))) %>%
+  pull(stack_unit_num)
+}
+
+prepare_controls_for_spec <- function(data, controls) {
+ analysis_units <- complete_control_units(data, controls)
+
+ data <- data %>%
+  filter(stack_unit_num %in% analysis_units)
+
+ retained_events <- data %>%
+  group_by(event_id) %>%
+  summarise(
+   has_treated = any(g > 0),
+   has_control = any(g == 0),
+   .groups = "drop"
+  ) %>%
+  filter(has_treated, has_control) %>%
+  select(event_id)
+
+ data <- data %>%
+  semi_join(retained_events, by = "event_id")
+
+ formula_vars <- controls[
+  map_lgl(data[controls], ~ n_distinct(.x, na.rm = TRUE) > 1)
+ ]
+
+ list(data = data, formula_vars = formula_vars)
+}
+
+summarise_missing_controls <- function(data, controls, spec_name, timing_name) {
+ data %>%
+  distinct(stack_unit_num, event_id, across(all_of(controls))) %>%
+  summarise(across(all_of(controls), ~ sum(is.na(.x)))) %>%
+  pivot_longer(everything(), names_to = "control", values_to = "missing_units") %>%
+  mutate(
+   spec = spec_name,
+   timing = timing_name
+  ) %>%
+  select(spec, timing, control, missing_units)
+}
+
+run_event_study <- function(data, outcome, controls, spec_name, timing_name,
+                            window = 70) {
  data_es <- data %>%
   select(stack_unit_num, GEOID, decade, g, sample_role, event_id,
-         all_of(outcome)) %>%
+         all_of(outcome), all_of(controls)) %>%
   rename(y = all_of(outcome)) %>%
   filter(!is.na(y))
+
+ control_prep <- prepare_controls_for_spec(data_es, controls)
+ data_es <- control_prep$data
+
+ if (nrow(data_es) == 0) {
+  return(list(
+   ok = FALSE,
+   outcome = outcome,
+   spec = spec_name,
+   timing = timing_name,
+   n_rows = 0L,
+   n_units = 0L,
+   n_events = 0L,
+   n_treated_units = 0L,
+   n_control_units = 0L,
+   formula_vars = list(control_prep$formula_vars),
+   error = "No rows after outcome and control missingness filters."
+  ))
+ }
 
  if (n_distinct(data_es$g[data_es$g > 0]) == 0) {
   return(list(
    ok = FALSE,
    outcome = outcome,
+   spec = spec_name,
    timing = timing_name,
+   formula_vars = list(control_prep$formula_vars),
    error = "No treated cohorts in estimation sample."
   ))
  }
@@ -141,9 +225,17 @@ run_event_study <- function(data, outcome, timing_name, window = 70) {
   return(list(
    ok = FALSE,
    outcome = outcome,
+   spec = spec_name,
    timing = timing_name,
+   formula_vars = list(control_prep$formula_vars),
    error = "Outcome has insufficient variation."
   ))
+ }
+
+ xformla <- if (length(control_prep$formula_vars) > 0) {
+  as.formula(paste("~", paste(control_prep$formula_vars, collapse = " + ")))
+ } else {
+  ~ 1
  }
 
  tryCatch(
@@ -153,9 +245,10 @@ run_event_study <- function(data, outcome, timing_name, window = 70) {
     tname = "decade",
     idname = "stack_unit_num",
     gname = "g",
+    xformla = xformla,
     data = data_es,
     control_group = "nevertreated",
-    est_method = "dr",
+    est_method = "reg",
     base_period = "universal",
     allow_unbalanced_panel = TRUE,
     cores = 4
@@ -172,6 +265,7 @@ run_event_study <- function(data, outcome, timing_name, window = 70) {
    list(
     ok = TRUE,
     outcome = outcome,
+    spec = spec_name,
     timing = timing_name,
     out = out,
     es = es,
@@ -182,6 +276,7 @@ run_event_study <- function(data, outcome, timing_name, window = 70) {
     n_control_units = n_distinct(data_es$stack_unit_num[data_es$g == 0]),
     min_decade = min(data_es$decade, na.rm = TRUE),
     max_decade = max(data_es$decade, na.rm = TRUE),
+    formula_vars = list(control_prep$formula_vars),
     error = NA_character_
    )
   },
@@ -189,7 +284,9 @@ run_event_study <- function(data, outcome, timing_name, window = 70) {
    list(
     ok = FALSE,
     outcome = outcome,
+    spec = spec_name,
     timing = timing_name,
+    formula_vars = list(control_prep$formula_vars),
     error = conditionMessage(e)
    )
   }
@@ -288,6 +385,10 @@ event_lookup <- pairs_long %>%
    floor(experiment_year / 10) * 10 + 10,
    floor(experiment_year / 10) * 10
   )
+ ) %>%
+ filter(
+  experiment_year >= event_year_min,
+  experiment_year <= event_year_max
  )
 
 treated_units <- event_lookup %>%
@@ -366,6 +467,18 @@ if (any(is.na(runner_units$GEOID))) {
 first_panel_decade <- min(panel$decade, na.rm = TRUE)
 last_panel_decade <- max(panel$decade, na.rm = TRUE)
 
+baseline_population <- panel %>%
+ transmute(
+  GEOID,
+  control_year = decade,
+  population_baseline = population,
+  log_population_baseline = if_else(
+   population_baseline > 0,
+   log(population_baseline),
+   NA_real_
+  )
+ )
+
 build_stack_panel <- function(timing_var, timing_name) {
  event_sample <- event_lookup %>%
   mutate(treatment_decade = .data[[timing_var]]) %>%
@@ -389,9 +502,11 @@ build_stack_panel <- function(timing_var, timing_name) {
   distinct(event_id, GEOID, sample_role, .keep_all = TRUE) %>%
   mutate(
    timing = timing_name,
+   control_year = treatment_decade - 10,
    stack_unit_id = paste(event_id, GEOID, sample_role, sep = "_"),
    stack_unit_num = dense_rank(stack_unit_id)
-  )
+  ) %>%
+  left_join(baseline_population, by = c("GEOID", "control_year"))
 
  panel %>%
   inner_join(stack_units, by = "GEOID") %>%
@@ -412,26 +527,39 @@ outcomes <- c(
  "amws_per_100k"
 )
 
+control_sets <- list(
+ population_level = "population_baseline",
+ population_log = "log_population_baseline"
+)
+
 window_years <- 70
 
 model_results <- list()
 
-for (timing_name in c("standard_decade", "alternative_decade")) {
- panel_timing <- if (timing_name == "standard_decade") {
-  panel_es_std
- } else {
-  panel_es_shift
- }
+for (spec_name in names(control_sets)) {
+ for (timing_name in c("standard_decade", "alternative_decade")) {
+  panel_timing <- if (timing_name == "standard_decade") {
+   panel_es_std
+  } else {
+   panel_es_shift
+  }
 
- for (outcome in outcomes) {
-  message("Running AMWS event study: ", outcome, " | ", timing_name)
+  for (outcome in outcomes) {
+   message(
+    "Running baseline-population controlled AMWS event study: ",
+    outcome, " | ", spec_name, " | ", timing_name
+   )
 
-  model_results[[paste(outcome, timing_name, sep = "__")]] <- run_event_study(
-   data = panel_timing,
-   outcome = outcome,
-   timing_name = timing_name,
-   window = window_years
-  )
+   model_results[[paste(outcome, spec_name, timing_name, sep = "__")]] <-
+    run_event_study(
+     data = panel_timing,
+     outcome = outcome,
+     controls = control_sets[[spec_name]],
+     spec_name = spec_name,
+     timing_name = timing_name,
+     window = window_years
+    )
+  }
  }
 }
 
@@ -444,7 +572,7 @@ if (length(successful_models) == 0) {
 
 dynamic_att <- imap_dfr(
  successful_models,
- ~ extract_dynamic_att(.x$es, .x$outcome, .x$timing)
+ ~ extract_dynamic_att(.x$es, .x$outcome, .x$spec, .x$timing)
 )
 
 model_status <- imap_dfr(
@@ -452,6 +580,7 @@ model_status <- imap_dfr(
  ~ tibble(
   model = .y,
   outcome = .x$outcome,
+  spec = .x$spec,
   timing = .x$timing,
   ok = .x$ok,
   n_rows = ifelse(isTRUE(.x$ok), .x$n_rows, NA_integer_),
@@ -461,21 +590,36 @@ model_status <- imap_dfr(
   n_control_units = ifelse(isTRUE(.x$ok), .x$n_control_units, NA_integer_),
   min_decade = ifelse(isTRUE(.x$ok), .x$min_decade, NA_real_),
   max_decade = ifelse(isTRUE(.x$ok), .x$max_decade, NA_real_),
+  formula_vars = paste(unlist(.x$formula_vars), collapse = " + "),
   error = .x$error
  )
 )
 
-twfe_results <- run_and_export_twfe_event_studies(
- panel_by_timing = list(
-  standard_decade = panel_es_std,
-  alternative_decade = panel_es_shift
- ),
- outcomes = outcomes,
- window = window_years,
- results_subdir_path = results_subdir_path,
- title_prefix =
-  "AMWS TWFE event study - Andrews county pairs - all college types"
-)
+missing_controls <- imap_dfr(control_sets, function(controls, spec_name) {
+ bind_rows(
+  summarise_missing_controls(panel_es_std, controls, spec_name,
+                             "standard_decade"),
+  summarise_missing_controls(panel_es_shift, controls, spec_name,
+                             "alternative_decade")
+ )
+})
+
+baseline_population_source_audit <- bind_rows(panel_es_std, panel_es_shift) %>%
+ distinct(
+  timing,
+  event_id,
+  stack_unit_id,
+  stack_unit_num,
+  sample_role,
+  GEOID,
+  college,
+  experiment_year,
+  treatment_decade,
+  control_year,
+  population_baseline,
+  log_population_baseline
+ ) %>%
+ arrange(timing, event_id, sample_role, GEOID)
 
 ###############################################################################
 # Export plots and tables
@@ -483,13 +627,14 @@ twfe_results <- run_and_export_twfe_event_studies(
 
 for (model in successful_models) {
  model_att <- dynamic_att %>%
-  filter(outcome == model$outcome, timing == model$timing)
+  filter(outcome == model$outcome, spec == model$spec, timing == model$timing)
 
  y_limits <- dynamic_y_limits(model_att)
 
  plot_es <- plot_dynamic_event_study(
   model$es,
   model$outcome,
+  model$spec,
   model$timing,
   y_limits
  )
@@ -500,6 +645,7 @@ for (model in successful_models) {
     paste(
      "Group-specific ATT - AMWS - Andrews county pairs - all college types -",
      model$outcome,
+     control_title(model$spec),
      model$timing
     ),
     width = 72
@@ -507,12 +653,13 @@ for (model in successful_models) {
   )
 
  safe_outcome <- sanitize_filename(model$outcome)
+ safe_spec <- sanitize_filename(model$spec)
  safe_timing <- sanitize_filename(model$timing)
 
  ggsave(
   filename = results_subdir_path(
-   paste0("ES_amws_county_pairs_all_colleges_", safe_outcome, "_",
-          safe_timing, ".png")
+   paste0("ES_amws_county_pairs_all_colleges_baseline_pop_controls_",
+          safe_spec, "_", safe_outcome, "_", safe_timing, ".png")
   ),
   plot = plot_es,
   width = 8,
@@ -522,8 +669,8 @@ for (model in successful_models) {
 
  ggsave(
   filename = results_subdir_path(
-   paste0("ggdid_amws_county_pairs_all_colleges_", safe_outcome, "_",
-          safe_timing, ".png")
+   paste0("ggdid_amws_county_pairs_all_colleges_baseline_pop_controls_",
+          safe_spec, "_", safe_outcome, "_", safe_timing, ".png")
   ),
   plot = plot_group,
   width = 8,
@@ -534,13 +681,33 @@ for (model in successful_models) {
 
 write_csv(
  dynamic_att,
- results_subdir_path("amws_county_pairs_all_colleges_dynamic_att.csv"),
+ results_subdir_path(
+  "amws_county_pairs_all_colleges_baseline_pop_controls_dynamic_att.csv"
+ ),
  na = ""
 )
 
 write_csv(
  model_status,
- results_subdir_path("amws_county_pairs_all_colleges_model_status.csv"),
+ results_subdir_path(
+  "amws_county_pairs_all_colleges_baseline_pop_controls_model_status.csv"
+ ),
+ na = ""
+)
+
+write_csv(
+ missing_controls,
+ results_subdir_path(
+  "amws_county_pairs_all_colleges_baseline_pop_controls_missing_controls.csv"
+ ),
+ na = ""
+)
+
+write_csv(
+ baseline_population_source_audit,
+ results_subdir_path(
+  "amws_county_pairs_all_colleges_baseline_pop_controls_source_years.csv"
+ ),
  na = ""
 )
 
@@ -559,64 +726,11 @@ event_distribution <- bind_rows(
   select(distribution, value, n_events)
 )
 
-university_allocations_by_decade <- event_lookup %>%
- count(decade = g_std, name = "n_universities") %>%
- arrange(decade)
-
-stopifnot(sum(university_allocations_by_decade$n_universities) == nrow(event_lookup))
-
-write_csv(
- university_allocations_by_decade,
- results_subdir_path("university_allocations_by_decade.csv"),
- na = ""
-)
-
-plot_university_allocations_by_decade <- ggplot(
- university_allocations_by_decade,
- aes(x = decade, y = n_universities)
-) +
- geom_col(fill = "#2f7786", width = 8) +
- geom_text(
-  aes(label = n_universities),
-  vjust = -0.3,
-  size = 3.5
- ) +
- scale_x_continuous(
-  breaks = university_allocations_by_decade$decade,
-  labels = as.character(university_allocations_by_decade$decade)
- ) +
- scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
- labs(
-  x = "Decade",
-  y = "Number of universities allocated",
-  title = "Universities allocated by decade"
- ) +
- theme_classic() +
- theme(
-  plot.title = element_text(
-   color = "darkgray",
-   face = "bold",
-   size = 12
-  ),
-  axis.title = element_text(
-   color = "darkgray",
-   face = "bold",
-   size = 12
-  ),
-  axis.text.x = element_text(angle = 45, hjust = 1)
- )
-
-ggsave(
- filename = results_subdir_path("university_allocations_by_decade.png"),
- plot = plot_university_allocations_by_decade,
- width = 8,
- height = 6,
- dpi = 300
-)
-
 write_csv(
  event_distribution,
- results_subdir_path("amws_county_pairs_all_colleges_event_distribution.csv"),
+ results_subdir_path(
+  "amws_county_pairs_all_colleges_baseline_pop_controls_event_distribution.csv"
+ ),
  na = ""
 )
 
@@ -634,43 +748,44 @@ event_details <- event_lookup %>%
 
 write_csv(
  event_details,
- results_subdir_path("amws_county_pairs_all_colleges_events.csv"),
+ results_subdir_path(
+  "amws_county_pairs_all_colleges_baseline_pop_controls_events.csv"
+ ),
  na = ""
 )
 
-sample_summary <- bind_rows(
- tibble(
-  timing = "standard_decade",
+sample_summary <- model_status %>%
+ transmute(
+  spec,
+  timing,
+  outcome,
   original_events = nrow(event_lookup),
-  estimable_events = n_distinct(panel_es_std$event_id),
-  treated_units = n_distinct(panel_es_std$stack_unit_num[panel_es_std$g > 0]),
-  runner_up_units = n_distinct(panel_es_std$stack_unit_num[panel_es_std$g == 0]),
-  panel_rows = nrow(panel_es_std),
+  retained_events = n_events,
+  treated_units = n_treated_units,
+  runner_up_units = n_control_units,
+  panel_rows = n_rows,
   first_panel_decade = first_panel_decade,
   last_panel_decade = last_panel_decade,
-  unresolved_runner_up_rows = nrow(runner_unresolved_rows)
- ),
- tibble(
-  timing = "alternative_decade",
-  original_events = nrow(event_lookup),
-  estimable_events = n_distinct(panel_es_shift$event_id),
-  treated_units = n_distinct(panel_es_shift$stack_unit_num[panel_es_shift$g > 0]),
-  runner_up_units = n_distinct(panel_es_shift$stack_unit_num[panel_es_shift$g == 0]),
-  panel_rows = nrow(panel_es_shift),
-  first_panel_decade = first_panel_decade,
-  last_panel_decade = last_panel_decade,
-  unresolved_runner_up_rows = nrow(runner_unresolved_rows)
+  unresolved_runner_up_rows = nrow(runner_unresolved_rows),
+  ok,
+  error
  )
-)
 
 write_csv(
  sample_summary,
- results_subdir_path("amws_county_pairs_all_colleges_sample_summary.csv"),
+ results_subdir_path(
+  "amws_county_pairs_all_colleges_baseline_pop_controls_sample_summary.csv"
+ ),
  na = ""
 )
 
 notes_lines <- c(
- "AMWS event study using Andrews high-quality college site-selection experiments",
+ paste0(
+  "AMWS event study using Andrews high-quality college site-selection ",
+ "experiments, restricted to experiment years ",
+  event_year_min, "-", event_year_max,
+  ", controlling for baseline county population"
+ ),
  paste0("Source workbook: ", pairs_path),
  paste0("Generated on: ", Sys.Date()),
  "",
@@ -679,10 +794,14 @@ notes_lines <- c(
  paste0("AMWS panel decades used: ", first_panel_decade, "-",
         last_panel_decade),
  paste0("Dynamic window: +/-", window_years, " years"),
- paste0("Original Andrews events: ", nrow(event_lookup)),
- paste0("Unresolved runner-up rows excluded: ", nrow(runner_unresolved_rows)),
- "",
- "Event-study outcomes:",
+ paste0("Event-year restriction: ", event_year_min, "-", event_year_max),
+paste0("Retained Andrews events: ", nrow(event_lookup)),
+paste0("Unresolved runner-up rows excluded: ", nrow(runner_unresolved_rows)),
+"Estimation method: did::att_gt with est_method = 'reg'.",
+"Baseline population control year: treatment_decade - 10.",
+"Control specifications: population_level uses population_baseline; population_log uses log(population_baseline).",
+"",
+"Event-study outcomes:",
  paste0("- ", outcomes),
  "",
  "Sample summary:",
@@ -691,10 +810,13 @@ notes_lines <- c(
  "Event distribution:",
  capture.output(print(event_distribution, n = Inf)),
  "",
- "Model status:",
- capture.output(print(model_status, n = Inf)),
- "",
- "Events not estimable under standard decade:",
+"Model status:",
+capture.output(print(model_status, n = Inf)),
+"",
+"Missing controls:",
+capture.output(print(missing_controls, n = Inf)),
+"",
+"Events not estimable under standard decade:",
  event_details %>%
   filter(!estimable_standard_decade) %>%
   transmute(line = paste0(
@@ -715,7 +837,9 @@ notes_lines <- c(
 
 writeLines(
  notes_lines,
- con = results_subdir_path("amws_county_pairs_all_colleges_notes.txt")
+ con = results_subdir_path(
+  "amws_county_pairs_all_colleges_baseline_pop_controls_notes.txt"
+ )
 )
 
 message("Saved AMWS county-pairs event-study outputs in: ",
