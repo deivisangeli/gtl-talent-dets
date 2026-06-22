@@ -1,0 +1,23 @@
+World's fairs LAU-level event studies with baseline population controls
+
+Run timestamp: 2026-06-07 13:54:59
+DATA_INPUT: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/input
+DATA_OUTPUT: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/output
+Panel: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/output/europe_lau_inventor_panel_1700_1960_balanced_rates.csv
+Fairs: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/input/worlds_fairs_wikipedia_geocoded.xlsx
+GISCO LAU boundaries: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/output/europe_lau_boundaries_2024.gpkg
+Outcome panel window: 1700-1960.
+Treatment window: fair event_year between 1800 and 1900, inclusive.
+Multi-year entries use the first listed year via year_start / first 4-digit year.
+US events are excluded because the outcome panel is Europe-only.
+European events are assigned to GISCO LAU polygons by point-in-polygon.
+Units treated in the first outcome period are recorded but dropped from did estimation because they have no pre-period.
+Timing variables: g_std = floor(event_year / 10) * 10; g_shift shifts years ending in 7-9 to next decade.
+Baseline control definition: population of the unit in 1800.
+Control specifications: population_level uses population_baseline_1800; population_log uses log_population_baseline_1800.
+Estimator: did::att_gt with xformla controls, control_group = notyettreated, est_method = dr, base_period = universal.
+Outcomes: inventors_per_100k_pop, stem_per_100k_pop, n_inventors, log1p_n_inventors, n_stem, log1p_n_stem
+Successful models: 24 / 24
+Treatment fair rows matched to panel: 95
+Treated units in treatment assignment: 44
+Elapsed minutes: 1.4

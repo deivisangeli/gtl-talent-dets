@@ -1,0 +1,5 @@
+sample,control_spec,control,missing_units
+combined_us_europe,population_level,population_baseline_1800,0
+europe_city_only,population_level,population_baseline_1800,0
+combined_us_europe,population_log,log_population_baseline_1800,0
+europe_city_only,population_log,log_population_baseline_1800,0

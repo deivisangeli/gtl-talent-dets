@@ -1,0 +1,19 @@
+World's fairs city-level event studies
+
+Run timestamp: 2026-06-03 17:17:30
+DATA_INPUT: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/input
+DATA_OUTPUT: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/output
+Panel: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/output/us_europe_inventor_panel_1800_1960_balanced_rates.csv
+Fairs: C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets/input/worlds_fairs_wikipedia_geocoded.xlsx
+Treatment window: fair event_year between 1800 and 1900, inclusive.
+Multi-year entries use the first listed year via year_start / first 4-digit year.
+US events are assigned to counties because the US side of the final panel is county-level.
+European events are assigned by GeoNames city ID.
+Units treated in the first outcome period are recorded but dropped from did estimation because they have no pre-period.
+Timing variables: g_std = floor(event_year / 10) * 10; g_shift shifts years ending in 7-9 to next decade.
+Estimator: did::att_gt, control_group = notyettreated, est_method = dr, base_period = universal.
+Outcomes: inventors_per_100k_pop, stem_per_100k_pop, n_inventors, log1p_n_inventors, n_stem, log1p_n_stem
+Successful models: 24 / 24
+Treatment fair rows matched to panel: 133
+Treated units in treatment assignment: 60
+Elapsed minutes: 1.8

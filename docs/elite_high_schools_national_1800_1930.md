@@ -7,7 +7,7 @@ This note documents the national school list and the current admissions/access c
 - [elite_high_schools_national_1800_1930.csv](/abs/path/C:/Users/deivi/github/gtl-talent-dets/prep/output/elite_high_schools_national_1800_1930.csv)
 - [elite_high_schools_state_coverage_1800_1930.csv](/abs/path/C:/Users/deivi/github/gtl-talent-dets/prep/output/elite_high_schools_state_coverage_1800_1930.csv)
 - [elite_high_schools_national_manual.csv](/abs/path/C:/Users/deivi/github/gtl-talent-dets/prep/input/elite_high_schools_national_manual.csv)
-- [build_elite_high_schools_national.py](/abs/path/C:/Users/deivi/github/gtl-talent-dets/prep/build_elite_high_schools_national.py)
+- [build_elite_high_schools_national.py](/abs/path/C:/Users/deivi/github/gtl-talent-dets/prep/elite_schools/build_elite_high_schools_national.py)
 
 ## What Changed
 

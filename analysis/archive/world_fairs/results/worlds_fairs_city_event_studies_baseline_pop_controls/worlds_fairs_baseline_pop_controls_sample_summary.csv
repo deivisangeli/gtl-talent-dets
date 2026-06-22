@@ -1,0 +1,3 @@
+sample,n_rows,n_units,n_periods,min_decade,max_decade,is_balanced,min_periods_per_unit,max_periods_per_unit,missing_inventors_per_100k_pop,missing_stem_per_100k_pop,missing_population_baseline_1800,missing_log_population_baseline_1800,total_inventors,total_stem,n_treated_std,n_treated_shift
+combined_us_europe,137258,8074,17,1800,1960,TRUE,17,17,0,0,0,0,86767,33544,60,60
+europe_city_only,83844,4932,17,1800,1960,TRUE,17,17,0,0,0,0,64933,23223,48,48

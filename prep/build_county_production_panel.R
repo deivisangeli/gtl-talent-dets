@@ -109,7 +109,8 @@ extract_domain_panel <- function(spec, crosswalk) {
 # GISJOIN -> current/nominal FIPS GEOID crosswalk
 ###############################################################################
 
-# This is the same nominal county file used in prep/cleaning_county.R. Rows with
+# This is the same nominal county file used in
+# prep/scientific_facilities/cleaning_county.R. Rows with
 # missing COUNTYFP are historical counties that do not map cleanly to a current
 # 5-digit county GEOID and are audited separately.
 county_crosswalk <- read_csv(

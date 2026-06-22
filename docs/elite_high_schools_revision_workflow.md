@@ -10,7 +10,7 @@ This note documents the completed second-pass revision of the national elite-sch
 - [elite_high_schools_state_review_batches.csv](</C:/Users/deivi/github/gtl-talent-dets/prep/input/elite_high_schools_state_review_batches.csv>)
 - [elite_high_schools_revision_queue.csv](</C:/Users/deivi/github/gtl-talent-dets/prep/input/elite_high_schools_revision_queue.csv>)
 - [elite_high_schools_revision_decisions.csv](</C:/Users/deivi/github/gtl-talent-dets/prep/input/elite_high_schools_revision_decisions.csv>)
-- [build_elite_high_schools_national.py](</C:/Users/deivi/github/gtl-talent-dets/prep/build_elite_high_schools_national.py>)
+- [build_elite_high_schools_national.py](</C:/Users/deivi/github/gtl-talent-dets/prep/elite_schools/build_elite_high_schools_national.py>)
 - [elite_high_schools_national_1800_1930.csv](</C:/Users/deivi/github/gtl-talent-dets/prep/output/elite_high_schools_national_1800_1930.csv>)
 - [elite_high_schools_core_1800_1930.csv](</C:/Users/deivi/github/gtl-talent-dets/prep/output/elite_high_schools_core_1800_1930.csv>)
 - [elite_high_schools_robustness_only_1800_1930.csv](</C:/Users/deivi/github/gtl-talent-dets/prep/output/elite_high_schools_robustness_only_1800_1930.csv>)

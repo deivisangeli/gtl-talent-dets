@@ -14,7 +14,7 @@ All project data lives in Dropbox, not in the git repo. The canonical current da
 C:\Users\<username>\Globtalent Dropbox\gtl_talent_dets\
 ```
 
-Path variables are defined in `paths.R` at the repo root. Prep and analysis scripts that use the current convention source `../paths.R`.
+Path variables are defined in `paths.R` at the repo root. Older prep and analysis scripts may source `../paths.R`; organized prep subdirectories resolve `repo_root` first and then source `file.path(repo_root, "paths.R")`.
 
 ## Repository Layout
 
@@ -25,9 +25,20 @@ paths.R         Shared data-path config for the current convention.
 prep/           Data preparation — run scripts from within this folder
   input/        Empty or manual-only in repo; project data lives in Dropbox
   output/       Empty or manual-only in repo; project outputs live in Dropbox
+  amws/         American Men and Women of Science prep pipeline
+  elite_schools/ Curated elite high school treatment prep
+  land_grants/ Andrews college site-selection / land-grants county-pairs prep
+  mandatory_schooling/ Documentation for compulsory-schooling input
+  scientific_facilities/ Legacy scientific-infrastructure prep scripts
+  world_fairs_panel/ World fairs prep pipeline
 
 analysis/       Econometric analysis — run scripts from within this folder
-  results/      Figures and tables; main analysis outputs live in Dropbox
+  elite_schools/ Elite-school event studies and validation analyses
+  land_grants/ Andrews college site-selection / land-grants analyses
+  mandatory_schooling/ Compulsory-schooling-law event study
+  scientific_facilities/ Scientific-infrastructure and broader-determinants analyses
+  world_fairs/ World-fairs event studies
+  results/      Legacy/local non-event outputs; event-study outputs live in Dropbox results/<pipeline>/
 
 docs/           School-list documentation, revision workflow, facility spreadsheet
 ```
@@ -51,7 +62,7 @@ AMWS_OUTPUT    <- file.path(DATA_OUTPUT, "amws")
 SCHOOLS_OUTPUT <- file.path(DATA_OUTPUT, "elite_schools")
 ```
 
-Source from scripts as:
+Older scripts source from their working directory as:
 
 ```r
 # prep/ scripts
@@ -60,6 +71,8 @@ source("../paths.R")
 # analysis/ scripts
 source("../paths.R")
 ```
+
+Organized prep pipeline scripts instead use the `world_fairs_panel` convention: resolve `repo_root` from the `--file` argument, falling back to `GTL_REPO`/`getwd()`, then source helpers by absolute repo path.
 
 Coauthors on a different machine should set `TALENT_DETS_DATA_DIR` in their own R environment to their local Dropbox path.
 
@@ -125,10 +138,10 @@ Run all scripts from `prep/`. Order matters within each group.
 | 1 | `download_data.R` | `cross-verified-database.csv` in Dropbox input/raw, depending on path helper used |
 | 2 | `cleaning.R` | `data_final.csv` |
 | 3 | `cleaning_stem.R` + `stem_labels.R` | `data_final_stem.csv`, `crossverified_with_stem.csv` |
-| 4 | `build_elite_high_schools_national.py` | `elite_schools/elite_high_schools_core_1800_1930.csv` |
+| 4 | `elite_schools/build_elite_high_schools_national.py` | `elite_schools/elite_high_schools_core_1800_1930.csv` |
 | 5 | `build_county_population.R` | `county_population.csv` (NHGIS + HYDE unified — preferred) |
 | 5b | `build_county_hyde_population.R` | `county_hyde_population.csv` (HYDE-only — keep as alternative) |
-| 6 | `cleaning_county_stem.R` | `us_panel_county_stem.csv` |
+| 6 | `scientific_facilities/cleaning_county_stem.R` | `us_panel_county_stem.csv` |
 | 7 | `cleaning_county_1800.R` | `us_panel_county_stem_1800.csv` |
 
 **Population pipeline note:** Two scripts build the county population series. `build_county_population.R` (NHGIS + HYDE) is the canonical version; `build_county_hyde_population.R` (HYDE-only) is retained as an alternative until a decision is made on which harmonization approach to use.
@@ -137,65 +150,92 @@ Run all scripts from `prep/`. Order matters within each group.
 
 | Script | Purpose |
 |--------|---------|
-| `cleaning_amws_1906.R`, `_1938.R`, `_1955.R` | Parse raw AMWS editions |
-| `geocode_amws_edition.R`, `geocode_amws_1955_us.R` | Geocode birth locations |
-| `dedup_amws_editions.R` | Remove duplicates across editions |
-| `build_amws_county_year.R`, `build_amws_combined_county_year.R` | Aggregate to county-year panel |
+| `amws/cleaning_amws_1906.R`, `_1938.R`, `_1955.R` | Parse raw AMWS editions |
+| `amws/geocode_amws_edition.R`, `amws/geocode_amws_1955_us.R` | Geocode birth locations |
+| `amws/dedup_amws_editions.R` | Remove duplicates across editions |
+| `amws/build_amws_county_year.R`, `amws/build_amws_combined_county_year.R` | Aggregate to county-year panel |
+
+### Elite schools pipeline
+
+| Script | Purpose |
+|--------|---------|
+| `elite_schools/build_elite_high_schools_national.py` | Build national elite-school list and core/expanded/robustness outputs |
+| `elite_schools/prep_enrollment_research_batches.R` | Prepare enrollment-research batches |
+| `elite_schools/aggregate_enrollment_research.R` | Aggregate enrollment research outputs |
+
+### Land grants pipeline
+
+| Script | Purpose |
+|--------|---------|
+| `land_grants/01_build_andrews_county_pairs_long.R` | Build `raw/andrews_2023_county_pairs_long.xlsx` from Andrews Appendix Table A1 and Census county gazetteer |
+
+### Mandatory schooling pipeline
+
+Mandatory schooling has no prep script yet. The current input is the manual Dropbox file `input/compulsory_schooling_laws.csv`, read directly by `analysis/mandatory_schooling/analysis_compulsory_schooling.R`.
 
 ### Legacy / broader determinants pipeline
 
 | Script | Purpose |
 |--------|---------|
 | `download_amo_results.R` | Scrape AMO results page and download winner PDFs by year/grade |
-| `cleaning_county.R` | County-level Wikipedia panel (older) |
-| `cleaning_us.R` | US HYDE cleaning, facilities panel |
-| `coding_hyde.R`, `cleaning_hyde.R`, `hyde_data.R` | HYDE raster processing |
+| `scientific_facilities/cleaning_county.R` | County-level Wikipedia panel (older) |
+| `scientific_facilities/cleaning_us.R` | US HYDE cleaning, facilities panel |
+| `scientific_facilities/coding_hyde.R`, `scientific_facilities/cleaning_hyde.R`, `scientific_facilities/hyde_data.R` | HYDE raster processing |
 | `coding_city.R`, `new_cleaning.R` | Alternative geocoding |
 
 ## Analysis Pipeline
 
 Run from `analysis/`.
 
+AMWS is an outcome source, not a standalone analysis pipeline. AMWS outcome scripts live under the treatment pipeline that uses them, currently `elite_schools/`, `land_grants/`, or `scientific_facilities/`. Standalone legacy AMWS analyses are archived under `analysis/archive/amws_standalone/`.
+
 ### Elite schools paper (main)
 
 | Script | Purpose |
 |--------|---------|
-| `analysis_elite_school_high_access_estimators_1800.R` | **Main analysis** — Wooldridge ETWFE + CS DID |
-| `etwfe_high_access_helpers.R` | Helper: Sun-Abraham runner, detrending, plotting |
-| `analysis_elite_school_1800.R` | Reduced-form event study (raw cohort means) |
-| `analysis_elite_school_high_vs_low_1800.R` | High-access vs low-access counties |
-| `analysis_elite_school_stem_share.R` | STEM share event study |
-| `analysis_elite_school_radius_stem.R` | Spatial treatment by radius |
-| `analysis_compulsory_schooling.R` | Null: compulsory schooling laws |
-| `analysis_event_study_yearly_1860_1910.R` | Annual-level event study |
-| `analysis_continuous_treatment_panel.R` | Continuous treatment (school count) |
-| `analysis_synthetic_control_yearly_1860_1910.R` | Synthetic control |
-| `analysis_elite_school_year_amws_wiki.R` | AMWS vs Wikipedia comparison |
-| `analysis_high_access_etwfe_synthetic_validation.R` | Monte Carlo validation |
-| `analysis_synthetic_bjs_wooldridge_validation.R` | BJS vs Wooldridge comparison |
+| `elite_schools/analysis_elite_school_high_access_estimators_1800.R` | **Main analysis** — Wooldridge ETWFE + CS DID |
+| `elite_schools/etwfe_high_access_helpers.R` | Helper: Sun-Abraham runner, detrending, plotting |
+| `elite_schools/analysis_elite_school_1800.R` | Reduced-form event study (raw cohort means) |
+| `elite_schools/analysis_elite_school_high_vs_low_1800.R` | High-access vs low-access counties |
+| `elite_schools/analysis_elite_school_stem_share.R` | STEM share event study |
+| `elite_schools/analysis_elite_school_radius_stem.R` | Spatial treatment by radius |
+| `mandatory_schooling/analysis_compulsory_schooling.R` | Null: compulsory schooling laws |
+| `elite_schools/analysis_event_study_yearly_1860_1910.R` | Annual-level event study |
+| `elite_schools/analysis_continuous_treatment_panel.R` | Continuous treatment (school count) |
+| `elite_schools/analysis_synthetic_control_yearly_1860_1910.R` | Synthetic control |
+| `elite_schools/analysis_elite_school_year_amws_wiki.R` | AMWS vs Wikipedia comparison |
+| `elite_schools/analysis_high_access_etwfe_synthetic_validation.R` | Monte Carlo validation |
+| `elite_schools/analysis_synthetic_bjs_wooldridge_validation.R` | BJS vs Wooldridge comparison |
 
 ### Robustness env-var flags (main script)
 
 ```r
-ELITE_MERGE_NYC=TRUE Rscript analysis_elite_school_high_access_estimators_1800.R
+ELITE_MERGE_NYC=TRUE Rscript elite_schools/analysis_elite_school_high_access_estimators_1800.R
 ELITE_DROP_COHORT=1920 Rscript ...
 ELITE_DROP_STATES=NY Rscript ...
 ```
 
-Results land in `analysis/results/elite_school_event_studies/<spec>/` or the corresponding Dropbox results folder when the script uses Dropbox output helpers.
+Event-study results land in the Dropbox results tree, under `results/<pipeline>/...`: `elite_schools/`, `land_grants/`, `mandatory_schooling/`, `scientific_facilities/`, and `worlds_fair/` for world-fairs compatibility.
 
 ### Broader determinants / null results
 
 | Script | Purpose |
 |--------|---------|
 | `analysis_main.R` | USSR talent analysis (TWFE + staggered DiD) |
-| `analysis_hyde.R` | HYDE event studies at 100km and 200km radii |
-| `analysis_jan26.R`, `analysis_jan26_stem.R` | Jan 2026 analysis (STEM variant) |
-| `analysis_country.R` | Country-level analysis |
-| `analysis_county.R`, `analysis_county_stem.R` | County-level DiD (facilities) |
-| `analysis_border.R` | County border discontinuity |
-| `analysis_hyde_us.R` | US HYDE state-level analysis |
-| `analysis_stem.R`, `compare_stem_allsci.R` | STEM vs all-science comparisons |
+| `land_grants/analysis_amws_county_pairs_all_colleges*.R` | AMWS outcome variants for Andrews selected vs runner-up county-pairs / land-grants event studies |
+| `land_grants/amws_twfe_event_study_helpers.R` | Helper for AMWS county-pairs event studies |
+| `land_grants/analysis_county_pairs_es.R` | Andrews selected vs runner-up county-pairs event study |
+| `land_grants/analysis_county_pairs_map.R` | Map Andrews selected and runner-up counties |
+| `land_grants/analysis_county_pairs_inventor_rates_hyde_pre1900.R` | Land-grants/county-pairs event study using HYDE inventor rates |
+| `land_grants/analysis_county_pairs_inventor_rates_hyde_pre1900_controls.R` | Controlled HYDE inventor-rate land-grants/county-pairs event study |
+| `scientific_facilities/analysis_amws_scientific_facilities.R` | AMWS outcome event study using scientific-facility treatment timing |
+| `scientific_facilities/analysis_hyde.R` | HYDE event studies at 100km and 200km radii |
+| `scientific_facilities/analysis_jan26.R`, `scientific_facilities/analysis_jan26_stem.R` | Jan 2026 analysis (STEM variant) |
+| `scientific_facilities/analysis_country.R` | Country-level analysis |
+| `scientific_facilities/analysis_county.R`, `scientific_facilities/analysis_county_stem.R` | County-level DiD (facilities) |
+| `scientific_facilities/analysis_border.R` | County border discontinuity |
+| `scientific_facilities/analysis_hyde_us.R` | US HYDE state-level analysis |
+| `scientific_facilities/analysis_stem.R`, `compare_stem_allsci.R` | STEM vs all-science comparisons |
 
 ## Key Definitions (Elite Schools Paper)
 
@@ -254,10 +294,10 @@ The frontier-exposure map (counties with historical frontier exposure) shows a s
 
 ## Known Issues / Limitations
 
-- HYDE rasters are not tracked in git. Download from PBL Netherlands before running `build_county_hyde_population.R`, `cleaning_us.R`, `coding_hyde.R`, `cleaning_hyde.R`, or `hyde_data.R`.
+- HYDE rasters are not tracked in git. Download from PBL Netherlands before running `build_county_hyde_population.R`, `scientific_facilities/cleaning_us.R`, `scientific_facilities/coding_hyde.R`, `scientific_facilities/cleaning_hyde.R`, or `scientific_facilities/hyde_data.R`.
 - `cross-verified-database.csv` is not tracked. Run `prep/download_data.R` first.
-- `analysis_hyde_us.R`: requires `us_panel_fixed.csv` from `cleaning_us.R`, which needs HYDE rasters.
+- `analysis/scientific_facilities/analysis_hyde_us.R`: requires `us_panel_fixed.csv` from `scientific_facilities/cleaning_us.R`, which needs HYDE rasters.
 - NHGIS file name changed across scripts: older scripts use `nhgis0001_ts_nominal_county.csv`, newer use `nhgis0005_ts_nominal_county.csv`. Both should be present in Dropbox input.
-- `prep/cleaning_county.R`: still requires the manual NHGIS file `nhgis0001_ts_nominal_county.csv`.
+- `prep/scientific_facilities/cleaning_county.R`: still requires the manual NHGIS file `nhgis0001_ts_nominal_county.csv`.
 - Population pipeline: `build_county_population.R` (NHGIS+HYDE) and `build_county_hyde_population.R` (HYDE-only) both exist; a decision on which to use as canonical is pending.
 - Schools with `historically_unclear == "yes"` are flagged but included in main spec.

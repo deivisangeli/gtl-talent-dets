@@ -1,0 +1,30 @@
+fair_row_id,Year,City,Country,Fair_name,event_year,match_status
+25,1853-1854,New York City,United States,Exhibition of the Industry of All Nations,1853,matched_to_panel
+111,1880-1881,Melbourne,Victoria,Melbourne International Exhibition,1880,not_in_europe_city_panel
+120,1881-1882,Perth,Western Australia,Perth International Exhibition,1881,not_in_europe_city_panel
+143,1883-1884,Boston,United States,"The American Exhibition of the Products, Arts and Manufactures of Foreign Nations",1883,matched_to_panel
+177,1887-1888,Adelaide,South Australia,Adelaide Jubilee International Exhibition (1887),1887,not_in_europe_city_panel
+184,1888-1889,Melbourne,Victoria,Melbourne Centennial Exhibition,1888,not_in_europe_city_panel
+185,1888-1889,Melbourne,Victoria,Victorian Juvenile Industrial Exhibition (1888),1888,not_in_europe_city_panel
+201,1891-1892,Launceston,Tasmania,Tasmanian International Exhibition (1891),1891,not_in_europe_city_panel
+207,1892-1893,Madrid,Spain,Historical American Exposition,1892,matched_to_panel
+293,1906-1907,Christchurch,New Zealand,International Exhibition (1906),1906,outside_1800_1900
+362,1915-1916,San Diego,United States,Panama – California Exposition,1915,outside_1800_1900
+374,1922-1923,Rio de Janeiro,Brazil,Exposição do Centenario do Brasil (1922),1922,outside_1800_1900
+380,1923-1924,Hokitika,New Zealand,British and Intercolonial Exhibition,1923,outside_1800_1900
+388,1925-1926,Dunedin,New Zealand,New Zealand and South Seas International Exhibition,1925,outside_1800_1900
+397,1929-1930,Seville,Spain,Ibero-American Exposition of 1929,1929,outside_1800_1900
+398,1929-1930,Barcelona,Spain,1929 Barcelona International Exposition,1929,outside_1800_1900
+410,1933-1934,Buenos Aires,Argentina,Industrial Exposition,1933,outside_1800_1900
+411,1933-1934,Chicago,United States,Century of Progress International Exposition,1933,outside_1800_1900
+420,1935-1936,San Diego,California United States,California Pacific International Exposition,1935,outside_1800_1900
+426,1936-1937,Johannesburg,South Africa,"Empire Exhibition, South Africa",1936,outside_1800_1900
+441,1939-1940,New York City,United States,"1939 New York World's Fair (exhibits included The World of Tomorrow, Futurama, Trylon and Perisphere)",1939,outside_1800_1900
+442,1939-1940,San Francisco,United States,Golden Gate International Exposition,1939,outside_1800_1900
+455,1949-1950,Port-au-Prince,Haiti,Exposition internationale du bicentenaire de Port-au-Prince,1949,outside_1800_1900
+466,1954-1955,São Paulo,Brazil,Fourth Centenary Exhibition,1954,outside_1800_1900
+479,1964-1965,New York City,United States,1964/1965 New York World's Fair (note: not sanctioned by the Bureau International des Expositions) – Unisphere,1964,outside_1800_1900
+518,2006-2007,Chiang Mai,Thailand,Royal Flora Ratchaphruek 2006,2006,outside_1800_1900
+527,2021-2022,Dubai,United Arab Emirates,Expo 2020,2021,outside_1800_1900
+530,2023-2024,Doha,Qatar,Expo 2023,2023,outside_1800_1900
+535,2029-2030,Nakhon Ratchasima,Thailand,Expo 2029,2029,outside_1800_1900

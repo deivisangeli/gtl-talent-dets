@@ -1,5 +1,0 @@
-source("state_alias.R")
-test <- c("N. Y", "N.Y", "N. Y.", "Mass", "Ohio", "Ohi", "N", "ny", "NY")
-for (t in test) cat(sprintf("'%s' -> %s\n", t, normalize_state(t)))
-cat("\nSTATE_ALIAS['n. y']:", STATE_ALIAS["n. y"], "\n")
-cat("Names containing 'n. y':\n"); print(grep("^n\\.? ?y", names(STATE_ALIAS), value=TRUE))

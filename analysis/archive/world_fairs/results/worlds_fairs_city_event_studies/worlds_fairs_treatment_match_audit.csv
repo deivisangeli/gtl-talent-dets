@@ -1,0 +1,538 @@
+fair_row_id,Year,City,Country,Fair_name,event_year,in_treatment_window,lat,lon,geonameid,matched_name,matched_country_iso3,assigned_unit_type,assigned_unit_id,assigned_GEOID,europe_place_name,europe_country,europe_iso3,match_status
+1,1791,Prague,Bohemia,"first industrial exhibition on the occasion of the coronation of Leopold II as king of Bohemia, took place in Clementinum, a site of considerable sophistication of manufacturing methods. For this occasion, Wolfgang Amadeus Mozart wrote his final opera La clemenza di Tito.",1791,FALSE,50.08804,14.42076,3067696,Prague,CZE,europe_city,GEONAMES_3067696,NA,Prague,Czechia,CZE,outside_1800_1900
+2,1798,Paris,France,"L'Exposition des produits de l'industrie française, Paris, 1798. This was the first public industrial exposition in France although earlier in 1798 the Marquis d'Avèze had held a private exposition of handicrafts and manufactured goods at the Maison d'Orsay in the Rue de Varenne and it was this that suggested the idea of a public exposition to Nicolas François de Neufchâteau, Minister of the Interior for the French Republic.",1798,FALSE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+3,1801,Paris,France,"Second Exposition (1801). After the success of the exposition of 1798 a series of expositions for French manufacturing followed (1801, 1802, 1806, 1819, 1823, 1827, 1834, 1844 and 1849) until the first properly international (or universal) exposition in France in 1855.",1801,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+4,1802,Paris,France,Third Exposition (1802),1802,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+5,1806,Paris,France,Fourth Exposition (1806),1806,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+6,1819,Paris,France,Fifth Exposition (1819),1819,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+7,1823,Paris,France,Sixth Exposition (1823),1823,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+8,1827,Paris,France,Seventh Exposition (1827),1827,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+9,1829,New York City,United States,American Institute Fair,1829,TRUE,40.71427,-74.00597,5128581,New York City,USA,us_county,US_COUNTY_36047,36047,NA,NA,NA,matched_to_panel
+10,1829,Turin,Piedmont-Sardinia,"Prima Triennale Pubblica Esposizione dell’anno 1829. In Turin, a second 'triennale' followed in 1832 before other national agricultural, industrial, commercial, and applied arts expositions there in 1838, 1844, 1850 and 1858.",1829,TRUE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,matched_to_panel
+11,1832,Turin,Piedmont-Sardinia,Seconda Triennale Pubblica Esposizione dell’anno 1832.,1832,TRUE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,matched_to_panel
+12,1834,Paris,France,French Industrial Exposition of 1834,1834,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+13,1838,Turin,Piedmont-Sardinia,Pubblica esposizione dell'anno 1838.,1838,TRUE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,matched_to_panel
+14,1839,Paris,France,Ninth Exposition (1839),1839,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+15,1844,Paris,France,French Industrial (Tenth) Exposition of 1844,1844,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+16,1844,Turin,Piedmont-Sardinia,Quarta Esposizione d'Industria et di Belle Arti.,1844,TRUE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,matched_to_panel
+17,1846,Genoa,Piedmont-Sardinia,Esposizione dei Prodotti e delle Manufatture nazionali,1846,TRUE,44.40478,8.94439,3176219,Genoa,ITA,europe_city,GEONAMES_3176219,NA,Genoa,Italy,ITA,matched_to_panel
+18,1849,Birmingham,United Kingdom,Exhibition of Industrial Arts and Manufacturers,1849,TRUE,52.48142,-1.89983,2655603,Birmingham,GBR,europe_city,GEONAMES_2655603,NA,Birmingham,United Kingdom,GBR,matched_to_panel
+19,1849,London,United Kingdom,First Exhibition of British Manufacturers (1849),1849,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+20,1849,Paris,France,Eleventh Exposition (1849),1849,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+21,1850,Turin,Piedmont-Sardinia,Quinta Esposizione di Industria e di Belle Arti,1850,TRUE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,matched_to_panel
+22,1851,London,United Kingdom,"The Great Exhibition of the Works of Industry of All Nations – The Crystal Palace (typically listed as the ""first world's fair"")",1851,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+23,1852,Cork,Ireland,Irish Industrial Exhibition,1852,TRUE,51.89797,-8.47061,2965140,Cork,IRL,europe_city,GEONAMES_2965140,NA,Cork,Ireland,IRL,matched_to_panel
+24,1853,Naples,Two Sicilies,Solenne Pubblica Esposizione di Arti e Manifatture,1853,TRUE,40.85216,14.26811,3172394,Naples,ITA,europe_city,GEONAMES_3172394,NA,Naples,Italy,ITA,matched_to_panel
+25,1853-1854,New York City,United States,Exhibition of the Industry of All Nations,1853,TRUE,40.71427,-74.00597,5128581,New York City,USA,us_county,US_COUNTY_36047,36047,NA,NA,NA,matched_to_panel
+26,1853,Dublin,Ireland,Great Industrial Exhibition (1853),1853,TRUE,53.33306,-6.24889,2964574,Dublin,IRL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+27,1854,Genoa,Piedmont-Sardinia,Esposizione Industriale,1854,TRUE,44.40478,8.94439,3176219,Genoa,ITA,europe_city,GEONAMES_3176219,NA,Genoa,Italy,ITA,matched_to_panel
+28,1854,Munich,Bavaria,General German Industrial Exhibition (Allgemeine deutsche Industrie-Ausstellung),1854,TRUE,48.13743,11.57549,2867714,Munich,DEU,europe_city,GEONAMES_2867714,NA,Munich,Germany,DEU,matched_to_panel
+29,1854,Melbourne,Victoria,Melbourne Exhibition (in conjunction with Exposition Universelle (1855)),1854,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+30,1855,Paris,France,Exposition Universelle (1855),1855,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+31,1856,Brussels,Belgium,International Exhibition,1856,TRUE,50.85045,4.34878,2800866,Brussels,BEL,europe_city,GEONAMES_2800866,NA,Brussels,Belgium,BEL,matched_to_panel
+32,1857,Manchester,United Kingdom,"Art Treasures Exhibition at the Royal Botanical Gardens, Stretford",1857,TRUE,53.48095,-2.23743,2643123,Manchester,GBR,europe_city,GEONAMES_2643123,NA,Manchester,United Kingdom,GBR,matched_to_panel
+33,1857,Lausanne,Switzerland,Lausanne Exhibition,1857,TRUE,46.516,6.63282,2659994,Lausanne,CHE,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+34,1858,Dijon,France,Dijon Exposition,1858,TRUE,47.31344,5.01391,3021372,Dijon,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+35,1858,Philadelphia,United States,Philadelphia Technological Exhibition,1858,TRUE,39.95238,-75.16362,4560349,Philadelphia,USA,us_county,US_COUNTY_42101,42101,NA,NA,NA,matched_to_panel
+36,1858,Turin,Piedmont-Sardinia,Sesta Esposizione Nazionale di Prodotti d'Industria,1858,TRUE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,matched_to_panel
+37,1860,Montreal,Canada,Grand Exhibition of the Industrial Products of United Canada at the Crystal Palace (Montreal),1860,TRUE,45.50884,-73.58781,6077243,Montréal,CAN,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+38,1861,Brisbane,Queensland,First Queensland Exhibition,1861,TRUE,-27.46794,153.02809,2174003,Brisbane,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+39,1861,Melbourne,Victoria,Second Victorian Exhibition,1861,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+40,1861,Metz,France,Exposition Universelle (1861),1861,TRUE,49.11911,6.17269,2994160,Metz,FRA,europe_city,GEONAMES_2994160,NA,Metz,France,FRA,matched_to_panel
+41,1861,Amsterdam,Netherlands,Fisheries Exposition,1861,TRUE,52.37403,4.88969,2759794,Amsterdam,NLD,europe_city,GEONAMES_2759794,NA,Amsterdam,The Netherlands,NLD,matched_to_panel
+42,1862,Geelong,Australia,"Exhibition of Art, Science and Industry",1862,TRUE,-38.14711,144.36069,2165798,Geelong,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+43,1862,London,United Kingdom,1862 International Exhibition,1862,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+44,1864,Bayonne,France,Franco-Spanish Exposition,1864,TRUE,43.49316,-1.473,3034475,Bayonne,FRA,europe_city,GEONAMES_3034475,NA,Bayonne,France,FRA,matched_to_panel
+45,1865,Cologne,Prussia,International Agricultural Exhibition,1865,TRUE,45.57862,9.9418,3178287,Cologne,ITA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+46,1865,Bergen,Norway,International Fisheries Exhibition,1865,TRUE,60.39299,5.32415,3161732,Bergen,NOR,europe_city,GEONAMES_3161732,NA,Bergen,Norway,NOR,matched_to_panel
+47,1865,Batavia,Dutch East Indies,Industrial and Agricultural Exhibition,1865,TRUE,3.3183,97.151,6703761,Batai,IDN,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+48,1865,Dunedin,New Zealand,New Zealand Exhibition,1865,TRUE,-45.87416,170.50361,2191562,Dunedin,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+49,1865,Dublin,United Kingdom,International Exhibition of Arts and Manufactures,1865,TRUE,52.28102,1.17081,13274840,Dublin,GBR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+50,1865,Freetown,Sierra Leone,Sierra Leone Exhibition,1865,TRUE,8.48714,-13.2356,2409306,Freetown,SLE,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+51,1865,Porto,Portugal,1865 International Exhibition,1865,TRUE,41.1485,-8.61097,2735943,Porto,PRT,europe_city,GEONAMES_2735943,NA,Porto,Portugal,PRT,matched_to_panel
+52,1866,Ballarat,Victoria,National Industrial Exhibition,1866,TRUE,-37.56622,143.84957,2177091,Ballarat,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+53,1866,Melbourne,Victoria,Intercolonial Exhibition of Australasia,1866,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+54,1866,Boulogne-sur-Mer,France,International Fisheries Exposition,1866,TRUE,50.724850000000004,1.61373,3031133,Boulogne-sur-Mer,FRA,europe_city,GEONAMES_3031133,NA,Boulogne-sur-Mer,France,FRA,matched_to_panel
+55,1866,Arcachon,France,International Exposition of Fish and Water Products,1866,TRUE,44.66126,-1.17255,3037253,Arcachon,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+56,1866,Stockholm,Sweden,Scandinavian Industrial Exhibition,1866,TRUE,59.32938,18.06871,2673730,Stockholm,SWE,europe_city,GEONAMES_2673730,NA,Stockholm,Sweden,SWE,matched_to_panel
+57,1867,Paris,France,Exposition Universelle (1867),1867,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+58,1867,The Hague,Netherlands,International Maritime Exhibition,1867,TRUE,52.07667,4.29861,2747373,The Hague,NLD,europe_city,GEONAMES_2747373,NA,The Hague,The Netherlands,NLD,matched_to_panel
+59,1867,Aarhaus,Denmark,International Maritime Exhibition,1867,TRUE,56.16558,10.21231,11746746,Aarhus C,DNK,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+60,1867,Vienna,Austria,International Maritime Exhibition,1867,TRUE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,matched_to_panel
+61,1867,Gothenburg,Sweden,International Maritime Exhibition,1867,TRUE,57.70716,11.96679,2711537,Gothenburg,SWE,europe_city,GEONAMES_2711537,NA,Gothenburg,Sweden,SWE,matched_to_panel
+62,1868,Le Havre,France,International Maritime Exposition,1868,TRUE,49.49346,0.10785,3003796,Le Havre,FRA,europe_city,GEONAMES_3003796,NA,Le Havre,France,FRA,matched_to_panel
+63,1869,Amsterdam,Netherlands,International Exhibition of Domestic Economy,1869,TRUE,52.37403,4.88969,2759794,Amsterdam,NLD,europe_city,GEONAMES_2759794,NA,Amsterdam,The Netherlands,NLD,matched_to_panel
+64,1870,Sydney,New South Wales,Intercolonial Exhibition (1870),1870,TRUE,-33.86785,151.20732,2147714,Sydney,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+65,1871,Córdoba,Argentina,Exposición Nacional,1871,TRUE,-31.40648,-64.18853,3860259,Córdoba,ARG,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+66,1871,London,United Kingdom,First Annual International Exhibition (1871),1871,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+67,1871,Naples,Italy,International Maritime Exposition,1871,TRUE,40.85216,14.26811,3172394,Naples,ITA,europe_city,GEONAMES_3172394,NA,Naples,Italy,ITA,matched_to_panel
+68,1872,Hamilton,Bermuda,Industrial and Loan Exhibition,1872,TRUE,32.2949,-64.78303,3573197,Hamilton,BMU,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+69,1872,Copenhagen,Denmark,Second Scandinavian Exhibition of Arts and Industry,1872,TRUE,55.67594,12.56553,2618425,Copenhagen,DNK,europe_city,GEONAMES_2618425,NA,Copenhagen,Denmark,DNK,matched_to_panel
+70,1872,London,United Kingdom,Second Annual International Exhibition (1872),1872,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+71,1872,Christchurch,New Zealand,New Zealand Interprovincial Exhibition,1872,TRUE,-43.53333,172.63333,2192362,Christchurch,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+72,1872,Lima,Peru,Lima International Exhibition,1872,TRUE,-12.04318,-77.02824,3936456,Lima,PER,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+73,1872,Lyon,France,Exposition Universelle et Internationale (1872),1872,TRUE,45.74906,4.84789,2996944,Lyon,FRA,europe_city,GEONAMES_2996944,NA,Lyon,France,FRA,matched_to_panel
+74,1872,Kyoto,Japan,Exhibition of Arts and Manufactures (1872),1872,TRUE,35.02107,135.75385,1857910,Kyoto,JPN,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+75,1873,London,United Kingdom,Third Annual International Exhibition (1873),1873,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+76,1873,Vienna,Austria,Weltausstellung 1873 Wien,1873,TRUE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,matched_to_panel
+77,1873,Sydney,New South Wales,Metropolitan Intercolonial Exhibition (1873),1873,TRUE,-33.86785,151.20732,2147714,Sydney,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+78,1874,London,United Kingdom,Fourth Annual International Exhibition (1874),1874,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+79,1874,Dublin,United Kingdom,International Exhibition of Arts and Manufactures (1874),1874,TRUE,52.28102,1.17081,13274840,Dublin,GBR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+80,1874,Rome,Italy,Esposizione internazionale (1874) (never held),1874,TRUE,41.89193,12.51133,3169070,Rome,ITA,europe_city,GEONAMES_3169070,NA,Rome,Italy,ITA,matched_to_panel
+81,1874,Jamestown,Saint Helena,St. Helena Industrial Exhibition,1874,TRUE,-15.92488,-5.71816,3370903,Jamestown,SHN,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+82,1874,Marseille,France,Exhibition of Modern Inventions and Discoveries,1874,TRUE,43.29695,5.38107,2995469,Marseille,FRA,europe_city,GEONAMES_2995469,NA,Marseille,France,FRA,matched_to_panel
+83,1874,Philadelphia,United States,Franklin Institute Exhibition,1874,TRUE,39.95238,-75.16362,4560349,Philadelphia,USA,us_county,US_COUNTY_42101,42101,NA,NA,NA,matched_to_panel
+84,1875,Melbourne,Victoria,Victorian Intercolonial Exhibition,1875,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+85,1875,Nizhny Novgorod,Russia,Nizhny Novgorod Fair (1875),1875,TRUE,56.32867,44.00205,520555,Nizhniy Novgorod,RUS,europe_city,GEONAMES_520555,NA,Nizhniy Novgorod,Russia,RUS,matched_to_panel
+86,1875,Sydney,New South Wales,Intercolonial Exhibition (1875),1875,TRUE,-33.86785,151.20732,2147714,Sydney,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+87,1875,Santiago,Chile,Chilean International Exhibition,1875,TRUE,-33.45694,-70.64827,3871336,Santiago,CHL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+88,1876,Brussels,Belgium,International Exposition of Hygiene and Life-saving Apparatus,1876,TRUE,50.85045,4.34878,2800866,Brussels,BEL,europe_city,GEONAMES_2800866,NA,Brussels,Belgium,BEL,matched_to_panel
+89,1876,Helsinki,Finland,Finnish General Exhibition,1876,TRUE,60.16952,24.93545,658225,Helsinki,FIN,europe_city,GEONAMES_658225,NA,Helsinki,Finland,FIN,matched_to_panel
+90,1876,Adelaide,South Australia,Adelaide Industrial Exhibition,1876,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+91,1876,Philadelphia,United States,Centennial Exposition,1876,TRUE,39.95238,-75.16362,4560349,Philadelphia,USA,us_county,US_COUNTY_42101,42101,NA,NA,NA,matched_to_panel
+92,1876,Brisbane,Queensland,Intercolonial Exhibition (1876),1876,TRUE,-27.46794,153.02809,2174003,Brisbane,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+93,1876,London,United Kingdom,London Loan Collection of Scientific Apparatus,1876,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+94,1877,Cape Town,Cape Colony,South African International Exhibition,1877,TRUE,-33.92584,18.42322,3369157,Cape Town,ZAF,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+95,1877,Tokyo,Japan,First National Industrial Exhibition (1877) (Ueno Park),1877,TRUE,35.6895,139.69171,1850147,Tokyo,JPN,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+96,1877,Sydney,New South Wales,Sydney Metropolitan and Intercolonial Exhibition,1877,TRUE,-33.86785,151.20732,2147714,Sydney,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+97,1877,Adelaide,South Australia,Adelaide Industrial Exhibition,1877,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+98,1878,Paris,France,Exposition Universelle (1878),1878,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+99,1878,Ballarat,Victoria,Australian Juvenile Industrial Exhibition (1878),1878,TRUE,-37.56622,143.84957,2177091,Ballarat,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+100,1878,London,United Kingdom,International Fisheries Exhibition,1878,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+101,1879,Bendigo,Victoria,Juvenile Industrial Exhibition,1879,TRUE,-36.75818,144.28024,2176187,Bendigo,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+102,1879,Geelong,Victoria,Geelong Juvenile and Industrial Exhibition,1879,TRUE,-38.14711,144.36069,2165798,Geelong,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+103,1879,Sydney,New South Wales,Intercolonial Juvenile Industrial Exhibition,1879,TRUE,-33.86785,151.20732,2147714,Sydney,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+104,1879,Sydney,New South Wales,Sydney International Exhibition,1879,TRUE,-33.86785,151.20732,2147714,Sydney,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+105,1879,Melbourne,Victoria,Intercolonial Juvenile Industrial Exhibition (1879),1879,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+106,1879,Kilburn,United Kingdom,International Agricultural Exhibition,1879,TRUE,51.55295,-0.19157,6690572,Kilburn,GBR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+107,1880,Berlin,Germany,International Fisheries Exhibition,1880,TRUE,52.52437,13.41053,2950159,Berlin,DEU,europe_city,GEONAMES_2950159,NA,Berlin,Germany,DEU,matched_to_panel
+108,1880,Christchurch,New Zealand,Christchurch Industrial Exhibition,1880,TRUE,-43.53333,172.63333,2192362,Christchurch,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+109,1880,Adelaide,South Australia,Industrial and Juvenile Exhibition,1880,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+110,1880,Glasgow,United Kingdom,Glasgow Electrical Exhibition,1880,TRUE,55.86515,-4.25763,2648579,Glasgow,GBR,europe_city,GEONAMES_2648579,NA,Glasgow,United Kingdom,GBR,matched_to_panel
+111,1880-1881,Melbourne,Victoria,Melbourne International Exhibition,1880,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+112,1881,Adelaide,South Australia,Adelaide Exhibition.,1881,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+113,1881,Matanzas,Cuba,Exhibition of Matanzas,1881,TRUE,23.04388,-81.58284,3547398,Matanzas,CUB,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+114,1881,Paris,France,"International Exposition of Electricity, Paris",1881,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+115,1881,Dunedin,New Zealand,Dunedin Industrial Exhibition,1881,TRUE,-45.87416,170.50361,2191562,Dunedin,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+116,1881,Atlanta,United States,International Cotton Exposition,1881,TRUE,33.749,-84.38798,4180439,Atlanta,USA,us_county,US_COUNTY_13121,13121,NA,NA,NA,matched_to_panel
+117,1881,Budapest,Austria-Hungary,Országos Nőipari Kiállitás,1881,TRUE,47.49835,19.04045,3054643,Budapest,HUN,europe_city,GEONAMES_3054643,NA,Budapest,Hungary,HUN,matched_to_panel
+118,1881,London,United Kingdom,International Medical and Sanitary Exhibition,1881,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+119,1881,Tokyo,Japan,Second National Industrial Exhibition,1881,TRUE,35.6895,139.69171,1850147,Tokyo,JPN,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+120,1881-1882,Perth,Western Australia,Perth International Exhibition,1881,TRUE,-31.95224,115.8614,2063523,Perth,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+121,1882,Lille,France,International Exposition of Industrial Art,1882,TRUE,50.63391,3.05512,2998324,Lille,FRA,europe_city,GEONAMES_2998324,NA,Lille,France,FRA,matched_to_panel
+122,1882,Munich,Germany,International Electrical Exposition,1882,TRUE,48.13743,11.57549,2867714,Munich,DEU,europe_city,GEONAMES_2867714,NA,Munich,Germany,DEU,matched_to_panel
+123,1882,Christchurch,New Zealand,New Zealand International Exhibition,1882,TRUE,-43.53333,172.63333,2192362,Christchurch,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+124,1882,London,United Kingdom,Crystal Palace Electric Exhibition,1882,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+125,1882,Edinburgh,United Kingdom,International Fisheries Exhibition,1882,TRUE,55.95206,-3.19648,2650225,Edinburgh,GBR,europe_city,GEONAMES_2650225,NA,Edinburgh,United Kingdom,GBR,matched_to_panel
+126,1882,Bordeaux,France,Exposition internationale des vins,1882,TRUE,44.84124,-0.58046,3031582,Bordeaux,FRA,europe_city,GEONAMES_3031582,NA,Bordeaux,France,FRA,matched_to_panel
+127,1882,Buenos Aires,Argentina,South American Continental Exhibition (Exposición Continental Sud-Americana),1882,TRUE,-34.61315,-58.37723,3435910,Buenos Aires,ARG,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+128,1883,London,United Kingdom,International Electric Exhibition,1883,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+129,1883,Vienna,Austria-Hungary,International Electrical Exposition,1883,TRUE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,matched_to_panel
+130,1883,Cork,United Kingdom,Cork Industrial Exhibition,1883,TRUE,55.03333,-6.28333,2652370,Corkey,GBR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+131,1883,Amsterdam,Netherlands,International Colonial and Export Exhibition,1883,TRUE,52.37403,4.88969,2759794,Amsterdam,NLD,europe_city,GEONAMES_2759794,NA,Amsterdam,The Netherlands,NLD,matched_to_panel
+132,1883,Calcutta,India,Calcutta International Exhibition,1883,TRUE,11.6,92.73333,1275003,Calicut,IND,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+133,1883,Marseille,France,International Maritime Exposition,1883,TRUE,43.29695,5.38107,2995469,Marseille,FRA,europe_city,GEONAMES_2995469,NA,Marseille,France,FRA,matched_to_panel
+134,1883,Christchurch,New Zealand,All Colonial Exhibition,1883,TRUE,-43.53333,172.63333,2192362,Christchurch,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+135,1883,Madrid,Spain,Exposition of Mining and Metallurgy,1883,TRUE,40.4165,-3.70256,3117735,Madrid,ESP,europe_city,GEONAMES_3117735,NA,Madrid,Spain,ESP,matched_to_panel
+136,1883,South Kensington,United Kingdom,International Fisheries Exhibition,1883,TRUE,51.49437,-0.17321,2637395,South Kensington,GBR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+137,1883,Parramatta,New South Wales,Intercolonial Juvenile Industrial Exhibition,1883,TRUE,-33.8178,151.00348,7281840,Parramatta,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+138,1883,Hobart,Tasmania,Tasmanian Juvenile and Industrial Exhibition,1883,TRUE,-42.87936,147.32941,2163355,Hobart,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+139,1883,Launceston,Tasmania,Art and Industrial Exhibition,1883,TRUE,-41.43876,147.13467,2160517,Launceston,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+140,1883,Louisville,United States,Southern Exposition,1883,TRUE,38.25424,-85.75941,4299276,Louisville,USA,us_county,US_COUNTY_21111,21111,NA,NA,NA,matched_to_panel
+141,1883,New York City,United States,World's Fair (1883) (never held),1883,TRUE,40.71427,-74.00597,5128581,New York City,USA,us_county,US_COUNTY_36047,36047,NA,NA,NA,matched_to_panel
+142,1883,Caracas,Venezuela,National Exposition of Venezuela,1883,TRUE,10.48801,-66.87919,3646738,Caracas,VEN,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+143,1883-1884,Boston,United States,"The American Exhibition of the Products, Arts and Manufactures of Foreign Nations",1883,TRUE,42.35843,-71.05977,4930956,Boston,USA,us_county,US_COUNTY_25025,25025,NA,NA,NA,matched_to_panel
+144,1884,Nice,France,International Exposition of Nice,1884,TRUE,43.70313,7.26608,2990440,Nice,FRA,europe_city,GEONAMES_2990440,NA,Nice,France,FRA,matched_to_panel
+145,1884,Amsterdam,Netherlands,International Agricultural Exhibition,1884,TRUE,52.37403,4.88969,2759794,Amsterdam,NLD,europe_city,GEONAMES_2759794,NA,Amsterdam,The Netherlands,NLD,matched_to_panel
+146,1884,London,United Kingdom,London International Universal Exhibition,1884,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+147,1884,South Kensington,United Kingdom,International Health and Education Exhibition,1884,TRUE,51.49437,-0.17321,2637395,South Kensington,GBR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+148,1884,Cape Town,Cape Colony,South African Industrial Exhibition,1884,TRUE,-33.92584,18.42322,3369157,Cape Town,ZAF,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+149,1884,Durban,South Africa,"Natal Agricultural, Horticultural, Industrial and Art Exhibition",1884,TRUE,-29.8579,31.0292,1007311,Durban,ZAF,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+150,1884,New Orleans,United States,World Cotton Centennial,1884,TRUE,29.95465,-90.07507,4335045,New Orleans,USA,us_county,US_COUNTY_22071,22071,NA,NA,NA,matched_to_panel
+151,1884,Melbourne,Victoria,"Victorian International Exhibition 1884 of Wine, Fruit, Grain & other products of the soil of Australasia with machinery, plant and tools employed",1884,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+152,1884,Edinburgh,United Kingdom,First International Forestry Exhibition,1884,TRUE,55.95206,-3.19648,2650225,Edinburgh,GBR,europe_city,GEONAMES_2650225,NA,Edinburgh,United Kingdom,GBR,matched_to_panel
+153,1884,Turin,Italy,Esposizione Generale Italiana,1884,TRUE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,matched_to_panel
+154,1884,Adelaide,South Australia,Grand Industrial Exhibition,1884,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+155,1885,Melbourne,Victoria,Victorians' Jubilee Exhibition (1885) (Jubilee of Victoria Exhibition),1885,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+156,1885,Port Elizabeth,Cape Colony (now South Africa),South African Exhibition,1885,TRUE,-33.98404,25.61136,953975,Port Elizabeth Airport,ZAF,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+157,1885,Antwerp,Belgium,Exposition Universelle d'Anvers (1885),1885,TRUE,51.22047,4.40026,2803138,Antwerpen,BEL,europe_city,GEONAMES_2803138,NA,Antwerpen,Belgium,BEL,matched_to_panel
+158,1885,Nuremberg,Germany,International Exposition of Metals and Metallurgy,1885,TRUE,49.45421,11.07752,2861650,Nuremberg,DEU,europe_city,GEONAMES_2861650,NA,Nuremberg,Germany,DEU,matched_to_panel
+159,1885,Budapest,Hungary,Hungarian National Exhibition,1885,TRUE,47.49835,19.04045,3054643,Budapest,HUN,europe_city,GEONAMES_3054643,NA,Budapest,Hungary,HUN,matched_to_panel
+160,1885,Wellington,New Zealand,New Zealand Industrial Exhibition,1885,TRUE,-41.28664,174.77557,2179537,Wellington,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+161,1885,Zaragoza,Spain,Aragonese Exposition,1885,TRUE,41.65606,-0.87734,3104324,Zaragoza,ESP,europe_city,GEONAMES_3104324,NA,Zaragoza,Spain,ESP,matched_to_panel
+162,1885,London,United Kingdom,International Inventions Exhibition,1885,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+163,1886,London,United Kingdom,Colonial and Indian Exhibition (1886),1886,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+164,1886,Edinburgh,United Kingdom,"International Exhibition of Industry, Science and Art",1886,TRUE,55.95206,-3.19648,2650225,Edinburgh,GBR,europe_city,GEONAMES_2650225,NA,Edinburgh,United Kingdom,GBR,matched_to_panel
+165,1886,Liverpool,United Kingdom,"International Exhibition of Navigation, Commerce and Industry (1886)",1886,TRUE,53.41058,-2.97794,2644210,Liverpool,GBR,europe_city,GEONAMES_2644210,NA,Liverpool,United Kingdom,GBR,matched_to_panel
+166,1886,Bendigo,Victoria,Juvenile and Industrial Exhibition,1886,TRUE,-36.75818,144.28024,2176187,Bendigo,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+167,1886,Launceston,Tasmania,Launceston Industrial Exhibition,1886,TRUE,-41.43876,147.13467,2160517,Launceston,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+168,1886,Perth,Western Australia,West Australian Exhibition,1886,TRUE,-31.95224,115.8614,2063523,Perth,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+169,1887,Le Havre,France,International Maritime Exposition,1887,TRUE,49.49346,0.10785,3003796,Le Havre,FRA,europe_city,GEONAMES_3003796,NA,Le Havre,France,FRA,matched_to_panel
+170,1887,Atlanta,United States,Piedmont Exposition,1887,TRUE,33.749,-84.38798,4180439,Atlanta,USA,us_county,US_COUNTY_13121,13121,NA,NA,NA,matched_to_panel
+171,1887,Geelong,Victoria,Geelong Jubilee Juvenile and Industrial Exhibition (1887),1887,TRUE,-38.14711,144.36069,2165798,Geelong,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+172,1887,Manchester,United Kingdom,Royal Jubilee Exhibition,1887,TRUE,53.48095,-2.23743,2643123,Manchester,GBR,europe_city,GEONAMES_2643123,NA,Manchester,United Kingdom,GBR,matched_to_panel
+173,1887,London,United Kingdom,American Exhibition,1887,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+174,1887,Newcastle,United Kingdom,Royal Mining Engineering Jubilee Exhibition,1887,TRUE,54.21804,-5.88979,6695976,Newcastle,GBR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+175,1887,Rome,Italy,Esposizione mondiale (1887),1887,TRUE,41.89193,12.51133,3169070,Rome,ITA,europe_city,GEONAMES_3169070,NA,Rome,Italy,ITA,matched_to_panel
+176,1887,Madrid,Spain,Exposición General de las Islas Filipinas,1887,TRUE,40.4165,-3.70256,3117735,Madrid,ESP,europe_city,GEONAMES_3117735,NA,Madrid,Spain,ESP,matched_to_panel
+177,1887-1888,Adelaide,South Australia,Adelaide Jubilee International Exhibition (1887),1887,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+178,1888,Glasgow,United Kingdom,International Exhibition (1888),1888,TRUE,55.86515,-4.25763,2648579,Glasgow,GBR,europe_city,GEONAMES_2648579,NA,Glasgow,United Kingdom,GBR,matched_to_panel
+179,1888,Brussels,Belgium,Grand Concours International des Sciences et de l'Industrie (1888),1888,TRUE,50.85045,4.34878,2800866,Brussels,BEL,europe_city,GEONAMES_2800866,NA,Brussels,Belgium,BEL,matched_to_panel
+180,1888,Barcelona,Spain,Exposición Universal de Barcelona (1888),1888,TRUE,41.38879,2.15899,3128760,Barcelona,ESP,europe_city,GEONAMES_3128760,NA,Barcelona,Spain,ESP,matched_to_panel
+181,1888,Cincinnati,Ohio,Cincinnati Centennial Exposition (1888),1888,TRUE,39.12711,-84.51439,4508722,Cincinnati,USA,us_county,US_COUNTY_39061,39061,NA,NA,NA,matched_to_panel
+182,1888,Lisbon,Portugal,Exposição Industrial Portugueza (1888),1888,TRUE,38.72509,-9.1498,2267057,Lisbon,PRT,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+183,1888,Copenhagen,Denmark,The Nordic Exhibition of 1888 (Nordiske Industri-Landbrugs og Kunstudstilling),1888,TRUE,55.67594,12.56553,2618425,Copenhagen,DNK,europe_city,GEONAMES_2618425,NA,Copenhagen,Denmark,DNK,matched_to_panel
+184,1888-1889,Melbourne,Victoria,Melbourne Centennial Exhibition,1888,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+185,1888-1889,Melbourne,Victoria,Victorian Juvenile Industrial Exhibition (1888),1888,TRUE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+186,1889,Paris,France,Exposition Universelle (1889) – Eiffel Tower,1889,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+187,1889,Dunedin,New Zealand,New Zealand and South Seas Exhibition (1889),1889,TRUE,-45.87416,170.50361,2191562,Dunedin,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+188,1889,Buffalo,United States,International Industrial Fair (1889),1889,TRUE,42.88645,-78.87837,5110629,Buffalo,USA,us_county,US_COUNTY_36029,36029,NA,NA,NA,matched_to_panel
+189,1890,Buenos Aires,Argentina,Agricultural Exhibition,1890,TRUE,-34.61315,-58.37723,3435910,Buenos Aires,ARG,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+190,1890,Vienna,Austria-Hungary,Agricultural and Forestry Exposition,1890,TRUE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,matched_to_panel
+191,1890,Bremen,Germany,Nord-West-Deutsche Gewerbe und Industrie-Ausstellung,1890,TRUE,53.07582,8.80717,2944388,Bremen,DEU,europe_city,GEONAMES_2944388,NA,Bremen,Germany,DEU,matched_to_panel
+192,1890,London,United Kingdom,International Exhibition of Mining and Metallurgy,1890,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+193,1890,Edinburgh,United Kingdom,"International Exhibition of Science, Art & Industry",1890,TRUE,55.95206,-3.19648,2650225,Edinburgh,GBR,europe_city,GEONAMES_2650225,NA,Edinburgh,United Kingdom,GBR,matched_to_panel
+194,1890,Ballarat,Victoria,Australian Juvenile Industrial Exhibition,1890,TRUE,-37.56622,143.84957,2177091,Ballarat,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+195,1891,Moscow,Russia,Exposition française de Moscow,1891,TRUE,55.75204,37.61781,524901,Moscow,RUS,europe_city,GEONAMES_524901,NA,Moscow,Russia,RUS,matched_to_panel
+196,1891,Frankfurt,Germany,International Electrotechnical Exhibition,1891,TRUE,49.68333,10.53333,2925536,Frankfurt,DEU,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+197,1891,Kingston,Jamaica,International Exhibition (1891),1891,TRUE,17.99702,-76.79358,3489854,Kingston,JAM,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+198,1891,Prague,Austria-Hungary,General Land Centennial Exhibition (1891) at the Prague Exhibition Grounds,1891,TRUE,50.08804,14.42076,3067696,Prague,CZE,europe_city,GEONAMES_3067696,NA,Prague,Czechia,CZE,matched_to_panel
+199,1891,Adelaide,South Australia,"Industrial Exhibition of South Australian Industries, Products and Manufactures",1891,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+200,1891,Port of Spain,NA,Trinidad and Tobago Exhibition,1891,TRUE,10.66668,-61.51889,3573890,Port of Spain,TTO,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+201,1891-1892,Launceston,Tasmania,Tasmanian International Exhibition (1891),1891,TRUE,-41.43876,147.13467,2160517,Launceston,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+202,1892,Grenoble,France,International Alpine Exposition of Grenoble,1892,TRUE,45.17869,5.71479,3014728,Grenoble,FRA,europe_city,GEONAMES_3014728,NA,Grenoble,France,FRA,matched_to_panel
+203,1892,Genoa,Italy,Esposizione Italo-Americana (1892),1892,TRUE,44.40478,8.94439,3176219,Genoa,ITA,europe_city,GEONAMES_3176219,NA,Genoa,Italy,ITA,matched_to_panel
+204,1892,Washington,United States,Exposition of the Three Americas (1892) (never held),1892,TRUE,38.89511,-77.03637,4140963,Washington,USA,us_county,US_COUNTY_11001,11001,NA,NA,NA,matched_to_panel
+205,1892,London,United Kingdom,Crystal Palace Electrical Exhibition,1892,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+206,1892,Kimberley,Cape of Good Hope,South African and International Exhibition,1892,TRUE,-28.73226,24.76232,990930,Kimberley,ZAF,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+207,1892-1893,Madrid,Spain,Historical American Exposition,1892,TRUE,40.4165,-3.70256,3117735,Madrid,ESP,europe_city,GEONAMES_3117735,NA,Madrid,Spain,ESP,matched_to_panel
+208,1893,Chicago,United States,World's Columbian Exposition – Palace of Fine Arts and the World's Congress Auxiliary Building,1893,TRUE,41.85003,-87.65005,4887398,Chicago,USA,us_county,US_COUNTY_17031,17031,NA,NA,NA,matched_to_panel
+209,1893,New York City,United States,World's Fair Prize Winners' Exposition (1893),1893,TRUE,40.71427,-74.00597,5128581,New York City,USA,us_county,US_COUNTY_36047,36047,NA,NA,NA,matched_to_panel
+210,1894,San Francisco,United States,California Midwinter International Exposition of 1894,1894,TRUE,37.77493,-122.41942,5391959,San Francisco,USA,NA,NA,NA,NA,NA,NA,usa_county_not_in_panel
+211,1894,Antwerp,Belgium,Exposition Internationale d'Anvers (1894),1894,TRUE,51.22047,4.40026,2803138,Antwerpen,BEL,europe_city,GEONAMES_2803138,NA,Antwerpen,Belgium,BEL,matched_to_panel
+212,1894,Santiago,Chile,International Mining and Metallurgical Exposition,1894,TRUE,-33.45694,-70.64827,3871336,Santiago,CHL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+213,1894,Lyon,France,Exposition internationale et coloniale,1894,TRUE,45.74906,4.84789,2996944,Lyon,FRA,europe_city,GEONAMES_2996944,NA,Lyon,France,FRA,matched_to_panel
+214,1894,Manchester,United Kingdom,British and Colonial Exhibition,1894,TRUE,53.48095,-2.23743,2643123,Manchester,GBR,europe_city,GEONAMES_2643123,NA,Manchester,United Kingdom,GBR,matched_to_panel
+215,1894,Porto,Portugal,Exposição Insular e Colonial Portugueza (1894),1894,TRUE,41.1485,-8.61097,2735943,Porto,PRT,europe_city,GEONAMES_2735943,NA,Porto,Portugal,PRT,matched_to_panel
+216,1894,Fremantle,Western Australia,Fremantle Industrial Exhibition,1894,TRUE,-32.05632,115.74557,2071223,Fremantle,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+217,1895,Adelaide,South Australia,Exhibition of Art and Industry,1895,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+218,1895,Charleroi,Belgium,"Exposition internationale, industrielle, commerciale, agricole et horticole, avec annexes scientifiques et artistiques et concours ouvriers",1895,TRUE,50.41136,4.44448,2800481,Charleroi,BEL,europe_city,GEONAMES_2800481,NA,Charleroi,Belgium,BEL,matched_to_panel
+219,1895,Hobart,Tasmania,Tasmanian International Exhibition (1895),1895,TRUE,-42.87936,147.32941,2163355,Hobart,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+220,1895,Ballarat,Victoria,Australian Industrial Exhibition (1895),1895,TRUE,-37.56622,143.84957,2177091,Ballarat,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+221,1895,Bordeaux,France,Bordeaux Exposition,1895,TRUE,44.84124,-0.58046,3031582,Bordeaux,FRA,europe_city,GEONAMES_3031582,NA,Bordeaux,France,FRA,matched_to_panel
+222,1895,Kyoto,Japan,National Japanese Exhibition,1895,TRUE,35.02107,135.75385,1857910,Kyoto,JPN,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+223,1895,Christchurch,New Zealand,Art and Industrial Exhibition,1895,TRUE,-43.53333,172.63333,2192362,Christchurch,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+224,1895,Atlanta,United States,Cotton States and International Exposition (1895) (Atlanta Exposition),1895,TRUE,33.749,-84.38798,4180439,Atlanta,USA,us_county,US_COUNTY_13121,13121,NA,NA,NA,matched_to_panel
+225,1895,Montevideo,Uruguay,National Agricultural Exhibition,1895,TRUE,-34.90328,-56.18816,3441575,Montevideo,URY,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+226,1896,Rouen,France,National and Colonial Exposition,1896,TRUE,49.44313,1.09932,2982652,Rouen,FRA,europe_city,GEONAMES_2982652,NA,Rouen,France,FRA,matched_to_panel
+227,1896,Kiel,Germany,International Shipping and Fishery Exposition,1896,TRUE,54.32133,10.13489,2891122,Kiel,DEU,europe_city,GEONAMES_2891122,NA,Kiel,Germany,DEU,matched_to_panel
+228,1896,Budapest,Austria-Hungary,Hungarian Millenary Exhibition,1896,TRUE,47.49835,19.04045,3054643,Budapest,HUN,europe_city,GEONAMES_3054643,NA,Budapest,Hungary,HUN,matched_to_panel
+229,1896,Wellington,New Zealand,Wellington Industrial Exhibition,1896,TRUE,-41.28664,174.77557,2179537,Wellington,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+230,1896,Nizhny Novgorod,Russia,Pan Russian Exhibition,1896,TRUE,56.32867,44.00205,520555,Nizhniy Novgorod,RUS,europe_city,GEONAMES_520555,NA,Nizhniy Novgorod,Russia,RUS,matched_to_panel
+231,1896,Malmö,Sweden,Nordic Industrial and Handicraft Exhibition,1896,TRUE,55.60587,13.00073,2692969,Malmö,SWE,europe_city,GEONAMES_2692969,NA,Malmö,Sweden,SWE,matched_to_panel
+232,1896,Berlin,Germany,Great Industrial Exposition of Berlin,1896,TRUE,52.52437,13.41053,2950159,Berlin,DEU,europe_city,GEONAMES_2950159,NA,Berlin,Germany,DEU,matched_to_panel
+233,1896,Mexico City,Mexico,International Exposition (1896) (never held),1896,TRUE,19.42847,-99.12766,3530597,Mexico City,MEX,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+234,1896,Cardiff,United Kingdom,"Cardiff Fine Arts, Industrial, and Maritime Exhibition",1896,TRUE,51.48,-3.18,2653822,Cardiff,GBR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+235,1896,Geneva,Switzerland,Exposition National Suisse,1896,TRUE,46.20222,6.14569,2660646,Geneva,CHE,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+236,1897,Brussels,Belgium,Exposition Internationale de Bruxelles (1897),1897,TRUE,50.85045,4.34878,2800866,Brussels,BEL,europe_city,GEONAMES_2800866,NA,Brussels,Belgium,BEL,matched_to_panel
+237,1897,Arcachon,France,Arcachon International Exposition,1897,TRUE,44.66126,-1.17255,3037253,Arcachon,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+238,1897,Guatemala City,Guatemala,Exposición Centroamericana,1897,TRUE,14.64072,-90.51327,3598132,Guatemala City,GTM,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+239,1897,London,United Kingdom,Imperial Victorian Exhibition,1897,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+240,1897,Brisbane,Queensland,Queensland International Exhibition,1897,TRUE,-27.46794,153.02809,2174003,Brisbane,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+241,1897,Chicago,United States,Irish Fair (1897),1897,TRUE,41.85003,-87.65005,4887398,Chicago,USA,us_county,US_COUNTY_17031,17031,NA,NA,NA,matched_to_panel
+242,1897,Nashville,United States,Tennessee Centennial and International Exposition,1897,TRUE,36.16589,-86.78444,4644585,Nashville,USA,us_county,US_COUNTY_47037,47037,NA,NA,NA,matched_to_panel
+243,1897,Stockholm,Sweden,General Art and Industrial Exposition of Stockholm,1897,TRUE,59.32938,18.06871,2673730,Stockholm,SWE,europe_city,GEONAMES_2673730,NA,Stockholm,Sweden,SWE,matched_to_panel
+244,1897,Kiev,Russian Empire,Agricultural Exhibition,1897,TRUE,59.5987,55.2078,827619,Kiev,RUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+245,1898,Buenos Aires,Argentina,National Exhibition,1898,TRUE,-34.61315,-58.37723,3435910,Buenos Aires,ARG,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+246,1898,Jerusalem,Ottoman Empire,Universal Scientific and Philanthropic Exposition (1898),1898,TRUE,31.76904,35.21633,281184,Jerusalem,ISR,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+247,1898,Auckland,New Zealand,Auckland Industrial and Mining Exhibition,1898,TRUE,-36.84853,174.76349,2193733,Auckland,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+248,1898,Dunedin,New Zealand,Otago Jubilee Industrial Exhibition (1898),1898,TRUE,-45.87416,170.50361,2191562,Dunedin,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+249,1898,Omaha,United States,Trans-Mississippi Exposition,1898,TRUE,41.25626,-95.94043,5074472,Omaha,USA,us_county,US_COUNTY_31055,31055,NA,NA,NA,matched_to_panel
+250,1898,Bergen,Norway,International Fisheries Exposition (1898),1898,TRUE,60.39299,5.32415,3161732,Bergen,NOR,europe_city,GEONAMES_3161732,NA,Bergen,Norway,NOR,matched_to_panel
+251,1898,Munich,Germany,Kraft – und Arbeitsmaschinen-Ausstellung (1898),1898,TRUE,48.13743,11.57549,2867714,Munich,DEU,europe_city,GEONAMES_2867714,NA,Munich,Germany,DEU,matched_to_panel
+252,1898,San Francisco,United States,California's Golden Jubilee (1898),1898,TRUE,37.77493,-122.41942,5391959,San Francisco,USA,NA,NA,NA,NA,NA,NA,usa_county_not_in_panel
+253,1898,Turin,Italy,Esposizione Generale Italiana,1898,TRUE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,matched_to_panel
+254,1898,Vienna,Austria-Hungary,Jubiläums-Ausstellung,1898,TRUE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,matched_to_panel
+255,1898,Launceston,Tasmania,Tasmanian Juvenile Industrial Exhibition,1898,TRUE,-41.43876,147.13467,2160517,Launceston,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+256,1898,Grahamstown,South Africa,Industrial and Arts Exhibition,1898,TRUE,-33.30422,26.53276,1000501,Grahamstown,ZAF,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+257,1899,Coolgardie,Western Australia,Western Australian International Mining and Industrial Exhibition,1899,TRUE,-30.95266,121.16349,2073890,Coolgardie,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+258,1899,Como,Italy,Como Electrical Exhibition,1899,TRUE,45.80819,9.0832,3178229,Como,ITA,europe_city,GEONAMES_3178229,NA,Como,Italy,ITA,matched_to_panel
+259,1899,Omaha,United States,Greater America Exposition,1899,TRUE,41.25626,-95.94043,5074472,Omaha,USA,us_county,US_COUNTY_31055,31055,NA,NA,NA,matched_to_panel
+260,1899,Philadelphia,United States,National Export Exposition,1899,TRUE,39.95238,-75.16362,4560349,Philadelphia,USA,us_county,US_COUNTY_42101,42101,NA,NA,NA,matched_to_panel
+261,1899,London,United Kingdom,Greater Britain Exhibition,1899,TRUE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,matched_to_panel
+262,1900,Paris,France,Exposition Universelle (1900) – Le Grand Palais,1900,TRUE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+263,1900,Adelaide,South Australia,Century Exhibition of Arts and Industries (1900),1900,TRUE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+264,1900,Christchurch,New Zealand,Canterbury Jubilee Industrial Exhibition,1900,TRUE,-43.53333,172.63333,2192362,Christchurch,NZL,NA,NA,NA,NA,NA,NA,not_in_europe_city_panel
+265,1901,Bendigo,Australia,Victorian Gold Jubilee Exhibition,1901,FALSE,-36.75818,144.28024,2176187,Bendigo,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+266,1901,Buffalo,United States,Pan-American Exposition,1901,FALSE,42.88645,-78.87837,5110629,Buffalo,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+267,1901,Glasgow,United Kingdom,Glasgow International Exhibition (1901),1901,FALSE,55.86515,-4.25763,2648579,Glasgow,GBR,europe_city,GEONAMES_2648579,NA,Glasgow,United Kingdom,GBR,outside_1800_1900
+268,1901,Vienna,Austria-Hungary,Bosnische Weihnachts-Ausstellung (1901),1901,FALSE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,outside_1800_1900
+269,1901,Charleston,United States,South Carolina Inter-State and West Indian Exposition,1901,FALSE,32.77632,-79.93275,4574324,Charleston,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+270,1902,Vienna,Austria-Hungary,International Fishery Exposition,1902,FALSE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,outside_1800_1900
+271,1902,Turin,Italy,Esposizione Internazionale d'Arte Decorativa Moderna,1902,FALSE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,outside_1800_1900
+272,1902,Hanoi,French Indochina,Hanoi exhibition (Indo China Exposition Française et Internationale),1902,FALSE,21.0245,105.84117,1581130,Hanoi,VNM,NA,NA,NA,NA,NA,NA,outside_1800_1900
+273,1902,Lille,France,International Exposition of Lille,1902,FALSE,50.63391,3.05512,2998324,Lille,FRA,europe_city,GEONAMES_2998324,NA,Lille,France,FRA,outside_1800_1900
+274,1902,Cork,United Kingdom,Cork International Exhibition,1902,FALSE,55.03333,-6.28333,2652370,Corkey,GBR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+275,1902,Wolverhampton,United Kingdom,Wolverhampton Art and Industrial Exhibition,1902,FALSE,52.58547,-2.12296,2633691,Wolverhampton,GBR,europe_city,GEONAMES_2633691,NA,Wolverhampton,United Kingdom,GBR,outside_1800_1900
+276,1902,St. Petersburg,Russia,International Fisheries Exhibition,1902,FALSE,59.93863,30.31413,498817,Saint Petersburg,RUS,europe_city,GEONAMES_498817,NA,Saint Petersburg,Russia,RUS,outside_1800_1900
+277,1902,New York City,United States,"United States, Colonial and International Exposition (1902) (never held)",1902,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+278,1902,Toledo,United States,Ohio Centennial and Northwest Territory Exposition (1902) – (never held),1902,FALSE,41.66394,-83.55521,5174035,Toledo,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+279,1903,Melbourne,Australia,Australian Federal International Exhibition,1903,FALSE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+280,1903,Osaka,Japan,Fifth National Industrial Exhibition,1903,FALSE,34.69379,135.50107,1853909,Osaka,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+281,1904,St. Louis,United States,Louisiana Purchase Exposition (also called Louisiana Purchase International Exposition and Olympic Games ): 1904 Summer Olympics,1904,FALSE,38.62727,-90.19789,4407066,St. Louis,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+282,1904,Cape Town,South Africa,Cape Town Industrial Exhibition,1904,FALSE,-33.92584,18.42322,3369157,Cape Town,ZAF,NA,NA,NA,NA,NA,NA,outside_1800_1900
+283,1905,Portland,United States,Lewis and Clark Centennial Exposition,1905,FALSE,45.52345,-122.67621,5746545,Portland,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+284,1905,Liège,Belgium,Exposition universelle et internationale de Liège (1905),1905,FALSE,50.63373,5.56749,2792413,Liège,BEL,europe_city,GEONAMES_2792413,NA,Liège,Belgium,BEL,outside_1800_1900
+285,1905,London,United Kingdom,"Naval, Shipping and Fisheries Exhibition",1905,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+286,1905,New York City,United States,Irish Industrial Exposition (1905),1905,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+287,1906,Vienna,Austria-Hungary,Hygiene Exhibition,1906,FALSE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,outside_1800_1900
+288,1906,Milan,Italy,Esposizione Internazionale del Sempione,1906,FALSE,45.46427,9.18951,3173435,Milan,ITA,europe_city,GEONAMES_3173435,NA,Milan,Italy,ITA,outside_1800_1900
+289,1906,London,United Kingdom,Imperial Austrian Exhibition,1906,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+290,1906,Marseille,France,Exposition coloniale (1906),1906,FALSE,43.29695,5.38107,2995469,Marseille,FRA,europe_city,GEONAMES_2995469,NA,Marseille,France,FRA,outside_1800_1900
+291,1906,Bucharest,Romania,Romanian General Exposition,1906,FALSE,44.43225,26.10626,683506,Bucharest,ROU,europe_city,GEONAMES_683506,NA,Bucharest,Romania,ROU,outside_1800_1900
+292,1906,Tourcoing,France,International Exposition of Textile Industries,1906,FALSE,50.72391,3.16117,2972284,Tourcoing,FRA,europe_city,GEONAMES_2972284,NA,Tourcoing,France,FRA,outside_1800_1900
+293,1906-1907,Christchurch,New Zealand,International Exhibition (1906),1906,FALSE,-43.53333,172.63333,2192362,Christchurch,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+294,1907,Bordeaux,France,International Maritime Exposition,1907,FALSE,44.84124,-0.58046,3031582,Bordeaux,FRA,europe_city,GEONAMES_3031582,NA,Bordeaux,France,FRA,outside_1800_1900
+295,1907,Tokyo,Japan,Tokyo Industrial Exhibition,1907,FALSE,35.6895,139.69171,1850147,Tokyo,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+296,1907,Bergen,Norway,Nordic Marine Motor Exhibition,1907,FALSE,60.39299,5.32415,3161732,Bergen,NOR,europe_city,GEONAMES_3161732,NA,Bergen,Norway,NOR,outside_1800_1900
+297,1907,Dublin,United Kingdom,Irish International Exhibition,1907,FALSE,52.28102,1.17081,13274840,Dublin,GBR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+298,1907,Hampton Roads,United States,Jamestown Exposition,1907,FALSE,28.0374,-82.3582,7217894,Hampton Oaks,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+299,1907,Chicago,United States,World's Pure Food Exposition (1907),1907,FALSE,41.85003,-87.65005,4887398,Chicago,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+300,1907,Mannheim,Germany,Internationale Kunst-Ausstellung (1907),1907,FALSE,49.4891,8.46694,2873891,Mannheim,DEU,europe_city,GEONAMES_2873891,NA,Mannheim,Germany,DEU,outside_1800_1900
+301,1908,Trondheim,Norway,Scandinavian Fisheries Exhibition,1908,FALSE,63.43049,10.39506,3133880,Trondheim,NOR,europe_city,GEONAMES_3133880,NA,Trondheim,Norway,NOR,outside_1800_1900
+302,1908,Zaragoza,Spain,Hispano-French Exposition of 1908,1908,FALSE,41.65606,-0.87734,3104324,Zaragoza,ESP,europe_city,GEONAMES_3104324,NA,Zaragoza,Spain,ESP,outside_1800_1900
+303,1908,London,United Kingdom,Franco-British Exhibition (1908),1908,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+304,1908,Edinburgh,United Kingdom,Scottish National Exhibition,1908,FALSE,55.95206,-3.19648,2650225,Edinburgh,GBR,europe_city,GEONAMES_2650225,NA,Edinburgh,United Kingdom,GBR,outside_1800_1900
+305,1908,New York City,United States,International Mining Exposition (1908),1908,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+306,1908,Rio de Janeiro,Brazil,Exhibition of the Centenary of the Opening of the Ports of Brazil,1908,FALSE,-22.90642,-43.18223,3451190,Rio de Janeiro,BRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+307,1908,Marseille,France,Exposition International de l'Electricite,1908,FALSE,43.29695,5.38107,2995469,Marseille,FRA,europe_city,GEONAMES_2995469,NA,Marseille,France,FRA,outside_1800_1900
+308,1909,London,United Kingdom,Imperial International Exhibition,1909,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+309,1909,Nancy,France,Exposition Internationale de l'Est de la France,1909,FALSE,48.68439,6.18496,2990999,Nancy,FRA,europe_city,GEONAMES_2990999,NA,Nancy,France,FRA,outside_1800_1900
+310,1909,Seattle,United States,Alaska-Yukon-Pacific Exposition,1909,FALSE,47.60621,-122.33207,5809844,Seattle,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+311,1909,New York City,United States,Hudson-Fulton Celebration,1909,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+312,1909,San Francisco,United States,"Portolá Festival (October 19-23, 1909)",1909,FALSE,37.77493,-122.41942,5391959,San Francisco,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+313,1909,Quito,Ecuador,National Ecuadorian Exposition,1909,FALSE,-0.22985,-78.52495,3652462,Quito,ECU,NA,NA,NA,NA,NA,NA,outside_1800_1900
+314,1910,Vienna,Austria-Hungary,International Hunting Exposition,1910,FALSE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,outside_1800_1900
+315,1910,Santiago,Chile,International Agricultural and Industrial Exposition,1910,FALSE,-33.45694,-70.64827,3871336,Santiago,CHL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+316,1910,Bogotá,Colombia,Exposición del Centenario de la independencia (1910),1910,FALSE,4.60971,-74.08175,3688689,Bogotá,COL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+317,1910,Nanking,China,Nanyang Industrial Exposition,1910,FALSE,22.89905,107.65003,9906257,Naning,CHN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+318,1910,Brussels,Belgium,Brussels International 1910,1910,FALSE,50.85045,4.34878,2800866,Brussels,BEL,europe_city,GEONAMES_2800866,NA,Brussels,Belgium,BEL,outside_1800_1900
+319,1910,Buenos Aires,Argentina,Exposición Internacional del Centenario,1910,FALSE,-34.61315,-58.37723,3435910,Buenos Aires,ARG,NA,NA,NA,NA,NA,NA,outside_1800_1900
+320,1910,Nagoya,Japan,Nagoya Industrial Exhibition,1910,FALSE,35.18147,136.90641,1856057,Nagoya,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+321,1910,London,United Kingdom,Japan – British Exhibition,1910,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+322,1910,San Francisco,United States,"Admission Day Festival (1910) September 8, 9, 10",1910,FALSE,37.77493,-122.41942,5391959,San Francisco,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+323,1910,Vienna,Austria-Hungary,Internationale Jagd-Ausstellung (1910),1910,FALSE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,outside_1800_1900
+324,1911,Charleroi,Belgium,Charleroi Exposition,1911,FALSE,50.41136,4.44448,2800481,Charleroi,BEL,europe_city,GEONAMES_2800481,NA,Charleroi,Belgium,BEL,outside_1800_1900
+325,1911,Havana,Cuba,Cuban National Exposition,1911,FALSE,23.13302,-82.38304,3553478,Havana,CUB,NA,NA,NA,NA,NA,NA,outside_1800_1900
+326,1911,Roubaix,France,International Exposition of Northern France,1911,FALSE,50.69421,3.17456,2982681,Roubaix,FRA,europe_city,GEONAMES_2982681,NA,Roubaix,France,FRA,outside_1800_1900
+327,1911,Dresden,Germany,International Hygiene Exhibition,1911,FALSE,51.05089,13.73832,2935022,Dresden,DEU,europe_city,GEONAMES_2935022,NA,Dresden,Germany,DEU,outside_1800_1900
+328,1911,London,United Kingdom,Coronation Exhibition (1911),1911,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+329,1911,London,United Kingdom,Festival of Empire,1911,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+330,1911,Rome,Italy,Esposizione internazionale d'arte (1911),1911,FALSE,41.89193,12.51133,3169070,Rome,ITA,europe_city,GEONAMES_3169070,NA,Rome,Italy,ITA,outside_1800_1900
+331,1911,Wellington,New Zealand,Coronation Industrial Exhibition,1911,FALSE,-41.28664,174.77557,2179537,Wellington,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+332,1911,Turin,Italy,Turin International,1911,FALSE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,outside_1800_1900
+333,1911,Omsk,Russia,Western Siberian Exhibition,1911,FALSE,54.99244,73.36859,1496153,Omsk,RUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+334,1911,Glasgow,United Kingdom,"Scottish Exhibition of National History, Art and Industry",1911,FALSE,55.86515,-4.25763,2648579,Glasgow,GBR,europe_city,GEONAMES_2648579,NA,Glasgow,United Kingdom,GBR,outside_1800_1900
+335,1911,New York City,United States,International Mercantile Exposition (1911),1911,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+336,1912,Manila,Philippines,Philippine Exposition (1912),1912,FALSE,14.6042,120.9822,1701668,Manila,PHL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+337,1912,London,United Kingdom,Latin-British Exhibition,1912,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+338,1913,Melbourne,Australia,Great All-Australian Exhibition,1913,FALSE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+339,1913,Leipzig,Germany,International Building Trades Exposition,1913,FALSE,51.33962,12.37129,2879139,Leipzig,DEU,europe_city,GEONAMES_2879139,NA,Leipzig,Germany,DEU,outside_1800_1900
+340,1913,Auckland,New Zealand,Auckland Exhibition,1913,FALSE,-36.84853,174.76349,2193733,Auckland,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+341,1913,Ghent,Belgium,Exposition universelle et internationale (1913),1913,FALSE,51.05,3.71667,2797656,Gent,BEL,europe_city,GEONAMES_2797656,NA,Gent,Belgium,BEL,outside_1800_1900
+342,1913,Amsterdam,Netherlands,Tentoonstelling De Vrouw 1813 – 1913,1913,FALSE,52.37403,4.88969,2759794,Amsterdam,NLD,europe_city,GEONAMES_2759794,NA,Amsterdam,The Netherlands,NLD,outside_1800_1900
+343,1913,Kiev,Russian Empire,All Russian Exhibition,1913,FALSE,59.5987,55.2078,827619,Kiev,RUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+344,1913,Knoxville,United States,National Conservation Exposition,1913,FALSE,35.96064,-83.92074,4634946,Knoxville,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+345,1914,London,United Kingdom,Anglo-American Exhibition,1914,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+346,1914,Malmö,Sweden,Baltic Exhibition,1914,FALSE,55.60587,13.00073,2692969,Malmö,SWE,europe_city,GEONAMES_2692969,NA,Malmö,Sweden,SWE,outside_1800_1900
+347,1914,Boulogne-sur-Mer,France,International Exposition of Sea Fishery Industries (1914),1914,FALSE,50.724850000000004,1.61373,3031133,Boulogne-sur-Mer,FRA,europe_city,GEONAMES_3031133,NA,Boulogne-sur-Mer,France,FRA,outside_1800_1900
+348,1914,Lyon,France,Exposition internationale urbaine de Lyon,1914,FALSE,45.74906,4.84789,2996944,Lyon,FRA,europe_city,GEONAMES_2996944,NA,Lyon,France,FRA,outside_1800_1900
+349,1914,Tokyo,Japan,Tokyo Taisho Exposition,1914,FALSE,35.6895,139.69171,1850147,Tokyo,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+350,1914,Cologne,Germany,Werkbund Exhibition (1914),1914,FALSE,45.57862,9.9418,3178287,Cologne,ITA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+351,1914,Bristol,United Kingdom,International Exhibition (1914),1914,FALSE,51.45523,-2.59665,2654675,Bristol,GBR,europe_city,GEONAMES_2654675,NA,Bristol,United Kingdom,GBR,outside_1800_1900
+352,1914,Nottingham,United Kingdom,Universal Exhibition (1914) (work begun on site 1913 but never held),1914,FALSE,52.9536,-1.15047,2641170,Nottingham,GBR,europe_city,GEONAMES_2641170,NA,Nottingham,United Kingdom,GBR,outside_1800_1900
+353,1914,Semarang,Dutch East Indies,Colonial Exhibition of Semarang (Colonial Exposition),1914,FALSE,-6.99306,110.42083,1627896,Semarang,IDN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+354,1914,Christiania,Norway,1914 Jubilee Exhibition (Norges Jubilæumsutstilling),1914,FALSE,55.67346,12.59765,2623186,Christiania,DNK,NA,NA,NA,NA,NA,NA,outside_1800_1900
+355,1914,Baltimore,United States,National Star-Spangled Banner Centennial Celebration,1914,FALSE,39.29038,-76.61219,4347778,Baltimore,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+356,1914,Genoa,Italy,International exhibition of marine and maritime hygiene,1914,FALSE,44.40478,8.94439,3176219,Genoa,ITA,europe_city,GEONAMES_3176219,NA,Genoa,Italy,ITA,outside_1800_1900
+357,1915,Casablanca,Morocco,Casablanca Fair of 1915,1915,FALSE,33.58831,-7.61138,2553604,Casablanca,MAR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+358,1915,San Francisco,United States,Panama – Pacific International ExpositionPalace of Fine Arts,1915,FALSE,37.77493,-122.41942,5391959,San Francisco,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+359,1915,Panama City,Panama,Exposición Nacional de Panama (1915),1915,FALSE,8.9936,-79.51973,3703443,Panama City,PAN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+360,1915,Richmond,United States,Negro Historical and Industrial Exposition (1915),1915,FALSE,37.55376,-77.46026,4781708,Richmond,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+361,1915,Chicago,United States,Lincoln Jubilee and Exposition (1915),1915,FALSE,41.85003,-87.65005,4887398,Chicago,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+362,1915-1916,San Diego,United States,Panama – California Exposition,1915,FALSE,32.71571,-117.16472,5391811,San Diego,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+363,1916,Wellington,New Zealand,British Commercial and Industrial Exhibition,1916,FALSE,-41.28664,174.77557,2179537,Wellington,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+364,1918,New York City,United States,"Bronx International Exposition of Science, Arts and Industries",1918,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+365,1918,Los Angeles,United States,California Liberty Fair (1918),1918,FALSE,34.05223,-118.24368,5368361,Los Angeles,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+366,1920,Adelaide,Australia,All-Australian Peace Exhibition,1920,FALSE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+367,1920,Shanghai,China,American-Chinese Exposition,1920,FALSE,31.22222,121.45806,1796236,Shanghai,CHN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+368,1921,Riga,Latvia,International Exhibition of Agriculture and Industry,1921,FALSE,56.946,24.10589,456172,Riga,LVA,europe_city,GEONAMES_456172,NA,Riga,Latvia,LVA,outside_1800_1900
+369,1921,Wellington,New Zealand,Exhibition of New Zealand Industries,1921,FALSE,-41.28664,174.77557,2179537,Wellington,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+370,1921,London,United Kingdom,International Exhibition of Rubber and Other Tropical Products (1921),1921,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+371,1922,Marseille,France,Exposition nationale coloniale (1922),1922,FALSE,43.29695,5.38107,2995469,Marseille,FRA,europe_city,GEONAMES_2995469,NA,Marseille,France,FRA,outside_1800_1900
+372,1922,Tokyo,Japan,Peace Exhibition (1922),1922,FALSE,35.6895,139.69171,1850147,Tokyo,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+373,1922,Christchurch,New Zealand,Exhibition of New Zealand Industries,1922,FALSE,-43.53333,172.63333,2192362,Christchurch,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+374,1922-1923,Rio de Janeiro,Brazil,Exposição do Centenario do Brasil (1922),1922,FALSE,-22.90642,-43.18223,3451190,Rio de Janeiro,BRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+375,1923,Auckland,New Zealand,Dominion Industrial Exhibition,1923,FALSE,-36.84853,174.76349,2193733,Auckland,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+376,1923,Los Angeles,United States,American Historical Review and Motion Picture Exposition (1923),1923,FALSE,34.05223,-118.24368,5368361,Los Angeles,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+377,1923,Calcutta,India,Calcutta Exhibition (1923) preparatory to British Empire Exhibition,1923,FALSE,11.6,92.73333,1275003,Calicut,IND,NA,NA,NA,NA,NA,NA,outside_1800_1900
+378,1923,Moscow,Soviet Union,All-Russian Agricultural and Domestic Industries Exhibition,1923,FALSE,55.75204,37.61781,524901,Moscow,RUS,europe_city,GEONAMES_524901,NA,Moscow,Russia,RUS,outside_1800_1900
+379,1923,Gothenburg,Sweden,Gothenburg Exhibition (1923) (Jubileumsutställningens i Göteborg) (Liseberg),1923,FALSE,57.70716,11.96679,2711537,Gothenburg,SWE,europe_city,GEONAMES_2711537,NA,Gothenburg,Sweden,SWE,outside_1800_1900
+380,1923-1924,Hokitika,New Zealand,British and Intercolonial Exhibition,1923,FALSE,-42.71667,170.96667,2206894,Hokitika,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+381,1924,Wembley,United Kingdom,British Empire Exhibition,1924,FALSE,51.55242,-0.29686,2634549,Wembley,GBR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+382,1924,New York City,United States,French Exposition (1924),1924,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+383,1924,1925 Buenos Aires,Argentina,Industrial Exposition,1924,FALSE,-34.61315,-58.37723,3435910,Buenos Aires,ARG,NA,NA,NA,NA,NA,NA,outside_1800_1900
+384,1925,Adelaide,Australia,All-Australian Exhibition,1925,FALSE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+385,1925,Wellington,New Zealand,Dominion Industrial Exhibition,1925,FALSE,-41.28664,174.77557,2179537,Wellington,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+386,1925,San Francisco,United States,California's Diamond Jubilee (1925),1925,FALSE,37.77493,-122.41942,5391959,San Francisco,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+387,1925,Paris,France,International Exhibition of Modern Decorative and Industrial Arts,1925,FALSE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+388,1925-1926,Dunedin,New Zealand,New Zealand and South Seas International Exhibition,1925,FALSE,-45.87416,170.50361,2191562,Dunedin,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+389,1926,Philadelphia,United States,Sesquicentennial Exposition,1926,FALSE,39.95238,-75.16362,4560349,Philadelphia,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+390,1926,Berlin,Germany,Internationale Polizeiausstellung (1926),1926,FALSE,52.52437,13.41053,2950159,Berlin,DEU,europe_city,GEONAMES_2950159,NA,Berlin,Germany,DEU,outside_1800_1900
+391,1927,Lyon,France,Foire internationale (1925),1927,FALSE,45.74906,4.84789,2996944,Lyon,FRA,europe_city,GEONAMES_2996944,NA,Lyon,France,FRA,outside_1800_1900
+392,1927,Stuttgart,Germany,Werkbund Exhibition,1927,FALSE,48.78232,9.17702,2825297,Stuttgart,DEU,europe_city,GEONAMES_2825297,NA,Stuttgart,Germany,DEU,outside_1800_1900
+393,1928,Cologne,Germany,International Press Exhibition,1928,FALSE,45.57862,9.9418,3178287,Cologne,ITA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+394,1928,Long Beach,United States,Pacific Southwest Exposition (1928),1928,FALSE,33.76696,-118.18923,5367929,Long Beach,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+395,1929,Newcastle upon Tyne,United Kingdom,North East Coast Exhibition,1929,FALSE,54.97328,-1.61396,2641673,Newcastle upon Tyne,GBR,europe_city,GEONAMES_2641673,NA,Newcastle upon Tyne,United Kingdom,GBR,outside_1800_1900
+396,1929,Hangzhou,China,Westlake Exposition,1929,FALSE,30.29365,120.16142,1808926,Hangzhou,CHN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+397,1929-1930,Seville,Spain,Ibero-American Exposition of 1929,1929,FALSE,37.39141,-5.95918,6361046,Seville,ESP,NA,NA,NA,NA,NA,NA,outside_1800_1900
+398,1929-1930,Barcelona,Spain,1929 Barcelona International Exposition,1929,FALSE,41.38879,2.15899,3128760,Barcelona,ESP,europe_city,GEONAMES_3128760,NA,Barcelona,Spain,ESP,outside_1800_1900
+399,1930,Adelaide,Australia,All-Australian Exhibition,1930,FALSE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+400,1930,Antwerp,Belgium,"Exposition internationale coloniale, maritime et d'art flamand",1930,FALSE,51.22047,4.40026,2803138,Antwerpen,BEL,europe_city,GEONAMES_2803138,NA,Antwerpen,Belgium,BEL,outside_1800_1900
+401,1930,Liège,Belgium,"Exposition internationale de la grande industrie, sciences et applications, art wallon ancien",1930,FALSE,50.63373,5.56749,2792413,Liège,BEL,europe_city,GEONAMES_2792413,NA,Liège,Belgium,BEL,outside_1800_1900
+402,1930,Oran,Algeria,Oran Exposition,1930,FALSE,35.69906,-0.63588,2485926,Oran,DZA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+403,1930,Dresden,Germany,International Hygiene Exposition,1930,FALSE,51.05089,13.73832,2935022,Dresden,DEU,europe_city,GEONAMES_2935022,NA,Dresden,Germany,DEU,outside_1800_1900
+404,1930,Stockholm,Sweden,"Stockholm Exhibition (1930) (Utställningen av konstindustri, konsthandverk och hemslöjd)",1930,FALSE,59.32938,18.06871,2673730,Stockholm,SWE,europe_city,GEONAMES_2673730,NA,Stockholm,Sweden,SWE,outside_1800_1900
+405,1930,Trondheim,Norway,Trøndelag Exhibition,1930,FALSE,63.43049,10.39506,3133880,Trondheim,NOR,europe_city,GEONAMES_3133880,NA,Trondheim,Norway,NOR,outside_1800_1900
+406,1931,Paris,France,Paris Colonial Exposition,1931,FALSE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+407,1931,Berlin,Germany,International Building Exposition,1931,FALSE,52.52437,13.41053,2950159,Berlin,DEU,europe_city,GEONAMES_2950159,NA,Berlin,Germany,DEU,outside_1800_1900
+408,1932,Tel Aviv,Mandatory Palestine,Levant Fair,1932,FALSE,32.08088,34.78057,293397,Tel Aviv,ISR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+409,1933,Tokyo,Japan,Women's and Children International Exhibition,1933,FALSE,35.6895,139.69171,1850147,Tokyo,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+410,1933-1934,Buenos Aires,Argentina,Industrial Exposition,1933,FALSE,-34.61315,-58.37723,3435910,Buenos Aires,ARG,NA,NA,NA,NA,NA,NA,outside_1800_1900
+411,1933-1934,Chicago,United States,Century of Progress International Exposition,1933,FALSE,41.85003,-87.65005,4887398,Chicago,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+412,1934,Melbourne,Australia,Centenary All Australian Exhibition,1934,FALSE,-37.814,144.96332,2158177,Melbourne,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+413,1934,Porto,Portugal,Portuguese colonial exhibition,1934,FALSE,41.1485,-8.61097,2735943,Porto,PRT,europe_city,GEONAMES_2735943,NA,Porto,Portugal,PRT,outside_1800_1900
+414,1934,Tel Aviv,Mandatory Palestine,Levant Fair,1934,FALSE,32.08088,34.78057,293397,Tel Aviv,ISR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+415,1935,Yokohama,Japan,Grand Yokohama Exposition,1935,FALSE,35.43333,139.65,1848354,Yokohama,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+416,1935,Moscow,Soviet Union,All-Union Agricultural Exhibition (VSKhV),1935,FALSE,55.75204,37.61781,524901,Moscow,RUS,europe_city,GEONAMES_524901,NA,Moscow,Russia,RUS,outside_1800_1900
+417,1935,Brussels,Belgium,Brussels International Exposition (1935),1935,FALSE,50.85045,4.34878,2800866,Brussels,BEL,europe_city,GEONAMES_2800866,NA,Brussels,Belgium,BEL,outside_1800_1900
+418,1935,Porto Alegre,Brazil,Farroupilha Revolution centennial fair,1935,FALSE,-30.03283,-51.23019,3452925,Porto Alegre,BRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+419,1935,Taipei. Taiwan,NA,The Taiwan Exposition: In Commemoration of the First Forty Years of Colonial Rule,1935,FALSE,25.05306,121.52639,1668341,Taipei,TWN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+420,1935-1936,San Diego,California United States,California Pacific International Exposition,1935,FALSE,32.71571,-117.16472,5391811,San Diego,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+421,1936,Adelaide,Australia,Adelaide Centennial Exhibition,1936,FALSE,-34.92866,138.59863000000001,2078025,Adelaide,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+422,1936,Stockholm,Sweden,ILIS 1936,1936,FALSE,59.32938,18.06871,2673730,Stockholm,SWE,europe_city,GEONAMES_2673730,NA,Stockholm,Sweden,SWE,outside_1800_1900
+423,1936,Tel Aviv,Mandatory Palestine,Levant Fair,1936,FALSE,32.08088,34.78057,293397,Tel Aviv,ISR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+424,1936,Cleveland,United States,Great Lakes Exposition,1936,FALSE,41.4995,-81.69541,5150529,Cleveland,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+425,1936,Dallas,United States,Texas Centennial Exposition,1936,FALSE,32.78306,-96.80667,4684888,Dallas,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+426,1936-1937,Johannesburg,South Africa,"Empire Exhibition, South Africa",1936,FALSE,-26.20227,28.04363,993800,Johannesburg,ZAF,NA,NA,NA,NA,NA,NA,outside_1800_1900
+427,1937,Cleveland,United States,Great Lakes Exposition,1937,FALSE,41.4995,-81.69541,5150529,Cleveland,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+428,1937,Dallas,United States,Greater Texas & Pan-American Exposition,1937,FALSE,32.78306,-96.80667,4684888,Dallas,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+429,1937,Berlin,Germany,International Hunting Exposition,1937,FALSE,52.52437,13.41053,2950159,Berlin,DEU,europe_city,GEONAMES_2950159,NA,Berlin,Germany,DEU,outside_1800_1900
+430,1937,Düsseldorf,Germany,Reichsausstellung Schaffendes Volk,1937,FALSE,51.22319,6.77927,2934246,Düsseldorf,DEU,europe_city,GEONAMES_2934246,NA,Düsseldorf,Germany,DEU,outside_1800_1900
+431,1937,Miami,United States,Pan American Fair (1937),1937,FALSE,25.77427,-80.19366,4164138,Miami,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+432,1937,Paris,France,Exposition Internationale des Arts et Techniques dans la Vie Moderne (1937),1937,FALSE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+433,1937,Nagoya,Japan,Nagoya Pan-Pacific Peace Exposition,1937,FALSE,35.18147,136.90641,1856057,Nagoya,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+434,1938,Berlin,Germany,International Handiworks Exposition,1938,FALSE,52.52437,13.41053,2950159,Berlin,DEU,europe_city,GEONAMES_2950159,NA,Berlin,Germany,DEU,outside_1800_1900
+435,1938,Glasgow,United Kingdom,"Empire Exhibition, Scotland 1938",1938,FALSE,55.86515,-4.25763,2648579,Glasgow,GBR,europe_city,GEONAMES_2648579,NA,Glasgow,United Kingdom,GBR,outside_1800_1900
+436,1938,Helsinki,Finland,Second International Aeronautic Exhibition,1938,FALSE,60.16952,24.93545,658225,Helsinki,FIN,europe_city,GEONAMES_658225,NA,Helsinki,Finland,FIN,outside_1800_1900
+437,1939,Wellington,New Zealand,New Zealand Centennial Exhibition,1939,FALSE,-41.28664,174.77557,2179537,Wellington,NZL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+438,1939,Liège,Belgium,Exposition internationale de l'eau (1939),1939,FALSE,50.63373,5.56749,2792413,Liège,BEL,europe_city,GEONAMES_2792413,NA,Liège,Belgium,BEL,outside_1800_1900
+439,1939,Zürich,Switzerland,Schweizerische Landesausstellung,1939,FALSE,47.36667,8.55,2657896,Zürich,CHE,europe_city,GEONAMES_2657896,NA,Zürich,Switzerland,CHE,outside_1800_1900
+440,1939,Moscow,Soviet Union,All-Union Agricultural Exhibition,1939,FALSE,55.75204,37.61781,524901,Moscow,RUS,europe_city,GEONAMES_524901,NA,Moscow,Russia,RUS,outside_1800_1900
+441,1939-1940,New York City,United States,"1939 New York World's Fair (exhibits included The World of Tomorrow, Futurama, Trylon and Perisphere)",1939,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+442,1939-1940,San Francisco,United States,Golden Gate International Exposition,1939,FALSE,37.77493,-122.41942,5391959,San Francisco,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+443,1940,Lisbon,Portugal,Portuguese World Exhibition,1940,FALSE,38.72509,-9.1498,2267057,Lisbon,PRT,NA,NA,NA,NA,NA,NA,outside_1800_1900
+444,1940,Chicago,United States,American Negro Exposition,1940,FALSE,41.85003,-87.65005,4887398,Chicago,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+445,1940,Los Angeles,United States,Pacific Mercado (1940) (never held),1940,FALSE,34.05223,-118.24368,5368361,Los Angeles,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+446,1940,Naples,Italy,Mostra Triennale delle Terre Italiane d’Oltremare (Triennial Exhibition of Overseas Italian Territories),1940,FALSE,40.85216,14.26811,3172394,Naples,ITA,europe_city,GEONAMES_3172394,NA,Naples,Italy,ITA,outside_1800_1900
+447,1940,Tokyo,Japan,Grand International Exposition of Japan (1940) (never held),1940,FALSE,35.6895,139.69171,1850147,Tokyo,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+448,1942,Los Angeles,United States,Cabrillo Fair (1942) (never held),1942,FALSE,34.05223,-118.24368,5368361,Los Angeles,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+449,1942,Rome,Italy,Esposizione universale (1942) (E42) (never held),1942,FALSE,41.89193,12.51133,3169070,Rome,ITA,europe_city,GEONAMES_3169070,NA,Rome,Italy,ITA,outside_1800_1900
+450,1943,Stockholm,Sweden,Norwegian Exhibition,1943,FALSE,59.32938,18.06871,2673730,Stockholm,SWE,europe_city,GEONAMES_2673730,NA,Stockholm,Sweden,SWE,outside_1800_1900
+451,1947,Paris,France,International Exhibition on Urbanism and Housing,1947,FALSE,48.85341,2.3488,2988507,Paris,FRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+452,1948,Brussels,Belgium,Foire coloniale (1948),1948,FALSE,50.85045,4.34878,2800866,Brussels,BEL,europe_city,GEONAMES_2800866,NA,Brussels,Belgium,BEL,outside_1800_1900
+453,1949,Stockholm,Sweden,Universal Sport Exhibition,1949,FALSE,59.32938,18.06871,2673730,Stockholm,SWE,europe_city,GEONAMES_2673730,NA,Stockholm,Sweden,SWE,outside_1800_1900
+454,1949,Lyon,France,International Exhibition on Urbanism and Housing,1949,FALSE,45.74906,4.84789,2996944,Lyon,FRA,europe_city,GEONAMES_2996944,NA,Lyon,France,FRA,outside_1800_1900
+455,1949-1950,Port-au-Prince,Haiti,Exposition internationale du bicentenaire de Port-au-Prince,1949,FALSE,18.54349,-72.33881,3718426,Port-au-Prince,HTI,NA,NA,NA,NA,NA,NA,outside_1800_1900
+456,1951,Lille,France,The International Textile Exhibition,1951,FALSE,50.63391,3.05512,2998324,Lille,FRA,europe_city,GEONAMES_2998324,NA,Lille,France,FRA,outside_1800_1900
+457,1951,London,United Kingdom,Festival of Britain – Skylon,1951,FALSE,51.50853,-0.12574,2643743,London,GBR,europe_city,GEONAMES_2643743,NA,London,United Kingdom,GBR,outside_1800_1900
+458,1952,Colombo,Ceylon,Colombo Exhibition,1952,FALSE,6.93548,79.84868,1248991,Colombo,LKA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+459,1953,St Louis,United States,"intended to commemorate the Louisiana Purchase's sesquicentennial, but never held",1953,FALSE,38.62727,-90.19789,4407066,St. Louis,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+460,1953,Manila,Philippines,"the Philippines International Fair of 1953, 1 February – 30 April 1953, to show off the recovery of the Philippines from WW2 and as the first democracy in the Far East",1953,FALSE,14.6042,120.9822,1701668,Manila,PHL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+461,1953,Jerusalem,Israel,International Exhibition and Fair Jerusalem Israel Conquest of the desert,1953,FALSE,31.76904,35.21633,281184,Jerusalem,ISR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+462,1953,Rome,Italy,Agricultural Exposition of Rome EA 53 Rome,1953,FALSE,41.89193,12.51133,3169070,Rome,ITA,europe_city,GEONAMES_3169070,NA,Rome,Italy,ITA,outside_1800_1900
+463,1954,Naples,Italy,Oltremare Exhibition – Campi Flegrei,1954,FALSE,40.85216,14.26811,3172394,Naples,ITA,europe_city,GEONAMES_3172394,NA,Naples,Italy,ITA,outside_1800_1900
+464,1954,Bogota,Colombia,First International Industry and Commerce Fair of Bogota,1954,FALSE,4.60971,-74.08175,3688689,Bogotá,COL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+465,1954,Damascus,Syria,".mw-parser-output cite.citation{font-style:inherit;word-wrap:break-word}.mw-parser-output .citation q{quotes:""\""""""\""""""'""""'""}.mw-parser-output .citation:target{background-color:rgba(0,127,255,0.133)}.mw-parser-output .id-lock-free.id-lock-free a{background:url(""//upload.wikimedia.org/wikipedia/commons/6/65/Lock-green.svg"")right 0.1em center/9px no-repeat}.mw-parser-output .id-lock-limited.id-lock-limited a,.mw-parser-output .id-lock-registration.id-lock-registration a{background:url(""//upload.wikimedia.org/wikipedia/commons/d/d6/Lock-gray-alt-2.svg"")right 0.1em center/9px no-repeat}.mw-parser-output .id-lock-subscription.id-lock-subscription a{background:url(""//upload.wikimedia.org/wikipedia/commons/a/aa/Lock-red-alt-2.svg"")right 0.1em center/9px no-repeat}.mw-parser-output .cs1-ws-icon a{background:url(""//upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg"")right 0.1em center/12px no-repeat}body:not(.skin-timeless):not(.skin-minerva) .mw-parser-output .id-lock-free a,body:not(.skin-timeless):not(.skin-minerva) .mw-parser-output .id-lock-limited a,body:not(.skin-timeless):not(.skin-minerva) .mw-parser-output .id-lock-registration a,body:not(.skin-timeless):not(.skin-minerva) .mw-parser-output .id-lock-subscription a,body:not(.skin-timeless):not(.skin-minerva) .mw-parser-output .cs1-ws-icon a{background-size:contain;padding:0 1em 0 0}.mw-parser-output .cs1-code{color:inherit;background:inherit;border:none;padding:inherit}.mw-parser-output .cs1-hidden-error{display:none;color:var(--color-error,#bf3c2c)}.mw-parser-output .cs1-visible-error{color:var(--color-error,#bf3c2c)}.mw-parser-output .cs1-maint{display:none;color:#085;margin-left:0.3em}.mw-parser-output .cs1-kern-left{padding-left:0.2em}.mw-parser-output .cs1-kern-right{padding-right:0.2em}.mw-parser-output .citation .mw-selflink{font-weight:inherit}@media screen{.mw-parser-output .cs1-format{font-size:95%}html.skin-theme-clientpref-night .mw-parser-output .cs1-maint{color:#18911f}}@media screen and (prefers-color-scheme:dark){html.skin-theme-clientpref-os .mw-parser-output .cs1-maint{color:#18911f}}""Damascus World Fair"".",1954,FALSE,33.5102,36.29128,170654,Damascus,SYR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+466,1954-1955,São Paulo,Brazil,Fourth Centenary Exhibition,1954,FALSE,-23.5475,-46.63611,3448439,São Paulo,BRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+467,1955,Turin,Italy,International Expo of Sport Turin 1955,1955,FALSE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,outside_1800_1900
+468,1955,Helsingborg,Sweden,Helsingborg Exhibition 1955,1955,FALSE,56.04673,12.69437,2706767,Helsingborg,SWE,NA,NA,NA,NA,NA,NA,outside_1800_1900
+469,1955,Ciudad Trujillo (Santo Domingo),Dominican Republic,Feria de la Paz y Confraternidad del Mundo Libre,1955,FALSE,18.47186,-69.89232,3492908,Santo Domingo,DOM,NA,NA,NA,NA,NA,NA,outside_1800_1900
+470,1956,Beit Dagan,Israel,Exhibition of citriculture,1956,FALSE,32.00191,34.82977,295475,Bet Dagan,ISR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+471,1957,Berlin,NA,International Building Exposition,1957,FALSE,52.52437,13.41053,2950159,Berlin,DEU,europe_city,GEONAMES_2950159,NA,Berlin,Germany,DEU,outside_1800_1900
+472,1958,Brussels,Belgium,Expo '58 (Exposition Universelle et Internationale de Bruxelles) – Atomium,1958,FALSE,50.85045,4.34878,2800866,Brussels,BEL,europe_city,GEONAMES_2800866,NA,Brussels,Belgium,BEL,outside_1800_1900
+473,1959,New Delhi,India,World Agricultural Fair,1959,FALSE,28.62137,77.2148,1261481,New Delhi,IND,NA,NA,NA,NA,NA,NA,outside_1800_1900
+474,1959,Moscow,Soviet Union,Exhibition of Achievements of National Economy (VDNKh),1959,FALSE,55.75204,37.61781,524901,Moscow,RUS,europe_city,GEONAMES_524901,NA,Moscow,Russia,RUS,outside_1800_1900
+475,1960,Caracas,Venezuela,cancelled,1960,FALSE,10.48801,-66.87919,3646738,Caracas,VEN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+476,1961,Turin,Italy,Exposition International du TravailExpo 61,1961,FALSE,45.07049,7.68682,3165524,Turin,ITA,europe_city,GEONAMES_3165524,NA,Turin,Italy,ITA,outside_1800_1900
+477,1962,Seattle,United States,Century 21 Exposition – Space Needle,1962,FALSE,47.60621,-122.33207,5809844,Seattle,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+478,1964,Lausanne,Switzerland,Expo 64 – Schweizerische Landesausstellung,1964,FALSE,46.516,6.63282,2659994,Lausanne,CHE,NA,NA,NA,NA,NA,NA,outside_1800_1900
+479,1964-1965,New York City,United States,1964/1965 New York World's Fair (note: not sanctioned by the Bureau International des Expositions) – Unisphere,1964,FALSE,40.71427,-74.00597,5128581,New York City,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+480,1965,Munich,West Germany,International Exhibition of Transport and Communication,1965,FALSE,48.13743,11.57549,2867714,Munich,DEU,europe_city,GEONAMES_2867714,NA,Munich,Germany,DEU,outside_1800_1900
+481,1967,Montreal,Canada,"Expo 67, (Universal and International Exhibition of 1967)",1967,FALSE,45.50884,-73.58781,6077243,Montréal,CAN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+482,1968,San Antonio,United States,HemisFair '68 – Tower of the Americas,1968,FALSE,29.42412,-98.49363,4726206,San Antonio,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+483,1970,Osaka,Japan,Expo '70 (Japan World Exposition),1970,FALSE,34.69379,135.50107,1853909,Osaka,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+484,1971,Budapest,Hungary,Expo 71 (Exhibition World of Hunting),1971,FALSE,47.49835,19.04045,3054643,Budapest,HUN,europe_city,GEONAMES_3054643,NA,Budapest,Hungary,HUN,outside_1800_1900
+485,1974,Spokane,United States,Expo '74 (International Exposition on the Environment) – Riverfront Park,1974,FALSE,47.65966,-117.42908,5811696,Spokane,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+486,1975,Okinawa,Japan,Expo '75 (International Ocean Exposition),1975,FALSE,26.33583,127.80139,1894616,Okinawa,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+487,1980,Montreal,Canada,Floralies Internationales de Montréal,1980,FALSE,45.50884,-73.58781,6077243,Montréal,CAN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+488,1981,Plovdiv,Bulgaria,Expo 81,1981,FALSE,42.15387,24.75001,728193,Plovdiv,BGR,europe_city,GEONAMES_728193,NA,Plovdiv,Bulgaria,BGR,outside_1800_1900
+489,1982,Amsterdam,Netherlands,Floriade 1982,1982,FALSE,52.37403,4.88969,2759794,Amsterdam,NLD,europe_city,GEONAMES_2759794,NA,Amsterdam,The Netherlands,NLD,outside_1800_1900
+490,1982,Knoxville,United States,1982 World's Fair – Sunsphere,1982,FALSE,35.96064,-83.92074,4634946,Knoxville,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+491,1984,New Orleans,United States,1984 Louisiana World Exposition,1984,FALSE,29.95465,-90.07507,4335045,New Orleans,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+492,1984,Liverpool,United Kingdom,International Garden Festival Liverpool '84,1984,FALSE,53.41058,-2.97794,2644210,Liverpool,GBR,europe_city,GEONAMES_2644210,NA,Liverpool,United Kingdom,GBR,outside_1800_1900
+493,1985,Plovdiv,Bulgaria,Expo 85,1985,FALSE,42.15387,24.75001,728193,Plovdiv,BGR,europe_city,GEONAMES_728193,NA,Plovdiv,Bulgaria,BGR,outside_1800_1900
+494,1985,Tsukuba,Japan,Expo 85,1985,FALSE,36.08333,140.11667,2110681,Tsukuba,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+495,1986,Vancouver,Canada,Expo 86,1986,FALSE,49.24966,-123.11934,6173331,Vancouver,CAN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+496,1988,Brisbane,Australia,Expo '88,1988,FALSE,-27.46794,153.02809,2174003,Brisbane,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+497,1989,Nagoya,Japan,World Design Exhibition 1989,1989,FALSE,35.18147,136.90641,1856057,Nagoya,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+498,1990,Osaka,Japan,Expo '90,1990,FALSE,34.69379,135.50107,1853909,Osaka,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+499,1991,Plovdiv,Bulgaria,Second World Exhibition of inventions of the young,1991,FALSE,42.15387,24.75001,728193,Plovdiv,BGR,europe_city,GEONAMES_728193,NA,Plovdiv,Bulgaria,BGR,outside_1800_1900
+500,1992,three expositions (1 was cancelled) celebrating 500 years sinceChristopher Columbusreached the Americas Seville,Spain,"Seville Expo '92 Universal Exposition, port where Columbus started his voyage Genoa, Italy – Genoa Expo '92 Specialized Exposition, city where Columbus was born Columbus, Ohio, United States - AmeriFlora '92 Horticultural Exposition, city named in honor of Columbus Chicago, Illinois, United States (Cancelled) – meant to generically represent the Americas-side of Columbus' voyage",1992,FALSE,37.39141,-5.95918,6361046,Seville,ESP,NA,NA,NA,NA,NA,NA,outside_1800_1900
+501,1992,Zoetermeer,Netherlands,Floriade 1992,1992,FALSE,52.0575,4.49306,2743856,Zoetermeer,NLD,europe_city,GEONAMES_2743856,NA,Zoetermeer,The Netherlands,NLD,outside_1800_1900
+502,1993,Stuttgart,Germany,Internationale Gartenbauausstellung 93,1993,FALSE,48.78232,9.17702,2825297,Stuttgart,DEU,europe_city,GEONAMES_2825297,NA,Stuttgart,Germany,DEU,outside_1800_1900
+503,1993,Daejeon,South Korea,Expo '93,1993,FALSE,36.34913,127.38493,1835235,Daejeon,KOR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+504,1995,Vienna,Austria,which was proposed to be a joint exhibition with Budapest. This was never held,1995,FALSE,48.20849,16.37208,2761369,Vienna,AUT,europe_city,GEONAMES_2761369,NA,Vienna,Austria,AUT,outside_1800_1900
+505,1996,Budapest,Hungary,cancelled,1996,FALSE,47.49835,19.04045,3054643,Budapest,HUN,europe_city,GEONAMES_3054643,NA,Budapest,Hungary,HUN,outside_1800_1900
+506,1998,Lisbon,Portugal,Expo '98,1998,FALSE,38.72509,-9.1498,2267057,Lisbon,PRT,NA,NA,NA,NA,NA,NA,outside_1800_1900
+507,1999,Kunming,China,Expo '99,1999,FALSE,25.03889,102.71833,1804651,Kunming,CHN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+508,2000,Hanover,Germany,Expo 2000,2000,FALSE,53.1742,8.50694,2910830,Hannover,DEU,NA,NA,NA,NA,NA,NA,outside_1800_1900
+509,2000,Greenwich,United Kingdom,Millennium Dome,2000,FALSE,51.47785,-0.01176,2647937,Greenwich,GBR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+510,2002,Metro Manila,Philippines,cancelled,2002,FALSE,14.6042,120.9822,1701668,Manila,PHL,NA,NA,NA,NA,NA,NA,outside_1800_1900
+511,2002,Gold Coast,Australia,cancelled,2002,FALSE,-28.00029,153.43088,2165087,Gold Coast,AUS,NA,NA,NA,NA,NA,NA,outside_1800_1900
+512,2002,Haarlemmermeer,Netherlands,Floriade 2002,2002,FALSE,52.3888,4.68893,2755001,Haarlemmerliede,NLD,NA,NA,NA,NA,NA,NA,outside_1800_1900
+513,2002,Biel,Switzerland,Expo.02,2002,FALSE,46.45587,8.21773,2661514,Biel,CHE,NA,NA,NA,NA,NA,NA,outside_1800_1900
+514,2003,Rostock,Germany,Internationale Gartenbauausstellung 2003,2003,FALSE,54.0887,12.14049,2844588,Rostock,DEU,europe_city,GEONAMES_2844588,NA,Rostock,Germany,DEU,outside_1800_1900
+515,2004,Seine-Saint-Denis,France,cancelled,2004,FALSE,48.91421,2.47604,2975246,Seine-Saint-Denis,FRA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+516,2004,Barcelona,Spain,Universal Forum of World Cultures,2004,FALSE,41.38879,2.15899,3128760,Barcelona,ESP,europe_city,GEONAMES_3128760,NA,Barcelona,Spain,ESP,outside_1800_1900
+517,2005,Aichi,Japan,Expo 2005,2005,FALSE,32.51879,130.62158,11192139,Aichi,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+518,2006-2007,Chiang Mai,Thailand,Royal Flora Ratchaphruek 2006,2006,FALSE,18.79038,98.98468,1153671,Chiang Mai,THA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+519,2008,Zaragoza,Spain,Expo 2008,2008,FALSE,41.65606,-0.87734,3104324,Zaragoza,ESP,europe_city,GEONAMES_3104324,NA,Zaragoza,Spain,ESP,outside_1800_1900
+520,2010,Shanghai,China,Expo 2010,2010,FALSE,31.22222,121.45806,1796236,Shanghai,CHN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+521,2012,Venlo,Netherlands,Floriade 2012,2012,FALSE,51.37,6.16806,2745641,Venlo,NLD,NA,NA,NA,NA,NA,NA,outside_1800_1900
+522,2012,Yeosu,South Korea,Expo 2012,2012,FALSE,34.76062,127.66215,1884138,Yeosu,KOR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+523,2015,Milan,Italy,Expo 2015,2015,FALSE,45.46427,9.18951,3173435,Milan,ITA,europe_city,GEONAMES_3173435,NA,Milan,Italy,ITA,outside_1800_1900
+524,2016,Antalya,Türkiye,Expo 2016,2016,FALSE,36.90812,30.69556,323777,Antalya,TUR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+525,2017,Astana,Kazakhstan,Expo 2017,2017,FALSE,51.1801,71.44598,1526273,Astana,KAZ,NA,NA,NA,NA,NA,NA,outside_1800_1900
+526,2019,Beijing,China,Expo 2019,2019,FALSE,39.9075,116.39723,1816670,Beijing,CHN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+527,2021-2022,Dubai,United Arab Emirates,Expo 2020,2021,FALSE,25.07725,55.30927,292223,Dubai,ARE,NA,NA,NA,NA,NA,NA,outside_1800_1900
+528,2022,Almere,Netherlands,Floriade 2022,2022,FALSE,52.37025,5.21413,2759879,Almere Stad,NLD,NA,NA,NA,NA,NA,NA,outside_1800_1900
+529,2023,Buenos Aires,Argentina,cancelled,2023,FALSE,-34.61315,-58.37723,3435910,Buenos Aires,ARG,NA,NA,NA,NA,NA,NA,outside_1800_1900
+530,2023-2024,Doha,Qatar,Expo 2023,2023,FALSE,25.28545,51.53096,290030,Doha,QAT,NA,NA,NA,NA,NA,NA,outside_1800_1900
+531,2025,Osaka,Japan,Expo 2025,2025,FALSE,34.69379,135.50107,1853909,Osaka,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+532,2027,Yokohama,Japan,Expo 2027,2027,FALSE,35.43333,139.65,1848354,Yokohama,JPN,NA,NA,NA,NA,NA,NA,outside_1800_1900
+533,2027,Belgrade,Serbia,Expo 2027,2027,FALSE,44.80401,20.46513,792680,Belgrade,SRB,NA,NA,NA,NA,NA,NA,outside_1800_1900
+534,2027,İzmir,Türkiye,NA,2027,FALSE,38.41273,27.13838,311046,İzmir,TUR,NA,NA,NA,NA,NA,NA,outside_1800_1900
+535,2029-2030,Nakhon Ratchasima,Thailand,Expo 2029,2029,FALSE,14.97066,102.10196,1608529,Nakhon Ratchasima,THA,NA,NA,NA,NA,NA,NA,outside_1800_1900
+536,2030,Riyadh,Saudi Arabia,Expo 2030,2030,FALSE,24.68773,46.72185,108410,Riyadh,SAU,NA,NA,NA,NA,NA,NA,outside_1800_1900
+537,2031,Minnesota,United States,Expo 2031,2031,FALSE,31.31185,-83.91018,4209662,Minnesota,USA,NA,NA,NA,NA,NA,NA,outside_1800_1900

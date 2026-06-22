@@ -1,9 +1,0 @@
-scenario,spec,estimator,max_abs_deviation,max_abs_dev_pre,max_abs_dev_post,passes
-no_selection_on_slope,Spec A: high vs all others,Wooldridge ETWFE,0.06140848155352119,0.028348936990996332,0.06140848155352119,TRUE
-no_selection_on_slope,Spec A: high vs all others,Wooldridge ETWFE + county pre-period trend,0.06017375475615605,0.029583663785453018,0.06017375475615605,TRUE
-no_selection_on_slope,Spec B: high vs low-access only,Wooldridge ETWFE,0.06353388447818675,0.0285683998361205,0.06353388447818675,TRUE
-no_selection_on_slope,Spec B: high vs low-access only,Wooldridge ETWFE + county pre-period trend,0.06447282694309875,0.028951762856739394,0.06447282694309875,TRUE
-selection_on_slope,Spec A: high vs all others,Wooldridge ETWFE,1.445693828528519,0.9878108173707312,1.445693828528519,FALSE
-selection_on_slope,Spec A: high vs all others,Wooldridge ETWFE + county pre-period trend,0.08149624003429667,0.055168118427562175,0.08149624003429667,TRUE
-selection_on_slope,Spec B: high vs low-access only,Wooldridge ETWFE,1.4469459740804869,0.988638592886425,1.4469459740804869,FALSE
-selection_on_slope,Spec B: high vs low-access only,Wooldridge ETWFE + county pre-period trend,0.09064471559824594,0.05498620152153848,0.09064471559824594,TRUE

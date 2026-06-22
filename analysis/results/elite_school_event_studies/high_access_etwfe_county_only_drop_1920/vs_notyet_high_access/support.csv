@@ -1,6 +1,0 @@
-spec,outcome,sample_counties,counties_dropped_min_pre,sample_counties_used,treated_counties_used,control_counties_used,first_cohort,last_cohort
-High access only (not-yet-treated controls),STEM births (count),14,4,10,10,0,1850,1910
-High access only (not-yet-treated controls),Any STEM birth (pp),14,4,10,10,0,1850,1910
-High access only (not-yet-treated controls),"STEM births per 1,000 population",14,4,10,10,0,1850,1910
-High access only (not-yet-treated controls),"STEM births per 1,000 est. births",14,4,10,10,0,1850,1910
-High access only (not-yet-treated controls),County population,14,4,10,10,0,1850,1910

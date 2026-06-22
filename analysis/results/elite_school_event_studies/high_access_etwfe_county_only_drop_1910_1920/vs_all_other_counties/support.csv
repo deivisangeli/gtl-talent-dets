@@ -1,6 +1,0 @@
-spec,outcome,sample_counties,counties_dropped_min_pre,sample_counties_used,treated_counties_used,control_counties_used,first_cohort,last_cohort
-High access vs all other counties,STEM births (count),3141,4,3137,9,3128,1850,1900
-High access vs all other counties,Any STEM birth (pp),3141,4,3137,9,3128,1850,1900
-High access vs all other counties,"STEM births per 1,000 population",3140,4,3136,9,3127,1850,1900
-High access vs all other counties,"STEM births per 1,000 est. births",3140,4,3136,9,3127,1850,1900
-High access vs all other counties,County population,3141,4,3137,9,3128,1850,1900

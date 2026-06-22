@@ -1,0 +1,2 @@
+sample,n_rows,n_units,n_periods,min_decade,max_decade,is_balanced,min_periods_per_unit,max_periods_per_unit,missing_inventors_per_100k_pop,missing_stem_per_100k_pop,total_inventors,total_stem,n_treated_std,n_treated_shift
+europe_lau,46035,1705,27,1700,1960,TRUE,27,27,0,0,59998,20144,44,44

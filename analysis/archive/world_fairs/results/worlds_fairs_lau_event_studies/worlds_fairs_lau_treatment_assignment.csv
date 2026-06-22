@@ -1,0 +1,45 @@
+unit_type,unit_id,event_year,g_std,g_shift,first_fair_name,first_fair_city,first_fair_country,n_fairs_1800_1900,fair_years_1800_1900,fair_names_1800_1900
+europe_lau,GISCO_LAU_AT_90001,1867,1860,1870,International Maritime Exhibition,Vienna,Austria,5,1867,International Maritime Exhibition | Weltausstellung 1873 Wien | International Electrical Exposition | Agricultural and Forestry Exposition | Jubiläums-Ausstellung
+europe_lau,GISCO_LAU_BE_11002,1885,1880,1880,Exposition Universelle d'Anvers (1885),Antwerp,Belgium,2,1885,Exposition Universelle d'Anvers (1885) | Exposition Internationale d'Anvers (1894)
+europe_lau,GISCO_LAU_BE_21004,1856,1850,1850,International Exhibition,Brussels,Belgium,4,1856,International Exhibition | International Exposition of Hygiene and Life-saving Apparatus | Grand Concours International des Sciences et de l'Industrie (1888) | Exposition Internationale de Bruxelles (1897)
+europe_lau,GISCO_LAU_BE_52011,1895,1890,1890,"Exposition internationale, industrielle, commerciale, agricole et horticole, avec annexes scientifiques et artistiques et concours ouvriers",Charleroi,Belgium,1,1895,"Exposition internationale, industrielle, commerciale, agricole et horticole, avec annexes scientifiques et artistiques et concours ouvriers"
+europe_lau,GISCO_LAU_CH_CH5586,1857,1850,1860,Lausanne Exhibition,Lausanne,Switzerland,1,1857,Lausanne Exhibition
+europe_lau,GISCO_LAU_CH_CH6621,1896,1890,1890,Exposition National Suisse,Geneva,Switzerland,1,1896,Exposition National Suisse
+europe_lau,GISCO_LAU_CZ_554782,1891,1890,1890,General Land Centennial Exhibition (1891) at the Prague Exhibition Grounds,Prague,Austria-Hungary,1,1891,General Land Centennial Exhibition (1891) at the Prague Exhibition Grounds
+europe_lau,GISCO_LAU_DE_01002000,1896,1890,1890,International Shipping and Fishery Exposition,Kiel,Germany,1,1896,International Shipping and Fishery Exposition
+europe_lau,GISCO_LAU_DE_04011000,1890,1890,1890,Nord-West-Deutsche Gewerbe und Industrie-Ausstellung,Bremen,Germany,1,1890,Nord-West-Deutsche Gewerbe und Industrie-Ausstellung
+europe_lau,GISCO_LAU_DE_09162000,1854,1850,1850,General German Industrial Exhibition (Allgemeine deutsche Industrie-Ausstellung),Munich,Bavaria,3,1854,General German Industrial Exhibition (Allgemeine deutsche Industrie-Ausstellung) | International Electrical Exposition | Kraft – und Arbeitsmaschinen-Ausstellung (1898)
+europe_lau,GISCO_LAU_DE_09564000,1885,1880,1880,International Exposition of Metals and Metallurgy,Nuremberg,Germany,1,1885,International Exposition of Metals and Metallurgy
+europe_lau,GISCO_LAU_DE_11000000,1880,1880,1880,International Fisheries Exhibition,Berlin,Germany,2,1880,International Fisheries Exhibition | Great Industrial Exposition of Berlin
+europe_lau,GISCO_LAU_DK_751,1867,1860,1870,International Maritime Exhibition,Aarhaus,Denmark,1,1867,International Maritime Exhibition
+europe_lau,GISCO_LAU_ES_08019,1888,1880,1890,Exposición Universal de Barcelona (1888),Barcelona,Spain,1,1888,Exposición Universal de Barcelona (1888)
+europe_lau,GISCO_LAU_ES_28079,1883,1880,1880,Exposition of Mining and Metallurgy,Madrid,Spain,3,1883,Exposition of Mining and Metallurgy | Exposición General de las Islas Filipinas | Historical American Exposition
+europe_lau,GISCO_LAU_ES_50297,1885,1880,1880,Aragonese Exposition,Zaragoza,Spain,1,1885,Aragonese Exposition
+europe_lau,GISCO_LAU_FI_091,1876,1870,1870,Finnish General Exhibition,Helsinki,Finland,1,1876,Finnish General Exhibition
+europe_lau,GISCO_LAU_FR_06088,1884,1880,1880,International Exposition of Nice,Nice,France,1,1884,International Exposition of Nice
+europe_lau,GISCO_LAU_FR_13055,1874,1870,1870,Exhibition of Modern Inventions and Discoveries,Marseille,France,2,1874,Exhibition of Modern Inventions and Discoveries | International Maritime Exposition
+europe_lau,GISCO_LAU_FR_21231,1858,1850,1860,Dijon Exposition,Dijon,France,1,1858,Dijon Exposition
+europe_lau,GISCO_LAU_FR_33063,1882,1880,1880,Exposition internationale des vins,Bordeaux,France,2,1882,Exposition internationale des vins | Bordeaux Exposition
+europe_lau,GISCO_LAU_FR_38185,1892,1890,1890,International Alpine Exposition of Grenoble,Grenoble,France,1,1892,International Alpine Exposition of Grenoble
+europe_lau,GISCO_LAU_FR_57463,1861,1860,1860,Exposition Universelle (1861),Metz,France,1,1861,Exposition Universelle (1861)
+europe_lau,GISCO_LAU_FR_59350,1882,1880,1880,International Exposition of Industrial Art,Lille,France,1,1882,International Exposition of Industrial Art
+europe_lau,GISCO_LAU_FR_62160,1866,1860,1860,International Fisheries Exposition,Boulogne-sur-Mer,France,1,1866,International Fisheries Exposition
+europe_lau,GISCO_LAU_FR_64102,1864,1860,1860,Franco-Spanish Exposition,Bayonne,France,1,1864,Franco-Spanish Exposition
+europe_lau,GISCO_LAU_FR_69123,1872,1870,1870,Exposition Universelle et Internationale (1872),Lyon,France,2,1872,Exposition Universelle et Internationale (1872) | Exposition internationale et coloniale
+europe_lau,GISCO_LAU_FR_75056,1801,1800,1800,Paris 1801,Paris,France,16,1801,"Paris 1801 | Third Exposition (1802) | Fourth Exposition (1806) | Fifth Exposition (1819) | Sixth Exposition (1823) | Seventh Exposition (1827) | French Industrial Exposition of 1834 | Ninth Exposition (1839) | French Industrial (Tenth) Exposition of 1844 | Eleventh Exposition (1849) | Exposition Universelle (1855) | Exposition Universelle (1867) | Exposition Universelle (1878) | International Exposition of Electricity, Paris | Exposition Universelle (1889) – Eiffel Tower | Exposition Universelle (1900) – Le Grand Palais"
+europe_lau,GISCO_LAU_FR_76351,1868,1860,1870,International Maritime Exposition,Le Havre,France,2,1868,International Maritime Exposition
+europe_lau,GISCO_LAU_FR_76540,1896,1890,1890,National and Colonial Exposition,Rouen,France,1,1896,National and Colonial Exposition
+europe_lau,GISCO_LAU_HU_13578,1881,1880,1880,Országos Nőipari Kiállitás,Budapest,Austria-Hungary,3,1881,Országos Nőipari Kiállitás | Hungarian National Exhibition | Hungarian Millenary Exhibition
+europe_lau,GISCO_LAU_IE_01340413,1852,1850,1850,Irish Industrial Exhibition,Cork,Ireland,1,1852,Irish Industrial Exhibition
+europe_lau,GISCO_LAU_IT_001272,1829,1820,1830,Turin 1829,Turin,Piedmont-Sardinia,8,1829,Turin 1829 | Seconda Triennale Pubblica Esposizione dell’anno 1832. | Pubblica esposizione dell'anno 1838. | Quarta Esposizione d'Industria et di Belle Arti. | Quinta Esposizione di Industria e di Belle Arti | Sesta Esposizione Nazionale di Prodotti d'Industria | Esposizione Generale Italiana
+europe_lau,GISCO_LAU_IT_010025,1846,1840,1840,Esposizione dei Prodotti e delle Manufatture nazionali,Genoa,Piedmont-Sardinia,3,1846,Esposizione dei Prodotti e delle Manufatture nazionali | Esposizione Industriale | Esposizione Italo-Americana (1892)
+europe_lau,GISCO_LAU_IT_013075,1899,1890,1900,Como Electrical Exhibition,Como,Italy,1,1899,Como Electrical Exhibition
+europe_lau,GISCO_LAU_IT_058091,1874,1870,1870,Esposizione internazionale (1874) (never held),Rome,Italy,2,1874,Esposizione internazionale (1874) (never held) | Esposizione mondiale (1887)
+europe_lau,GISCO_LAU_IT_063049,1853,1850,1850,Solenne Pubblica Esposizione di Arti e Manifatture,Naples,Two Sicilies,2,1853,Solenne Pubblica Esposizione di Arti e Manifatture | International Maritime Exposition
+europe_lau,GISCO_LAU_NL_GM0363,1861,1860,1860,Fisheries Exposition,Amsterdam,Netherlands,4,1861,Fisheries Exposition | International Exhibition of Domestic Economy | International Colonial and Export Exhibition | International Agricultural Exhibition
+europe_lau,GISCO_LAU_NL_GM0518,1867,1860,1870,International Maritime Exhibition,The Hague,Netherlands,1,1867,International Maritime Exhibition
+europe_lau,GISCO_LAU_NO_4601,1865,1860,1860,International Fisheries Exhibition,Bergen,Norway,2,1865,International Fisheries Exhibition | International Fisheries Exposition (1898)
+europe_lau,GISCO_LAU_PT_131217,1865,1860,1860,1865 International Exhibition,Porto,Portugal,2,1865,1865 International Exhibition | Exposição Insular e Colonial Portugueza (1894)
+europe_lau,GISCO_LAU_SE_0180,1866,1860,1860,Scandinavian Industrial Exhibition,Stockholm,Sweden,2,1866,Scandinavian Industrial Exhibition | General Art and Industrial Exposition of Stockholm
+europe_lau,GISCO_LAU_SE_1280,1896,1890,1890,Nordic Industrial and Handicraft Exhibition,Malmö,Sweden,1,1896,Nordic Industrial and Handicraft Exhibition
+europe_lau,GISCO_LAU_SE_1480,1867,1860,1870,International Maritime Exhibition,Gothenburg,Sweden,1,1867,International Maritime Exhibition
