@@ -1,0 +1,4 @@
+interface:
+  display_name: "AMWS Regex Gap Auditor"
+  short_description: "Audit missing AMWS regex extraction fields."
+  default_prompt: "Use $amws-regex-gap-auditor to audit AMWS parsed rows with missing birthplace, birth date, or field and propose regex rules."

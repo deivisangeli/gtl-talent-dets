@@ -1,0 +1,4 @@
+interface:
+  display_name: "AMWS Regex Parser"
+  short_description: "Parse AMWS raw entries with conservative regex."
+  default_prompt: "Use $amws-regex-parser to parse AMWS raw lineid/raw_text rows into birth_place, birth_date, field, and parse_flag."

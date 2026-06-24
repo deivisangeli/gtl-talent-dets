@@ -1,0 +1,4 @@
+interface:
+  display_name: "AMWS Entry Segmentation"
+  short_description: "Split AMWS DOC text into raw participant entries."
+  default_prompt: "Use this skill to split AMWS DOC/DOCX pages into agent batches and produce one XLSX per batch with lineid and raw_text only."
