@@ -1,0 +1,50 @@
+###############################################################################
+# Project: GTL Talent Determinants
+# Goal: Stacked synthetic DiD for world's-fairs ever-hosted treatment.
+#
+# Run from analysis/ or repo root:
+#   Rscript analysis/world_fairs/synthdid/archived/worlds_fairs_ever_hosted_synthdid.R
+###############################################################################
+
+rm(list = ls())
+
+script_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
+if (length(script_arg) > 0L) {
+  script_path <- normalizePath(
+    sub("^--file=", "", script_arg[[1L]]),
+    winslash = "/",
+    mustWork = TRUE
+  )
+  repo_root <- normalizePath(file.path(dirname(script_path), "..", "..", "..", ".."), winslash = "/", mustWork = TRUE)
+} else {
+  repo_root <- normalizePath(Sys.getenv("GTL_REPO", unset = getwd()), winslash = "/", mustWork = TRUE)
+  if (basename(repo_root) == "archived" &&
+      basename(dirname(repo_root)) == "synthdid" &&
+      basename(dirname(dirname(repo_root))) == "world_fairs" &&
+      basename(dirname(dirname(dirname(repo_root)))) == "analysis") {
+    repo_root <- normalizePath(file.path(repo_root, "..", "..", "..", ".."), winslash = "/", mustWork = TRUE)
+  }
+  if (basename(repo_root) == "synthdid" &&
+      basename(dirname(repo_root)) == "world_fairs" &&
+      basename(dirname(dirname(repo_root))) == "analysis") {
+    repo_root <- normalizePath(file.path(repo_root, "..", "..", ".."), winslash = "/", mustWork = TRUE)
+  }
+  if (basename(repo_root) == "world_fairs" && basename(dirname(repo_root)) == "analysis") {
+    repo_root <- normalizePath(file.path(repo_root, "..", ".."), winslash = "/", mustWork = TRUE)
+  }
+  if (basename(repo_root) == "analysis") {
+    repo_root <- normalizePath(file.path(repo_root, ".."), winslash = "/", mustWork = TRUE)
+  }
+}
+
+source(file.path(repo_root, "analysis", "world_fairs", "synthdid", "worlds_fairs_synthdid_helpers.R"))
+
+run_worlds_fairs_synthdid(
+  spec_type = "ever_hosted",
+  visits_threshold = NULL,
+  results_subdir = file.path(
+    "archived",
+    "worlds_fairs_uk_us_ever_hosted_synthdid_with_london_events_1840_1910"
+  ),
+  repo_root = repo_root
+)

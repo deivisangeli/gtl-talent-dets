@@ -1,0 +1,4 @@
+interface:
+  display_name: "AMWS GPT JSON Consolidator"
+  short_description: "Consolidate AMWS GPT JSON batches."
+  default_prompt: "Use $amws-gpt-json-consolidator to consolidate AMWS GPT batch JSON outputs into validated JSON, CSV, and XLSX files with raw_text."

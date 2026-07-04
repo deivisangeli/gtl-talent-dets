@@ -1,24 +1,20 @@
 ###############################################################################
 # Project: GTL Talent Determinants
 # Goal: Pooled UK historical urban-unit + US county event studies using
-#       distance to world's fair venues, restricted to fairs with at least
-#       100,000 visits.
+#       distance to the first Crystal Palace world's fair venue.
 #
 # Treatment:
-#   - First exposure to a realized world's fair venue within distance bins,
-#     using only fairs with visits >= 100,000:
-#       0-2, 2-4, 4-6, 6-8, 8-10 km.
-#   - Controls are units never exposed within 10 km over 1790-1961 to fairs
-#     with visits >= 100,000.
-#   - Units first exposed before 1840 to such fairs are always-treated and
-#     excluded.
-#   - Units first exposed after 1910 to such fairs are future-treated and
-#     excluded.
+#   - Exposure to The Great Exhibition of 1851 at Crystal Palace, London,
+#     within distance bins:
+#       0-2, 2-4, 4-6, 6-8, 8-10, 10-12, 12-14, 14-16, 16-18, 18-20 km.
+#   - Controls are units never exposed within 20 km to this event.
+#   - Units first exposed before 1840 are always-treated and excluded.
+#   - Units first exposed after 1910 are future-treated and excluded.
 #   - Greater London is included as an outcome unit using the Nomis/ONS 1921
 #     boundary definition selected by >=50% overlap with 1911 Greater London.
 #
 # Run from analysis/ or repo root:
-#   Rscript analysis/world_fairs/worlds_fairs_venue_distance_visits_100k.R
+#   Rscript analysis/world_fairs/worlds_fairs_venue_distance_crystal_palace_1851_0_20km.R
 ###############################################################################
 
 rm(list = ls())
@@ -83,7 +79,7 @@ results_dir <- file.path(
   TALENT_DETS_DATA_DIR,
   "results",
   "worlds_fair",
-  "worlds_fairs_uk_us_venue_distance_visits_100k_event_studies_with_london_events_1840_1910"
+  "worlds_fairs_uk_us_venue_distance_crystal_palace_1851_event_studies_0_20km"
 )
 dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -118,17 +114,36 @@ if (length(missing_files) > 0L) {
 
 greater_london_id <- "GBR_HIST_URBAN_GREATER_LONDON"
 target_types <- c("Urban District", "Municipal Borough", "County Borough")
-bin_breaks <- c(-1e-9, 2, 4, 6, 8, 10)
-bin_labels <- c("0-2", "2-4", "4-6", "6-8", "8-10")
+crystal_palace_1851_fair_id <- 23L
+crystal_palace_1851_latitude <- 51.50241
+crystal_palace_1851_longitude <- -0.17049
+crystal_palace_1851_coordinate_source <- "Geograph/Read the Plaque - Great Exhibition site marker, Hyde Park"
+crystal_palace_1851_coordinate_note <- paste(
+  "Manual override for the 1851 Hyde Park Crystal Palace site.",
+  "The consolidated fair file geocodes the name Crystal Palace to the later Sydenham site;",
+  "this specification uses the Hyde Park Great Exhibition site marker instead."
+)
+max_treatment_distance_km <- 20
+max_treatment_distance_m <- max_treatment_distance_km * 1000
+aggregate_bin_label <- "0-20"
+bin_breaks <- c(-1e-9, seq(2, max_treatment_distance_km, by = 2))
+bin_labels <- paste(seq(0, max_treatment_distance_km - 2, by = 2),
+                    seq(2, max_treatment_distance_km, by = 2),
+                    sep = "-")
 bin_dirs <- c(
   "0-2" = "bin_0_2km",
   "2-4" = "bin_2_4km",
   "4-6" = "bin_4_6km",
   "6-8" = "bin_6_8km",
   "8-10" = "bin_8_10km",
-  "0-10" = "bin_0_10km"
+  "10-12" = "bin_10_12km",
+  "12-14" = "bin_12_14km",
+  "14-16" = "bin_14_16km",
+  "16-18" = "bin_16_18km",
+  "18-20" = "bin_18_20km",
+  "0-20" = "bin_0_20km"
 )
-analysis_bin_labels <- c(bin_labels, "0-10")
+analysis_bin_labels <- c(bin_labels, aggregate_bin_label)
 classification_year_min <- 1790L
 classification_year_max <- 1961L
 treated_event_year_min <- 1840L
@@ -137,10 +152,21 @@ panel_year_min <- 1800L
 panel_year_max <- 1960L
 event_window <- 50L
 control_group_name <- "nevertreated"
-visits_threshold <- 100000
-visits_threshold_label <- formatC(visits_threshold, format = "d", big.mark = ",")
 
-outcomes <- c(
+filter_outcomes <- function(default_outcomes) {
+  env <- Sys.getenv("WORLD_FAIRS_OUTCOMES", unset = "")
+  if (env == "") return(default_outcomes)
+
+  requested <- trimws(strsplit(env, ",", fixed = TRUE)[[1]])
+  requested <- requested[requested != ""]
+  bad <- setdiff(requested, default_outcomes)
+  if (length(bad) > 0L) {
+    stop("Unknown WORLD_FAIRS_OUTCOMES: ", paste(bad, collapse = ", "))
+  }
+  requested
+}
+
+outcomes <- filter_outcomes(c(
   "inventors_per_100k_pop",
   "stem_per_100k_pop",
   "n_inventors",
@@ -149,7 +175,7 @@ outcomes <- c(
   "log1p_n_stem",
   "population",
   "log_population"
-)
+))
 
 ###############################################################################
 # Helpers
@@ -274,7 +300,7 @@ plot_dynamic_event_study <- function(es, outcome, bin_label, y_limits, sample_an
       y = "Effect",
       title = str_wrap(
         paste(
-          "World's fairs pooled UK+US venue-distance event study, visits >= 100,000",
+          "World's fairs pooled UK+US venue-distance event study",
           paste0("bin ", bin_label, " km"),
           outcome
         ),
@@ -399,9 +425,6 @@ load_conservative_venues <- function() {
 
   if (!"parent_fair_id" %in% names(fairs)) fairs$parent_fair_id <- fairs$fair_id
   if (!"venue_seq" %in% names(fairs)) fairs$venue_seq <- 1L
-  if (!"visits" %in% names(fairs)) {
-    stop("Missing required visits column in fairs file: ", fairs_file)
-  }
 
   fairs <- fairs %>%
     mutate(
@@ -409,26 +432,11 @@ load_conservative_venues <- function() {
       parent_fair_id = as.integer(parent_fair_id),
       venue_seq = as.integer(venue_seq),
       year_start = as.integer(year_start),
-      visits_num = suppressWarnings(as.numeric(visits)),
       host_matched_country_iso3 = as.character(host_matched_country_iso3),
       venue_longitude = as.numeric(venue_longitude),
       venue_latitude = as.numeric(venue_latitude),
       venue_coordinates_note = as.character(venue_coordinates_note)
     )
-
-  fair_visits_by_parent <- fairs %>%
-    group_by(parent_fair_id) %>%
-    summarise(
-      fair_visits = {
-        values <- visits_num[!is.na(visits_num)]
-        if (length(values) == 0L) NA_real_ else max(values)
-      },
-      .groups = "drop"
-    ) %>%
-    ungroup()
-
-  fairs <- fairs %>%
-    left_join(fair_visits_by_parent, by = "parent_fair_id")
 
   venue_audit <- fairs %>%
     filter(
@@ -437,10 +445,6 @@ load_conservative_venues <- function() {
       host_matched_country_iso3 %in% c("GBR", "USA")
     ) %>%
     mutate(
-      fair_has_visits = !is.na(fair_visits),
-      fair_visits_ge_threshold = fair_has_visits & fair_visits >= visits_threshold,
-      excluded_missing_visits = !fair_has_visits,
-      excluded_below_visits_threshold = fair_has_visits & fair_visits < visits_threshold,
       has_venue_coordinates = !is.na(venue_longitude) & !is.na(venue_latitude),
       excluded_no_venue_coordinates = !has_venue_coordinates,
       excluded_low_quality_venue_coordinates =
@@ -449,11 +453,34 @@ load_conservative_venues <- function() {
             coalesce(venue_coordinates_note, ""),
             fixed("automated geocoding returned no reliable coordinate")
           ),
-      venue_coordinates_used_conservative =
-        has_venue_coordinates & !excluded_low_quality_venue_coordinates,
       venue_used_conservative =
-        fair_visits_ge_threshold & venue_coordinates_used_conservative
+        has_venue_coordinates & !excluded_low_quality_venue_coordinates
     )
+
+  venue_audit <- venue_audit %>%
+    filter(fair_id == crystal_palace_1851_fair_id) %>%
+    mutate(
+      venue_longitude = crystal_palace_1851_longitude,
+      venue_latitude = crystal_palace_1851_latitude,
+      venue_coordinates_source_title = crystal_palace_1851_coordinate_source,
+      venue_coordinates_note = crystal_palace_1851_coordinate_note,
+      has_venue_coordinates = TRUE,
+      excluded_no_venue_coordinates = FALSE,
+      excluded_low_quality_venue_coordinates = FALSE,
+      venue_used_conservative = TRUE
+    )
+
+  if (nrow(venue_audit) != 1L) {
+    stop(
+      "Expected exactly one Crystal Palace 1851 venue row for fair_id ",
+      crystal_palace_1851_fair_id,
+      "; found ",
+      nrow(venue_audit)
+    )
+  }
+  if (!isTRUE(venue_audit$venue_used_conservative[[1L]])) {
+    stop("Crystal Palace 1851 venue row is not usable under conservative coordinate rules.")
+  }
 
   venues <- venue_audit %>%
     filter(venue_used_conservative) %>%
@@ -465,10 +492,6 @@ load_conservative_venues <- function() {
       City,
       Country,
       Fair_name,
-      visits,
-      visits_num,
-      fair_visits,
-      visits_measure,
       host_matched_country_iso3,
       host_matched_name,
       host_admin1_name,
@@ -514,7 +537,7 @@ build_distance_exposure_one_country <- function(targets_sf, venues_country) {
     ncol = nrow(venues_country)
   )
 
-  hit_index <- which(distance_matrix <= 10000, arr.ind = TRUE)
+  hit_index <- which(distance_matrix <= max_treatment_distance_m, arr.ind = TRUE)
   if (nrow(hit_index) == 0L) {
     return(list(
       distance_audit = tibble(),
@@ -566,8 +589,6 @@ build_distance_exposure_one_country <- function(targets_sf, venues_country) {
       first_fair_city = City,
       first_fair_country = Country,
       first_fair_venue = venue,
-      first_fair_visits = fair_visits,
-      first_fair_visits_measure = visits_measure,
       exposure_status = case_when(
         first_exposure_year < treated_event_year_min ~ "always_treated_pre_1840",
         first_exposure_year >= treated_event_year_min &
@@ -796,7 +817,7 @@ us_targets <- build_us_target_geometries(panel_year) %>%
 # Build venue-distance treatment assignment
 ###############################################################################
 
-message("Building conservative venue-distance treatment assignment for fairs with >= 100,000 visits...")
+message("Building conservative venue-distance treatment assignment...")
 venue_data <- load_conservative_venues()
 venues <- venue_data$venues
 venue_quality_audit <- venue_data$audit
@@ -880,7 +901,7 @@ for (bin_label in analysis_bin_labels) {
   treated_units <- first_exposure %>%
     filter(
       exposure_status == "treated",
-      if (bin_label == "0-10") {
+      if (bin_label == aggregate_bin_label) {
         distance_bin_km %in% bin_labels
       } else {
         distance_bin_km == bin_label
@@ -903,9 +924,7 @@ for (bin_label in analysis_bin_labels) {
       first_fair_name,
       first_fair_city,
       first_fair_country,
-      first_fair_venue,
-      first_fair_visits,
-      first_fair_visits_measure
+      first_fair_venue
     )
 
   controls <- never_units %>%
@@ -1050,7 +1069,7 @@ for (bin_label in analysis_bin_labels) {
     model_results,
     ~ .x$effective_sample_summary
   )
-  distance_audit_bin <- if (bin_label == "0-10") {
+  distance_audit_bin <- if (bin_label == aggregate_bin_label) {
     distance_audit %>%
       filter(distance_bin_km %in% bin_labels) %>%
       mutate(analysis_distance_bin_km = bin_label)
@@ -1106,22 +1125,29 @@ for (bin_label in analysis_bin_labels) {
   }
 
   notes <- c(
-    "World's fairs pooled UK+US venue-distance event study, visits >= 100,000",
+    "World's fairs pooled UK+US venue-distance event study: Crystal Palace 1851 only",
     "",
     paste0("Run timestamp: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S")),
     paste0("Distance bin: ", bin_label, " km"),
     paste0("Panel: ", panel_file),
     paste0("Fairs: ", fairs_file),
-    paste0("Visits threshold: >= ", visits_threshold_label),
+    paste0("Selected fair_id: ", crystal_palace_1851_fair_id),
+    paste0(
+      "Selected venue coordinates: ",
+      crystal_palace_1851_latitude,
+      ", ",
+      crystal_palace_1851_longitude
+    ),
+    paste0("Selected venue coordinate source: ", crystal_palace_1851_coordinate_source),
     paste0("Control group: ", control_group_name),
     "Greater London included using Nomis/ONS 1921 districts selected by >=50% overlap with 1911 Greater London.",
-    "London venues are used to classify exposure for Greater London and nearby units.",
+    "The Crystal Palace 1851 venue is used to classify exposure for Greater London and nearby units.",
     "US counties use tigris 2020 cartographic-boundary counties.",
     "Distance is polygon-to-venue; venues inside polygons have distance 0.",
     "Venue coordinates use conservative quality filter.",
-    "Exposure, never-treated, always-treated, and future-treated status are classified using only fairs with visits >= 100,000 in 1790-1961.",
-    "Always-treated units are units first exposed before 1840 to fairs with visits >= 100,000.",
-    "Future-treated units are units first exposed after 1910 and before or during 1961 to fairs with visits >= 100,000.",
+    paste0("Maximum exposure distance: ", max_treatment_distance_km, " km."),
+    "Always-treated units are units first exposed before 1840.",
+    "Future-treated units are units first exposed after 1910 and before or during 1961.",
     paste0("Dynamic window: -", event_window, " to +", event_window, " years."),
     paste0("Treated units: ", sample_summary$n_treated_units),
     paste0("Never-treated control units: ", sample_summary$n_control_units),
@@ -1148,21 +1174,41 @@ all_event_distribution <- map_dfr(analysis_bin_labels, function(bin_label) {
 write_csv(all_event_distribution, file.path(results_dir, "event_distribution_all_bins.csv"))
 
 root_notes <- c(
-  "World's fairs pooled UK historical urban-unit + US county venue-distance event studies, visits >= 100,000",
+  "World's fairs pooled UK historical urban-unit + US county venue-distance event studies: Crystal Palace 1851 only",
   "",
   paste0("Run timestamp: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S")),
   paste0("TALENT_DETS_DATA_DIR: ", TALENT_DETS_DATA_DIR),
   paste0("Panel: ", panel_file),
   paste0("Fairs: ", fairs_file),
+  paste0("Selected fair_id: ", crystal_palace_1851_fair_id),
+  paste0(
+    "Selected venue coordinates: ",
+    crystal_palace_1851_latitude,
+    ", ",
+    crystal_palace_1851_longitude
+  ),
+  paste0("Selected venue coordinate source: ", crystal_palace_1851_coordinate_source),
   paste0("Results directory: ", results_dir),
-  paste0("Visits threshold: >= ", visits_threshold_label),
-  "Distance specifications: 0-2, 2-4, 4-6, 6-8, 8-10, and cumulative 0-10 km.",
-  paste0("Exposure classification window: ", classification_year_min, "-", classification_year_max, ", restricted to fairs with visits >= 100,000."),
+  paste0(
+    "Distance specifications: ",
+    paste(bin_labels, collapse = ", "),
+    ", and cumulative ",
+    aggregate_bin_label,
+    " km."
+  ),
+  paste0("Exposure classification window: ", classification_year_min, "-", classification_year_max, "."),
   paste0("Included treated event window: ", treated_event_year_min, "-", treated_event_year_max, "."),
-  "Control group is strictly never treated within 10 km by fairs with visits >= 100,000 over 1790-1961.",
-  "Fairs with missing visits or visits below 100,000 do not enter treatment, always-treated, future-treated, or never-treated classification.",
+  paste0(
+    "Control group is strictly never treated within ",
+    max_treatment_distance_km,
+    " km of Crystal Palace 1851 over ",
+    classification_year_min,
+    "-",
+    classification_year_max,
+    "."
+  ),
   "Greater London is included using Nomis/ONS 1921 districts selected by >=50% overlap with 1911 Greater London.",
-  "US events are included via venue coordinates and US county polygons.",
+  "US counties remain in the panel but no US event is selected in this Crystal Palace-only specification.",
   "Venue coordinates with low-quality automated geocoding notes are excluded.",
   paste0("Elapsed minutes: ", round(difftime(Sys.time(), initial_time, units = "mins"), 1))
 )

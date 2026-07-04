@@ -1,19 +1,20 @@
 ###############################################################################
 # Project: GTL Talent Determinants
-# Goal: Pooled UK historical urban-unit + US county event studies using
-#       distance to world's fair venues.
+# Goal: UK historical urban-unit synthetic DiD estimates treating only the
+#       historical unit that hosted the first Crystal Palace world's fair venue.
 #
 # Treatment:
-#   - First exposure to a realized world's fair venue within distance bins:
-#       0-2, 2-4, 4-6, 6-8, 8-10 km.
-#   - Controls are units never exposed within 10 km over 1790-1961.
+#   - Exposure to The Great Exhibition of 1851 at Crystal Palace, London, for
+#     the UK historical urban unit whose polygon contains the Hyde Park venue.
+#   - Controls are UK units that did not host this event.
 #   - Units first exposed before 1840 are always-treated and excluded.
 #   - Units first exposed after 1910 are future-treated and excluded.
+#   - US counties are excluded from the panel and control group.
 #   - Greater London is included as an outcome unit using the Nomis/ONS 1921
 #     boundary definition selected by >=50% overlap with 1911 Greater London.
 #
 # Run from analysis/ or repo root:
-#   Rscript analysis/world_fairs/worlds_fairs_venue_distance.R
+#   Rscript analysis/world_fairs/synthdid/worlds_fairs_hosted_crystal_palace_1851_synthdid_uk_only.R
 ###############################################################################
 
 rm(list = ls())
@@ -21,13 +22,18 @@ rm(list = ls())
 suppressPackageStartupMessages({
   library(tidyverse)
   library(data.table)
-  library(did)
+  if (!requireNamespace("synthdid", quietly = TRUE)) {
+    stop(
+      "Package 'synthdid' is required. Install it with ",
+      "remotes::install_github('synth-inference/synthdid') or the local project convention."
+    )
+  }
+  library(synthdid)
   library(sf)
-  library(tigris)
 })
 
 initial_time <- Sys.time()
-options(timeout = 1000, tigris_use_cache = TRUE)
+options(timeout = 1000)
 sf_use_s2(FALSE)
 
 script_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
@@ -38,7 +44,7 @@ if (length(script_arg) > 0L) {
     mustWork = TRUE
   )
   repo_root <- normalizePath(
-    file.path(dirname(script_path), "..", ".."),
+    file.path(dirname(script_path), "..", "..", ".."),
     winslash = "/",
     mustWork = TRUE
   )
@@ -48,6 +54,11 @@ if (length(script_arg) > 0L) {
     winslash = "/",
     mustWork = TRUE
   )
+  if (basename(repo_root) == "synthdid" &&
+      basename(dirname(repo_root)) == "world_fairs" &&
+      basename(dirname(dirname(repo_root))) == "analysis") {
+    repo_root <- normalizePath(file.path(repo_root, "..", "..", ".."), winslash = "/", mustWork = TRUE)
+  }
   if (basename(repo_root) == "world_fairs" && basename(dirname(repo_root)) == "analysis") {
     repo_root <- normalizePath(file.path(repo_root, "..", ".."), winslash = "/", mustWork = TRUE)
   }
@@ -78,7 +89,8 @@ results_dir <- file.path(
   TALENT_DETS_DATA_DIR,
   "results",
   "worlds_fair",
-  "worlds_fairs_uk_us_venue_distance_event_studies_with_london_events_1840_1910"
+  "synthdid",
+  "worlds_fairs_uk_hosted_crystal_palace_1851_synthdid"
 )
 dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -113,25 +125,59 @@ if (length(missing_files) > 0L) {
 
 greater_london_id <- "GBR_HIST_URBAN_GREATER_LONDON"
 target_types <- c("Urban District", "Municipal Borough", "County Borough")
-bin_breaks <- c(-1e-9, 2, 4, 6, 8, 10)
-bin_labels <- c("0-2", "2-4", "4-6", "6-8", "8-10")
-bin_dirs <- c(
-  "0-2" = "bin_0_2km",
-  "2-4" = "bin_2_4km",
-  "4-6" = "bin_4_6km",
-  "6-8" = "bin_6_8km",
-  "8-10" = "bin_8_10km",
-  "0-10" = "bin_0_10km"
+crystal_palace_1851_fair_id <- 23L
+crystal_palace_1851_latitude <- 51.50241
+crystal_palace_1851_longitude <- -0.17049
+crystal_palace_1851_coordinate_source <- "Geograph/Read the Plaque - Great Exhibition site marker, Hyde Park"
+crystal_palace_1851_coordinate_note <- paste(
+  "Manual override for the 1851 Hyde Park Crystal Palace site.",
+  "The consolidated fair file geocodes the name Crystal Palace to the later Sydenham site;",
+  "this specification uses the Hyde Park Great Exhibition site marker instead."
 )
-analysis_bin_labels <- c(bin_labels, "0-10")
+max_treatment_distance_km <- 20
+max_treatment_distance_m <- max_treatment_distance_km * 1000
+treatment_spec_label <- "hosted"
+aggregate_bin_label <- treatment_spec_label
+zoomed_display_y_limits <- c(-10, 10)
+bin_labels <- treatment_spec_label
+bin_dirs <- c("hosted" = "hosted")
+analysis_bin_labels <- treatment_spec_label
+selected_bin_env <- Sys.getenv("SYNTHDID_BINS", unset = "")
+selected_analysis_bin_labels <- if (selected_bin_env == "") {
+  analysis_bin_labels
+} else {
+  str_split(selected_bin_env, ",", simplify = FALSE)[[1]] %>%
+    str_trim() %>%
+    discard(~ .x == "")
+}
+bad_selected_bins <- setdiff(selected_analysis_bin_labels, analysis_bin_labels)
+if (length(bad_selected_bins) > 0L) {
+  stop("Unknown SYNTHDID_BINS: ", paste(bad_selected_bins, collapse = ", "))
+}
+selected_bins_active <- !identical(selected_analysis_bin_labels, analysis_bin_labels)
+aggregate_suffix <- if (selected_bins_active) "_selected_specs" else "_all_specs"
 classification_year_min <- 1790L
 classification_year_max <- 1961L
 treated_event_year_min <- 1840L
 treated_event_year_max <- 1910L
 panel_year_min <- 1800L
 panel_year_max <- 1960L
-event_window <- 50L
 control_group_name <- "nevertreated"
+compute_placebo_se <- tolower(Sys.getenv("SYNTHDID_PLACEBO_SE", unset = "true")) %in%
+  c("1", "true", "yes", "y")
+synthdid_se_replications <- as.integer(Sys.getenv("SYNTHDID_SE_REPLICATIONS", unset = "200"))
+if (is.na(synthdid_se_replications) || synthdid_se_replications <= 0L) {
+  stop("SYNTHDID_SE_REPLICATIONS must be a positive integer.")
+}
+curve_placebo_replications <- as.integer(Sys.getenv(
+  "SYNTHDID_CURVE_PLACEBO_REPLICATIONS",
+  unset = as.character(synthdid_se_replications)
+))
+if (is.na(curve_placebo_replications) || curve_placebo_replications < 0L) {
+  stop("SYNTHDID_CURVE_PLACEBO_REPLICATIONS must be a non-negative integer.")
+}
+plot_package_placebo_ci <- tolower(Sys.getenv("SYNTHDID_PLOT_PLACEBO_CI", unset = "false")) %in%
+  c("1", "true", "yes", "y")
 
 outcomes <- c(
   "inventors_per_100k_pop",
@@ -181,35 +227,55 @@ pad_geoid <- function(x) {
   x_chr
 }
 
-extract_dynamic_att <- function(es, outcome, bin_label) {
+extract_synthdid_att <- function(model) {
+  estimate <- as.numeric(model$estimate)
+  se <- suppressWarnings(as.numeric(model$se))
   tibble(
-    outcome = outcome,
-    distance_bin_km = bin_label,
-    control_group = control_group_name,
-    event_time = es$egt,
-    estimate = es$att.egt,
-    se = es$se.egt,
+    outcome = model$outcome,
+    distance_bin_km = model$distance_bin_km,
+    estimator = "synthdid",
+    se_method = model$se_method,
+    se_replications = model$se_replications,
+    estimate = estimate,
+    se = se,
+    p_value = if_else(is.finite(se) & se > 0, 2 * (1 - pnorm(abs(estimate / se))), NA_real_),
     ci_low = estimate - 1.96 * se,
-    ci_high = estimate + 1.96 * se
+    ci_high = estimate + 1.96 * se,
+    n0 = model$n0,
+    n1 = model$n1,
+    t0 = model$t0,
+    t1 = model$t1,
+    min_decade = model$min_decade,
+    max_decade = model$max_decade
   )
 }
 
-extract_simple_att <- function(ag, outcome, bin_label) {
-  tibble(
-    outcome = outcome,
-    distance_bin_km = bin_label,
-    control_group = control_group_name,
-    estimate = ag$overall.att,
-    se = ag$overall.se,
-    p_value = 2 * (1 - pnorm(abs(estimate / se))),
-    ci_low = estimate - 1.96 * se,
-    ci_high = estimate + 1.96 * se
-  )
+format_att_annotation <- function(model) {
+  estimate <- as.numeric(model$estimate)
+  se <- suppressWarnings(as.numeric(model$se))
+
+  if (is.finite(se) && se > 0) {
+    ci_low <- estimate - 1.96 * se
+    ci_high <- estimate + 1.96 * se
+    paste(
+      paste0("ATT: ", signif(estimate, 4)),
+      paste0("SE: ", signif(se, 4)),
+      paste0("95% CI: [", signif(ci_low, 4), ", ", signif(ci_high, 4), "]"),
+      paste0("SE method: ", model$se_method, " (", model$se_replications, " reps)"),
+      sep = "\n"
+    )
+  } else {
+    paste(
+      paste0("ATT: ", signif(estimate, 4)),
+      "SE: not computed",
+      sep = "\n"
+    )
+  }
 }
 
-dynamic_y_limits <- function(dynamic_att) {
-  y_values <- dynamic_att %>%
-    select(estimate, ci_low, ci_high) %>%
+dynamic_y_limits <- function(effect_curve) {
+  y_values <- effect_curve %>%
+    select(any_of(c("effect", "ci_low", "ci_high"))) %>%
     unlist(use.names = FALSE)
   y_values <- y_values[is.finite(y_values)]
   max_abs <- max(abs(y_values), na.rm = TRUE)
@@ -249,13 +315,79 @@ format_sample_annotation <- function(sample_summary) {
   )
 }
 
-plot_dynamic_event_study <- function(es, outcome, bin_label, y_limits, sample_annotation) {
-  did::ggdid(es) +
+extract_effect_curve <- function(model) {
+  curve <- as.numeric(synthdid::synthdid_effect_curve(model$estimate_obj))
+  post_periods <- model$time_periods[(model$t0 + 1L):length(model$time_periods)]
+  if (length(curve) != length(post_periods)) {
+    post_periods <- seq_len(length(curve)) + model$t0
+  }
+
+  observed <- tibble(
+    outcome = model$outcome,
+    distance_bin_km = model$distance_bin_km,
+    estimator = "synthdid",
+    decade = as.integer(post_periods),
+    event_time = as.integer(post_periods - model$treatment_decade),
+    effect = curve
+  )
+
+  if (is.null(model$placebo_effect_curve) || nrow(model$placebo_effect_curve) == 0L) {
+    return(observed %>% mutate(se = NA_real_, ci_low = NA_real_, ci_high = NA_real_))
+  }
+
+  placebo_se <- model$placebo_effect_curve %>%
+    group_by(event_time) %>%
+    summarise(se = sd(placebo_effect, na.rm = TRUE), .groups = "drop")
+
+  observed %>%
+    left_join(placebo_se, by = "event_time") %>%
+    mutate(
+      ci_low = effect - 1.96 * se,
+      ci_high = effect + 1.96 * se
+    )
+}
+
+extract_synthdid_controls <- function(model, weight_type = c("omega", "lambda")) {
+  weight_type <- match.arg(weight_type)
+  out <- tryCatch(
+    synthdid::synthdid_controls(
+      model$estimate_obj,
+      mass = 1,
+      weight.type = weight_type
+    ),
+    error = function(e) tibble(error = conditionMessage(e))
+  )
+
+  id_col <- if (weight_type == "omega") "control_unit_id" else "pre_period"
+
+  as.data.frame(out) %>%
+    rownames_to_column(id_col) %>%
+    as_tibble() %>%
+    rename(weight = 2) %>%
+    mutate(
+      outcome = model$outcome,
+      distance_bin_km = model$distance_bin_km,
+      estimator = "synthdid",
+      weight_type = weight_type,
+      .before = 1
+    )
+}
+
+plot_effect_curve <- function(effect_curve, outcome, bin_label, y_limits, sample_annotation,
+                              att_annotation) {
+  annotation <- paste(sample_annotation, att_annotation, sep = "\n\n")
+
+  ggplot(effect_curve, aes(x = event_time, y = effect)) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "grey45") +
+    geom_vline(xintercept = 0, linetype = "dotted", color = "grey45") +
+    geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = 0.18, fill = "#1f78b4", na.rm = TRUE) +
+    geom_line(linewidth = 0.7, color = "#1f78b4") +
+    geom_point(size = 2, color = "#1f78b4") +
     annotate(
       "label",
       x = Inf,
       y = Inf,
-      label = sample_annotation,
+      label = annotation,
       hjust = 1.05,
       vjust = 1.05,
       size = 3,
@@ -264,17 +396,122 @@ plot_dynamic_event_study <- function(es, outcome, bin_label, y_limits, sample_an
     ) +
     labs(
       x = "Relative time (years)",
-      y = "Effect",
+      y = "Effect curve",
       title = str_wrap(
         paste(
-          "World's fairs pooled UK+US venue-distance event study",
-          paste0("bin ", bin_label, " km"),
+          "World's fairs UK host-only synthdid effect curve",
           outcome
         ),
         width = 72
-      )
+      ),
+      subtitle = paste0("Treatment specification: ", bin_label),
+      caption = "Bands are pointwise 95% intervals from placebo curves where available."
     ) +
+    theme_minimal(base_size = 12) +
     coord_cartesian(ylim = y_limits)
+}
+
+plot_synthdid_fit <- function(model) {
+  se_method <- if (isTRUE(plot_package_placebo_ci) && model$se_method == "placebo") {
+    "placebo"
+  } else {
+    "none"
+  }
+  treatment_decade <- as.integer(model$treatment_decade)
+
+  plot(model$estimate_obj, se.method = se_method) +
+    annotate(
+      "rect",
+      xmin = treatment_decade,
+      xmax = Inf,
+      ymin = -Inf,
+      ymax = Inf,
+      fill = "#1f78b4",
+      alpha = 0.04
+    ) +
+    geom_vline(
+      xintercept = treatment_decade,
+      linewidth = 0.6,
+      linetype = "dashed",
+      color = "#333333"
+    ) +
+    annotate(
+      "text",
+      x = treatment_decade - 20,
+      y = Inf,
+      label = "Pre-treatment",
+      hjust = 1,
+      vjust = 2.1,
+      size = 3.2,
+      color = "#333333"
+    ) +
+    annotate(
+      "text",
+      x = treatment_decade + 20,
+      y = Inf,
+      label = "Post-treatment",
+      hjust = 0,
+      vjust = 2.1,
+      size = 3.2,
+      color = "#333333"
+    ) +
+    annotate(
+      "label",
+      x = Inf,
+      y = Inf,
+      label = format_att_annotation(model),
+      hjust = 1.05,
+      vjust = 1.05,
+      size = 3,
+      label.size = 0.2,
+      alpha = 0.9
+    ) +
+    labs(
+      title = str_wrap(
+        paste(
+          "World's fairs UK host-only synthetic DiD",
+          model$outcome
+        ),
+        width = 72
+      ),
+      subtitle = paste0(
+        "Treatment specification: ",
+        model$distance_bin_km,
+        "; treatment decade: ",
+        treatment_decade
+      ),
+      caption = paste(
+        "Dashed vertical line marks the treatment decade.",
+        "The lower panel shows pre-treatment time weights, not outcome levels."
+      )
+    )
+}
+
+plot_att_by_bin <- function(att_data, outcome) {
+  plot_data <- att_data %>%
+    filter(outcome == !!outcome) %>%
+    mutate(distance_bin_km = factor(distance_bin_km, levels = analysis_bin_labels))
+
+  ggplot(plot_data, aes(x = distance_bin_km, y = estimate)) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "grey45") +
+    geom_errorbar(
+      aes(ymin = ci_low, ymax = ci_high),
+      width = 0.15,
+      na.rm = TRUE,
+      color = "#2f4f4f"
+    ) +
+    geom_point(size = 2.4, color = "#1f78b4") +
+    labs(
+      x = "Treatment specification",
+      y = "Synthetic DiD ATT",
+      title = str_wrap(
+        paste("Crystal Palace 1851 synthetic DiD ATT by treatment specification", outcome),
+        width = 76
+      ),
+      caption = "Bars show 95% CIs from placebo SEs where available."
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1))
 }
 
 check_balanced_panel <- function(data, id_col, time_col) {
@@ -409,7 +646,7 @@ load_conservative_venues <- function() {
     filter(
       year_start >= classification_year_min,
       year_start <= classification_year_max,
-      host_matched_country_iso3 %in% c("GBR", "USA")
+      host_matched_country_iso3 == "GBR"
     ) %>%
     mutate(
       has_venue_coordinates = !is.na(venue_longitude) & !is.na(venue_latitude),
@@ -423,6 +660,31 @@ load_conservative_venues <- function() {
       venue_used_conservative =
         has_venue_coordinates & !excluded_low_quality_venue_coordinates
     )
+
+  venue_audit <- venue_audit %>%
+    filter(fair_id == crystal_palace_1851_fair_id) %>%
+    mutate(
+      venue_longitude = crystal_palace_1851_longitude,
+      venue_latitude = crystal_palace_1851_latitude,
+      venue_coordinates_source_title = crystal_palace_1851_coordinate_source,
+      venue_coordinates_note = crystal_palace_1851_coordinate_note,
+      has_venue_coordinates = TRUE,
+      excluded_no_venue_coordinates = FALSE,
+      excluded_low_quality_venue_coordinates = FALSE,
+      venue_used_conservative = TRUE
+    )
+
+  if (nrow(venue_audit) != 1L) {
+    stop(
+      "Expected exactly one Crystal Palace 1851 venue row for fair_id ",
+      crystal_palace_1851_fair_id,
+      "; found ",
+      nrow(venue_audit)
+    )
+  }
+  if (!isTRUE(venue_audit$venue_used_conservative[[1L]])) {
+    stop("Crystal Palace 1851 venue row is not usable under conservative coordinate rules.")
+  }
 
   venues <- venue_audit %>%
     filter(venue_used_conservative) %>%
@@ -479,7 +741,7 @@ build_distance_exposure_one_country <- function(targets_sf, venues_country) {
     ncol = nrow(venues_country)
   )
 
-  hit_index <- which(distance_matrix <= 10000, arr.ind = TRUE)
+  hit_index <- which(distance_matrix <= max_treatment_distance_m, arr.ind = TRUE)
   if (nrow(hit_index) == 0L) {
     return(list(
       distance_audit = tibble(),
@@ -555,26 +817,136 @@ build_distance_exposure_one_country <- function(targets_sf, venues_country) {
   )
 }
 
-build_distance_exposure <- function(uk_targets, us_targets, venues) {
+build_distance_exposure <- function(uk_targets, venues) {
   uk_exposure <- build_distance_exposure_one_country(
     uk_targets,
     venues %>% filter(host_matched_country_iso3 == "GBR")
   )
-  us_exposure <- build_distance_exposure_one_country(
-    us_targets,
-    venues %>% filter(host_matched_country_iso3 == "USA")
-  )
 
   list(
-    distance_audit = bind_rows(uk_exposure$distance_audit, us_exposure$distance_audit),
-    first_exposure = bind_rows(uk_exposure$first_exposure, us_exposure$first_exposure),
-    never_units = bind_rows(uk_exposure$never_units, us_exposure$never_units),
-    always_units = bind_rows(uk_exposure$always_units, us_exposure$always_units),
-    future_units = bind_rows(uk_exposure$future_units, us_exposure$future_units)
+    distance_audit = uk_exposure$distance_audit,
+    first_exposure = uk_exposure$first_exposure,
+    never_units = uk_exposure$never_units,
+    always_units = uk_exposure$always_units,
+    future_units = uk_exposure$future_units
   )
 }
 
-run_event_study <- function(data, outcome, bin_label, window = event_window, cores = 4) {
+build_host_exposure_one_country <- function(targets_sf, venues_country) {
+  target_dt <- as_tibble(st_drop_geometry(targets_sf)) %>%
+    select(
+      unit_id,
+      target_unit_id,
+      target_unit_name,
+      target_area_type,
+      target_boundary_id,
+      geo_country_iso3,
+      GEOID
+    )
+
+  if (nrow(venues_country) == 0L) {
+    return(list(
+      hosted_audit = tibble(),
+      first_exposure = tibble(),
+      never_units = target_dt %>% mutate(exposure_status = "never_treated"),
+      always_units = tibble(),
+      future_units = tibble()
+    ))
+  }
+
+  venue_points <- venues_country %>%
+    st_as_sf(coords = c("venue_longitude", "venue_latitude"), crs = 4326, remove = FALSE) %>%
+    st_transform(st_crs(targets_sf))
+
+  hit_matrix <- st_intersects(targets_sf, venue_points, sparse = FALSE)
+  hit_index <- which(hit_matrix, arr.ind = TRUE)
+  if (nrow(hit_index) == 0L) {
+    return(list(
+      hosted_audit = tibble(),
+      first_exposure = tibble(),
+      never_units = target_dt %>% mutate(exposure_status = "never_treated"),
+      always_units = tibble(),
+      future_units = tibble()
+    ))
+  }
+
+  hosted_audit <- tibble(
+    target_row = hit_index[, 1],
+    venue_row = hit_index[, 2],
+    hosted_unit = TRUE,
+    treatment_spec = treatment_spec_label
+  ) %>%
+    bind_cols(target_dt[.$target_row, ]) %>%
+    bind_cols(venues_country[.$venue_row, ]) %>%
+    mutate(
+      distance_bin_km = treatment_spec_label,
+      distance_km = 0
+    ) %>%
+    arrange(geo_country_iso3, unit_id, year_start, fair_id)
+
+  first_exposure <- hosted_audit %>%
+    group_by(unit_id) %>%
+    slice(1L) %>%
+    ungroup() %>%
+    transmute(
+      unit_id,
+      target_unit_id,
+      target_unit_name,
+      target_area_type,
+      target_boundary_id,
+      geo_country_iso3,
+      GEOID,
+      first_exposure_year = year_start,
+      first_exposure_decade = standard_decade(first_exposure_year),
+      distance_bin_km = treatment_spec_label,
+      first_distance_km = distance_km,
+      first_fair_id = fair_id,
+      first_parent_fair_id = parent_fair_id,
+      first_venue_seq = venue_seq,
+      first_fair_name = Fair_name,
+      first_fair_city = City,
+      first_fair_country = Country,
+      first_fair_venue = venue,
+      exposure_status = case_when(
+        first_exposure_year < treated_event_year_min ~ "always_treated_pre_1840",
+        first_exposure_year >= treated_event_year_min &
+          first_exposure_year <= treated_event_year_max ~ "treated",
+        first_exposure_year > treated_event_year_max &
+          first_exposure_year <= classification_year_max ~ "future_treated_after_1910",
+        TRUE ~ "outside_classification_window"
+      )
+    )
+
+  exposed_units <- first_exposure %>% distinct(unit_id)
+  never_units <- target_dt %>%
+    anti_join(exposed_units, by = "unit_id") %>%
+    mutate(exposure_status = "never_treated")
+
+  list(
+    hosted_audit = hosted_audit,
+    first_exposure = first_exposure,
+    never_units = never_units,
+    always_units = first_exposure %>% filter(exposure_status == "always_treated_pre_1840"),
+    future_units = first_exposure %>% filter(exposure_status == "future_treated_after_1910")
+  )
+}
+
+build_host_exposure <- function(uk_targets, venues) {
+  uk_exposure <- build_host_exposure_one_country(
+    uk_targets,
+    venues %>% filter(host_matched_country_iso3 == "GBR")
+  )
+
+  list(
+    hosted_audit = uk_exposure$hosted_audit,
+    first_exposure = uk_exposure$first_exposure,
+    never_units = uk_exposure$never_units,
+    always_units = uk_exposure$always_units,
+    future_units = uk_exposure$future_units
+  )
+}
+
+run_synthdid <- function(data, outcome, bin_label) {
   data_es <- data %>%
     select(
       unit_num,
@@ -588,9 +960,10 @@ run_event_study <- function(data, outcome, bin_label, window = event_window, cor
     ) %>%
     rename(y = all_of(outcome)) %>%
     mutate(
-      unit_num = as.numeric(unit_num),
-      decade = as.numeric(decade),
-      g = as.numeric(g),
+      unit_num = as.integer(unit_num),
+      unit_id = as.character(unit_id),
+      decade = as.integer(decade),
+      g = as.integer(g),
       y = as.numeric(y)
     )
 
@@ -609,70 +982,136 @@ run_event_study <- function(data, outcome, bin_label, window = event_window, cor
     filter(unit_num %in% complete_units, !is.na(y), is.finite(y))
 
   effective_sample_summary <- summarise_effective_sample(data_es, outcome, bin_label)
-
-  if (n_distinct(data_es$g[data_es$g > 0]) == 0L) {
-    return(list(
+  fail_result <- function(error) {
+    list(
       ok = FALSE,
       outcome = outcome,
       distance_bin_km = bin_label,
+      n_rows = nrow(data_es),
+      n_units = n_distinct(data_es$unit_num),
+      n_treated_units = n_distinct(data_es$unit_num[data_es$g > 0]),
+      n_control_units = n_distinct(data_es$unit_num[data_es$g == 0]),
+      n_treated_cohorts = n_distinct(data_es$g[data_es$g > 0]),
       effective_sample_summary = effective_sample_summary,
       n_units_dropped_for_incomplete_outcome = n_distinct(data$unit_num) - length(complete_units),
-      error = "No treated cohorts in estimation sample."
+      min_decade = if (nrow(data_es) > 0L) min(data_es$decade, na.rm = TRUE) else NA_real_,
+      max_decade = if (nrow(data_es) > 0L) max(data_es$decade, na.rm = TRUE) else NA_real_,
+      error = error
+    )
+  }
+
+  if (n_distinct(data_es$g[data_es$g > 0]) == 0L) {
+    return(fail_result("No treated cohorts in estimation sample."))
+  }
+
+  if (n_distinct(data_es$g[data_es$g > 0]) != 1L) {
+    return(fail_result(
+      "synthdid requires simultaneous adoption; estimation sample has more than one treated cohort."
     ))
   }
 
   if (n_distinct(data_es$unit_num[data_es$g == 0]) == 0L) {
-    return(list(
-      ok = FALSE,
-      outcome = outcome,
-      distance_bin_km = bin_label,
-      effective_sample_summary = effective_sample_summary,
-      n_units_dropped_for_incomplete_outcome = n_distinct(data$unit_num) - length(complete_units),
-      error = "No never-treated control units in estimation sample."
-    ))
+    return(fail_result("No never-treated control units in estimation sample."))
   }
 
   if (n_distinct(data_es$y, na.rm = TRUE) < 2L) {
-    return(list(
-      ok = FALSE,
-      outcome = outcome,
-      distance_bin_km = bin_label,
-      effective_sample_summary = effective_sample_summary,
-      n_units_dropped_for_incomplete_outcome = n_distinct(data$unit_num) - length(complete_units),
-      error = "Outcome has insufficient variation."
-    ))
+    return(fail_result("Outcome has insufficient variation."))
   }
 
   tryCatch(
     {
-      out <- did::att_gt(
-        yname = "y",
-        tname = "decade",
-        idname = "unit_num",
-        gname = "g",
-        data = data_es,
-        control_group = control_group_name,
-        est_method = "dr",
-        base_period = "universal",
-        cores = cores
+      treatment_decade <- unique(data_es$g[data_es$g > 0])[[1L]]
+      data_sdid <- data_es %>%
+        mutate(
+          treatment = as.integer(g > 0 & decade >= treatment_decade)
+        ) %>%
+        arrange(treatment, unit_id, decade)
+
+      setup <- synthdid::panel.matrices(
+        data_sdid %>%
+          select(unit_id, decade, y, treatment) %>%
+          as.data.frame(),
+        unit = "unit_id",
+        time = "decade",
+        outcome = "y",
+        treatment = "treatment",
+        treated.last = TRUE
       )
 
-      es <- did::aggte(
-        out,
-        type = "dynamic",
-        na.rm = TRUE,
-        min_e = -window,
-        max_e = window
-      )
-      simple <- did::aggte(out, type = "simple", na.rm = TRUE)
+      if (setup$T0 != sum(sort(unique(data_sdid$decade)) < treatment_decade)) {
+        stop("Unexpected synthdid pre-period count for treatment decade ", treatment_decade, ".")
+      }
+      if (setup$N0 != n_distinct(data_sdid$unit_id[data_sdid$g == 0])) {
+        stop("Unexpected synthdid control-unit count.")
+      }
+
+      estimate_obj <- synthdid::synthdid_estimate(setup$Y, setup$N0, setup$T0)
+      se_method <- if (compute_placebo_se) "placebo" else "not_computed"
+      se <- if (compute_placebo_se) {
+        tryCatch(
+          sqrt(as.numeric(vcov(
+            estimate_obj,
+            method = "placebo",
+            replications = synthdid_se_replications
+          ))),
+          error = function(e) NA_real_
+        )
+      } else {
+        NA_real_
+      }
+
+      time_periods <- sort(unique(data_sdid$decade))
+      post_periods <- time_periods[(setup$T0 + 1L):length(time_periods)]
+      n1 <- nrow(setup$Y) - setup$N0
+      placebo_effect_curve <- tibble()
+      if (curve_placebo_replications > 0L && setup$N0 > n1) {
+        control_index <- seq_len(setup$N0)
+        y_control <- setup$Y[control_index, , drop = FALSE]
+        placebo_effect_curve <- map_dfr(seq_len(curve_placebo_replications), function(rep_id) {
+          set.seed(20260703L + rep_id)
+          placebo_treated <- sample(control_index, size = n1, replace = FALSE)
+          placebo_controls <- setdiff(control_index, placebo_treated)
+          y_placebo <- rbind(
+            y_control[placebo_controls, , drop = FALSE],
+            y_control[placebo_treated, , drop = FALSE]
+          )
+          est_placebo <- tryCatch(
+            synthdid::synthdid_estimate(y_placebo, length(placebo_controls), setup$T0),
+            error = function(e) NULL
+          )
+          if (is.null(est_placebo)) return(tibble())
+
+          placebo_effect <- as.numeric(synthdid::synthdid_effect_curve(est_placebo))
+          if (length(placebo_effect) != length(post_periods)) return(tibble())
+
+          tibble(
+            outcome = outcome,
+            distance_bin_km = bin_label,
+            placebo_rep = rep_id,
+            decade = as.integer(post_periods),
+            event_time = as.integer(post_periods - treatment_decade),
+            placebo_effect = placebo_effect
+          )
+        })
+      }
 
       list(
         ok = TRUE,
         outcome = outcome,
         distance_bin_km = bin_label,
-        out = out,
-        es = es,
-        simple = simple,
+        estimate_obj = estimate_obj,
+        setup = setup,
+        estimate = as.numeric(estimate_obj),
+        se = se,
+        se_method = se_method,
+        se_replications = if (compute_placebo_se) synthdid_se_replications else NA_integer_,
+        treatment_decade = treatment_decade,
+        time_periods = time_periods,
+        placebo_effect_curve = placebo_effect_curve,
+        n0 = setup$N0,
+        n1 = nrow(setup$Y) - setup$N0,
+        t0 = setup$T0,
+        t1 = ncol(setup$Y) - setup$T0,
         n_rows = nrow(data_es),
         n_units = n_distinct(data_es$unit_num),
         n_treated_units = n_distinct(data_es$unit_num[data_es$g > 0]),
@@ -709,31 +1148,19 @@ run_event_study <- function(data, outcome, bin_label, window = event_window, cor
 # Load panel and treatment geography
 ###############################################################################
 
-message("Reading combined UK+US panel...")
+message("Reading UK panel...")
 panel_year <- fread(panel_file, na.strings = c("", "NA")) %>%
   as_tibble() %>%
   mutate(
     unit_id = as.character(unit_id),
     GEOID = pad_geoid(GEOID),
-    target_unit_id = if_else(
-      iso3 == "USA" | is.na(target_unit_id) | target_unit_id == "",
-      unit_id,
-      as.character(target_unit_id)
-    ),
-    target_area_type = if_else(
-      iso3 == "USA" | is.na(target_area_type) | target_area_type == "",
-      "US County",
-      as.character(target_area_type)
-    ),
-    target_boundary_id = if_else(
-      iso3 == "USA" | is.na(target_boundary_id) | target_boundary_id == "",
-      coalesce(GEOID, unit_id),
-      as.character(target_boundary_id)
-    ),
+    target_unit_id = as.character(target_unit_id),
+    target_area_type = as.character(target_area_type),
+    target_boundary_id = as.character(target_boundary_id),
     year = as.integer(year)
   ) %>%
   filter(
-    iso3 %in% c("GBR", "USA"),
+    iso3 == "GBR",
     year >= panel_year_min,
     year <= panel_year_max
   )
@@ -751,29 +1178,25 @@ message("Building UK historical urban-unit geometries...")
 uk_targets <- build_uk_target_geometries() %>%
   semi_join(eligible_units %>% filter(iso3 == "GBR"), by = "unit_id")
 
-message("Building US county geometries...")
-us_targets <- build_us_target_geometries(panel_year) %>%
-  semi_join(eligible_units %>% filter(iso3 == "USA"), by = "unit_id")
-
 ###############################################################################
-# Build venue-distance treatment assignment
+# Build hosted treatment assignment
 ###############################################################################
 
-message("Building conservative venue-distance treatment assignment...")
+message("Building hosted treatment assignment...")
 venue_data <- load_conservative_venues()
 venues <- venue_data$venues
 venue_quality_audit <- venue_data$audit
-exposure <- build_distance_exposure(uk_targets, us_targets, venues)
+exposure <- build_host_exposure(uk_targets, venues)
 
 first_exposure <- exposure$first_exposure
 never_units <- exposure$never_units
 always_units <- exposure$always_units
 future_units <- exposure$future_units
-distance_audit <- exposure$distance_audit
+hosted_audit <- exposure$hosted_audit
 
 write_csv(venue_quality_audit, file.path(results_dir, "venue_quality_audit.csv"))
-write_csv(distance_audit, file.path(results_dir, "venue_distance_match_audit_all_bins.csv"))
-write_csv(first_exposure, file.path(results_dir, "first_exposure_all_bins.csv"))
+write_csv(hosted_audit, file.path(results_dir, "hosted_match_audit.csv"))
+write_csv(first_exposure, file.path(results_dir, "first_exposure_hosted.csv"))
 write_csv(never_units, file.path(results_dir, "never_treated_units.csv"))
 write_csv(always_units, file.path(results_dir, "always_treated_pre_1840_units.csv"))
 write_csv(future_units, file.path(results_dir, "future_treated_after_1910_units.csv"))
@@ -829,25 +1252,25 @@ panel_decade_base <- panel_year %>%
   )
 
 ###############################################################################
-# Run event studies by distance bin
+# Run synthetic DiD estimates by hosted treatment specification
 ###############################################################################
 
 root_sample_summary <- list()
 root_country_summary <- list()
+root_synthdid_att <- list()
+root_synthdid_effect_curve <- list()
+root_synthdid_control_weights <- list()
+root_synthdid_time_weights <- list()
 
-for (bin_label in analysis_bin_labels) {
-  message("Running bin ", bin_label, " km...")
+for (bin_label in selected_analysis_bin_labels) {
+  message("Running treatment specification ", bin_label, "...")
   bin_dir <- file.path(results_dir, bin_dirs[[bin_label]])
   dir.create(bin_dir, recursive = TRUE, showWarnings = FALSE)
 
   treated_units <- first_exposure %>%
     filter(
       exposure_status == "treated",
-      if (bin_label == "0-10") {
-        distance_bin_km %in% bin_labels
-      } else {
-        distance_bin_km == bin_label
-      },
+      distance_bin_km == bin_label,
       first_exposure_year >= treated_event_year_min,
       first_exposure_year <= treated_event_year_max
     ) %>%
@@ -858,7 +1281,7 @@ for (bin_label in analysis_bin_labels) {
       event_year = first_exposure_year,
       g = first_exposure_decade,
       distance_bin_km = bin_label,
-      source_distance_bin_km = distance_bin_km,
+      source_distance_bin_km = treatment_spec_label,
       first_distance_km,
       first_fair_id = as.character(first_fair_id),
       first_parent_fair_id = as.character(first_parent_fair_id),
@@ -955,12 +1378,10 @@ for (bin_label in analysis_bin_labels) {
   model_results <- list()
   for (outcome in outcomes) {
     message("  outcome: ", outcome)
-    model_results[[outcome]] <- run_event_study(
+    model_results[[outcome]] <- run_synthdid(
       data = panel_decade,
       outcome = outcome,
-      bin_label = bin_label,
-      window = event_window,
-      cores = 4
+      bin_label = bin_label
     )
   }
 
@@ -978,6 +1399,13 @@ for (bin_label in analysis_bin_labels) {
       n_treated_units = value_or(.x$n_treated_units, NA_integer_),
       n_control_units = value_or(.x$n_control_units, NA_integer_),
       n_treated_cohorts = value_or(.x$n_treated_cohorts, NA_integer_),
+      n0 = value_or(.x$n0, NA_integer_),
+      n1 = value_or(.x$n1, NA_integer_),
+      t0 = value_or(.x$t0, NA_integer_),
+      t1 = value_or(.x$t1, NA_integer_),
+      treatment_decade = value_or(.x$treatment_decade, NA_integer_),
+      se_method = value_or(.x$se_method, NA_character_),
+      se_replications = value_or(.x$se_replications, NA_integer_),
       n_events = value_or(.x$effective_sample_summary$n_events, NA_integer_),
       n_treated_gbr = value_or(.x$effective_sample_summary$n_treated_gbr, NA_integer_),
       n_treated_usa = value_or(.x$effective_sample_summary$n_treated_usa, NA_integer_),
@@ -994,48 +1422,54 @@ for (bin_label in analysis_bin_labels) {
   )
 
   if (length(successful_models) > 0L) {
-    dynamic_att <- imap_dfr(
+    synthdid_att <- imap_dfr(
       successful_models,
-      ~ extract_dynamic_att(.x$es, .x$outcome, .x$distance_bin_km)
+      ~ extract_synthdid_att(.x)
     )
-    simple_att <- imap_dfr(
+    synthdid_effect_curve <- imap_dfr(
       successful_models,
-      ~ extract_simple_att(.x$simple, .x$outcome, .x$distance_bin_km)
+      ~ extract_effect_curve(.x)
+    )
+    synthdid_control_weights <- imap_dfr(
+      successful_models,
+      ~ extract_synthdid_controls(.x, weight_type = "omega")
+    )
+    synthdid_time_weights <- imap_dfr(
+      successful_models,
+      ~ extract_synthdid_controls(.x, weight_type = "lambda")
     )
   } else {
-    dynamic_att <- tibble()
-    simple_att <- tibble()
+    synthdid_att <- tibble()
+    synthdid_effect_curve <- tibble()
+    synthdid_control_weights <- tibble()
+    synthdid_time_weights <- tibble()
   }
 
   effective_sample_summary <- imap_dfr(
     model_results,
     ~ .x$effective_sample_summary
   )
-  distance_audit_bin <- if (bin_label == "0-10") {
-    distance_audit %>%
-      filter(distance_bin_km %in% bin_labels) %>%
-      mutate(analysis_distance_bin_km = bin_label)
-  } else {
-    distance_audit %>%
-      filter(distance_bin_km == bin_label) %>%
-      mutate(analysis_distance_bin_km = bin_label)
-  }
+  hosted_audit_bin <- hosted_audit %>%
+    filter(distance_bin_km == bin_label) %>%
+    mutate(analysis_distance_bin_km = bin_label)
 
   write_csv(treated_units, file.path(bin_dir, "treatment_assignment.csv"))
   write_csv(
-    distance_audit_bin,
-    file.path(bin_dir, "venue_distance_match_audit.csv")
+    hosted_audit_bin,
+    file.path(bin_dir, "hosted_match_audit.csv")
   )
   write_csv(event_distribution, file.path(bin_dir, "event_distribution.csv"))
   write_csv(sample_summary, file.path(bin_dir, "sample_summary.csv"))
   write_csv(country_summary, file.path(bin_dir, "sample_summary_by_country.csv"))
   write_csv(effective_sample_summary, file.path(bin_dir, "effective_sample_summary_by_outcome.csv"))
   write_csv(model_status, file.path(bin_dir, "model_status.csv"))
-  write_csv(dynamic_att, file.path(bin_dir, "dynamic_att.csv"))
-  write_csv(simple_att, file.path(bin_dir, "simple_att.csv"))
+  write_csv(synthdid_att, file.path(bin_dir, "synthdid_att.csv"))
+  write_csv(synthdid_effect_curve, file.path(bin_dir, "synthdid_effect_curve.csv"))
+  write_csv(synthdid_control_weights, file.path(bin_dir, "synthdid_control_weights.csv"))
+  write_csv(synthdid_time_weights, file.path(bin_dir, "synthdid_time_weights.csv"))
 
-  if (nrow(dynamic_att) > 0L) {
-    y_limits_by_outcome <- dynamic_att %>%
+  if (nrow(synthdid_effect_curve) > 0L) {
+    y_limits_by_outcome <- synthdid_effect_curve %>%
       group_by(outcome) %>%
       summarise(y_limits = list(dynamic_y_limits(pick(everything()))), .groups = "drop")
 
@@ -1045,43 +1479,127 @@ for (bin_label in analysis_bin_labels) {
         pull(y_limits) %>%
         pluck(1)
 
-      plot_es <- plot_dynamic_event_study(
-        model$es,
+      model_effect_curve <- synthdid_effect_curve %>%
+        filter(outcome == model$outcome, distance_bin_km == model$distance_bin_km)
+
+      plot_curve <- plot_effect_curve(
+        model_effect_curve,
         model$outcome,
         model$distance_bin_km,
         y_limits,
-        format_sample_annotation(model$effective_sample_summary)
+        format_sample_annotation(model$effective_sample_summary),
+        format_att_annotation(model)
       )
 
       ggsave(
         file.path(
           bin_dir,
-          paste0("ES_", sanitize_filename(model$outcome), "_bin_", sanitize_filename(bin_label), "km.png")
+          paste0("SDID_effect_curve_", sanitize_filename(model$outcome), "_", sanitize_filename(bin_label), ".png")
         ),
-        plot_es,
+        plot_curve,
         width = 8,
         height = 6,
         dpi = 300
       )
+      ggsave(
+        file.path(
+          bin_dir,
+          paste0("SDID_event_study_", sanitize_filename(model$outcome), "_", sanitize_filename(bin_label), ".png")
+        ),
+        plot_curve,
+        width = 8,
+        height = 6,
+        dpi = 300
+      )
+
+      plot_fit <- plot_synthdid_fit(model)
+      ggsave(
+        file.path(
+          bin_dir,
+          paste0("SDID_fit_", sanitize_filename(model$outcome), "_", sanitize_filename(bin_label), ".png")
+        ),
+        plot_fit,
+        width = 8,
+        height = 6,
+        dpi = 300
+      )
+
+      if (bin_label == aggregate_bin_label && model$outcome == "stem_per_100k_pop") {
+        plot_curve_zoomed <- plot_effect_curve(
+          model_effect_curve,
+          model$outcome,
+          model$distance_bin_km,
+          zoomed_display_y_limits,
+          format_sample_annotation(model$effective_sample_summary),
+          format_att_annotation(model)
+        ) +
+          labs(caption = "Zoomed y-axis for display only; confidence intervals outside the range are clipped.")
+
+        ggsave(
+          file.path(
+            bin_dir,
+            paste0("SDID_effect_curve_", sanitize_filename(model$outcome), "_", sanitize_filename(bin_label), "_zoomed.png")
+          ),
+          plot_curve_zoomed,
+          width = 8,
+          height = 6,
+          dpi = 300
+        )
+      }
     }
   }
 
   notes <- c(
-    "World's fairs pooled UK+US venue-distance event study",
+    "World's fairs UK hosted synthetic DiD: Crystal Palace 1851 only",
     "",
     paste0("Run timestamp: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S")),
-    paste0("Distance bin: ", bin_label, " km"),
+    paste0("Treatment specification: ", bin_label),
     paste0("Panel: ", panel_file),
     paste0("Fairs: ", fairs_file),
+    paste0("Selected fair_id: ", crystal_palace_1851_fair_id),
+    paste0(
+      "Selected venue coordinates: ",
+      crystal_palace_1851_latitude,
+      ", ",
+      crystal_palace_1851_longitude
+    ),
+    paste0("Selected venue coordinate source: ", crystal_palace_1851_coordinate_source),
     paste0("Control group: ", control_group_name),
     "Greater London included using Nomis/ONS 1921 districts selected by >=50% overlap with 1911 Greater London.",
-    "London venues are used to classify exposure for Greater London and nearby units.",
-    "US counties use tigris 2020 cartographic-boundary counties.",
-    "Distance is polygon-to-venue; venues inside polygons have distance 0.",
+    "The Crystal Palace 1851 venue is used to classify only the historical unit containing the Hyde Park point as treated.",
+    "Controls are UK units that do not contain the Crystal Palace 1851 venue point.",
     "Venue coordinates use conservative quality filter.",
+    if (bin_label == aggregate_bin_label) {
+      paste0(
+        "A zoomed display-only figure is saved for stem_per_100k_pop with y-axis limits ",
+        paste(zoomed_display_y_limits, collapse = " to "),
+        "; CSV estimates and confidence intervals are unchanged."
+      )
+    } else {
+      NULL
+    },
     "Always-treated units are units first exposed before 1840.",
     "Future-treated units are units first exposed after 1910 and before or during 1961.",
-    paste0("Dynamic window: -", event_window, " to +", event_window, " years."),
+    "Estimator: synthdid::synthdid_estimate.",
+    paste0(
+      "Standard errors: ",
+      if (compute_placebo_se) {
+        paste0("vcov(method = 'placebo', replications = ", synthdid_se_replications, ")")
+      } else {
+        "not computed; set SYNTHDID_PLACEBO_SE=TRUE to enable placebo SEs"
+      },
+      "."
+    ),
+    paste0(
+      "Package plot CI arrows: ",
+      if (plot_package_placebo_ci) {
+        "enabled via SYNTHDID_PLOT_PLACEBO_CI=TRUE"
+      } else {
+        "disabled by default to avoid recomputing placebo vcov inside plot()"
+      },
+      "."
+    ),
+    "Dynamic CSV/figures use synthdid_effect_curve for post-treatment decades.",
     paste0("Treated units: ", sample_summary$n_treated_units),
     paste0("Never-treated control units: ", sample_summary$n_control_units),
     paste0("Always-treated units excluded: ", nrow(always_units)),
@@ -1092,35 +1610,105 @@ for (bin_label in analysis_bin_labels) {
 
   root_sample_summary[[bin_label]] <- sample_summary
   root_country_summary[[bin_label]] <- country_summary
+  root_synthdid_att[[bin_label]] <- synthdid_att
+  root_synthdid_effect_curve[[bin_label]] <- synthdid_effect_curve
+  root_synthdid_control_weights[[bin_label]] <- synthdid_control_weights
+  root_synthdid_time_weights[[bin_label]] <- synthdid_time_weights
 }
 
 all_sample_summary <- bind_rows(root_sample_summary)
-write_csv(all_sample_summary, file.path(results_dir, "sample_summary_all_bins.csv"))
+write_csv(all_sample_summary, file.path(results_dir, paste0("sample_summary", aggregate_suffix, ".csv")))
 
 all_country_summary <- bind_rows(root_country_summary)
-write_csv(all_country_summary, file.path(results_dir, "sample_summary_by_country_all_bins.csv"))
+write_csv(all_country_summary, file.path(results_dir, paste0("sample_summary_by_country", aggregate_suffix, ".csv")))
 
-all_event_distribution <- map_dfr(analysis_bin_labels, function(bin_label) {
+all_event_distribution <- map_dfr(selected_analysis_bin_labels, function(bin_label) {
   bin_file <- file.path(results_dir, bin_dirs[[bin_label]], "event_distribution.csv")
   read_csv(bin_file, show_col_types = FALSE)
 })
-write_csv(all_event_distribution, file.path(results_dir, "event_distribution_all_bins.csv"))
+write_csv(all_event_distribution, file.path(results_dir, paste0("event_distribution", aggregate_suffix, ".csv")))
+
+all_synthdid_att <- bind_rows(root_synthdid_att)
+write_csv(all_synthdid_att, file.path(results_dir, paste0("synthdid_att", aggregate_suffix, ".csv")))
+
+if (nrow(all_synthdid_att) > 0L) {
+  for (outcome in unique(all_synthdid_att$outcome)) {
+    plot_att <- plot_att_by_bin(all_synthdid_att, outcome)
+    ggsave(
+      file.path(
+        results_dir,
+        paste0("SDID_att_by_spec_", sanitize_filename(outcome), aggregate_suffix, ".png")
+      ),
+      plot_att,
+      width = 9,
+      height = 5.5,
+      dpi = 300
+    )
+  }
+}
+
+all_synthdid_effect_curve <- bind_rows(root_synthdid_effect_curve)
+write_csv(all_synthdid_effect_curve, file.path(results_dir, paste0("synthdid_effect_curve", aggregate_suffix, ".csv")))
+
+all_synthdid_control_weights <- bind_rows(root_synthdid_control_weights)
+write_csv(all_synthdid_control_weights, file.path(results_dir, paste0("synthdid_control_weights", aggregate_suffix, ".csv")))
+
+all_synthdid_time_weights <- bind_rows(root_synthdid_time_weights)
+write_csv(all_synthdid_time_weights, file.path(results_dir, paste0("synthdid_time_weights", aggregate_suffix, ".csv")))
 
 root_notes <- c(
-  "World's fairs pooled UK historical urban-unit + US county venue-distance event studies",
+  "World's fairs UK historical urban-unit hosted synthetic DiD: Crystal Palace 1851 only",
   "",
   paste0("Run timestamp: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S")),
   paste0("TALENT_DETS_DATA_DIR: ", TALENT_DETS_DATA_DIR),
   paste0("Panel: ", panel_file),
   paste0("Fairs: ", fairs_file),
+  paste0("Selected fair_id: ", crystal_palace_1851_fair_id),
+  paste0(
+    "Selected venue coordinates: ",
+    crystal_palace_1851_latitude,
+    ", ",
+    crystal_palace_1851_longitude
+  ),
+  paste0("Selected venue coordinate source: ", crystal_palace_1851_coordinate_source),
   paste0("Results directory: ", results_dir),
-  "Distance specifications: 0-2, 2-4, 4-6, 6-8, 8-10, and cumulative 0-10 km.",
+  paste0(
+    "Treatment specifications: ",
+    paste(analysis_bin_labels, collapse = ", "),
+    "."
+  ),
   paste0("Exposure classification window: ", classification_year_min, "-", classification_year_max, "."),
   paste0("Included treated event window: ", treated_event_year_min, "-", treated_event_year_max, "."),
-  "Control group is strictly never treated within 10 km over 1790-1961.",
+  paste0(
+    "Control group is strictly never treated as a host unit for Crystal Palace 1851 over ",
+    classification_year_min,
+    "-",
+    classification_year_max,
+    "."
+  ),
   "Greater London is included using Nomis/ONS 1921 districts selected by >=50% overlap with 1911 Greater London.",
-  "US events are included via venue coordinates and US county polygons.",
+  "US counties are excluded from the panel and control group.",
   "Venue coordinates with low-quality automated geocoding notes are excluded.",
+  "Estimator: synthdid::synthdid_estimate.",
+  paste0(
+    "Standard errors: ",
+    if (compute_placebo_se) {
+      paste0("vcov(method = 'placebo', replications = ", synthdid_se_replications, ")")
+    } else {
+      "not computed; set SYNTHDID_PLACEBO_SE=TRUE to enable placebo SEs"
+    },
+    "."
+  ),
+  paste0(
+    "Package plot CI arrows: ",
+    if (plot_package_placebo_ci) {
+      "enabled via SYNTHDID_PLOT_PLACEBO_CI=TRUE"
+    } else {
+      "disabled by default to avoid recomputing placebo vcov inside plot()"
+    },
+    "."
+  ),
+  "Dynamic outputs: synthdid_effect_curve for post-treatment decades.",
   paste0("Elapsed minutes: ", round(difftime(Sys.time(), initial_time, units = "mins"), 1))
 )
 writeLines(root_notes, file.path(results_dir, "notes.txt"))

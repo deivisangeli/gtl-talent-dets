@@ -133,7 +133,9 @@ outcomes <- c(
   "n_inventors",
   "log1p_n_inventors",
   "n_stem",
-  "log1p_n_stem"
+  "log1p_n_stem",
+  "population",
+  "log_population"
 )
 
 ###############################################################################
@@ -824,6 +826,7 @@ panel_decade_base <- panel_year %>%
     any_stem = as.integer(n_stem > 0),
     log1p_n_inventors = log1p(n_inventors),
     log1p_n_stem = log1p(n_stem),
+    log_population = if_else(population > 0, log(population), NA_real_),
     inventors_per_100k_pop = if_else(
       population > 0,
       100000 * n_inventors / population,

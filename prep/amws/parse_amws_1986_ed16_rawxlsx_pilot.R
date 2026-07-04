@@ -48,9 +48,15 @@ if (!dir.exists(TALENT_DETS_DATA_DIR) && dir.exists(local_dropbox)) {
   AMWS_OUTPUT <- file.path(DATA_OUTPUT, "amws")
 }
 
-run_id <- "amws16_A_0_200_precleaning_first10_rawxlsx_4agents"
+run_id <- Sys.getenv(
+  "AMWS_REGEX_RUN_ID",
+  unset = "amws16_A_0_200_precleaning_first10_rawxlsx_4agents"
+)
 run_dir <- file.path(DATA_OUTPUT, "amws", "transcription_runs", run_id)
-input_file <- file.path(run_dir, "amws_entries_raw_combined.xlsx")
+input_file <- Sys.getenv(
+  "AMWS_REGEX_INPUT_FILE",
+  unset = file.path(run_dir, "amws_entries_raw_combined.xlsx")
+)
 parsed_file <- file.path(run_dir, "amws_entries_regex_parsed.csv")
 audit_file <- file.path(run_dir, "amws_entries_regex_audit_flags.csv")
 
