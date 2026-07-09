@@ -8,6 +8,6 @@ repo_root <- if (length(script_arg)) {
 }
 
 target <- file.path(repo_root, "prep", "amws", "amws_1986", "archive",
-                    "compare_amws_regex_vs_gpt_sample.R")
+                    "pilot_amws_ed16_remaining_gpt_nano_api.R")
 status <- system2("Rscript", c(shQuote(target), args))
 if (!identical(status, 0L)) quit(save = "no", status = as.integer(status))

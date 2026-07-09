@@ -27,7 +27,10 @@ source(file.path(repo_root, "paths.R"))
 
 geo <- fread(file.path(AMWS_OUTPUT, "amws_1955_us_geocoded_final.csv"),
              select = c("lineid", "geoid"))
-cln <- fread(file.path(AMWS_OUTPUT, "amws_1955_split.csv"),
+split_corrected <- file.path(AMWS_OUTPUT, "amws_1955_split_corrected.csv")
+split_original <- file.path(AMWS_OUTPUT, "amws_1955_split.csv")
+split_file <- if (file.exists(split_corrected)) split_corrected else split_original
+cln <- fread(split_file,
              select = c("lineid", "birth_year"))
 
 d <- merge(geo, cln, by = "lineid", all.x = TRUE)

@@ -1,7 +1,8 @@
 ###############################################################################
 # Cross-edition dedup for AMWS 1906 + 1938 + 1955.
 #
-# Reads each edition's geocoded_final + the corresponding cleaned/raw file to
+# Reads each edition's geocoded_final + the corresponding cleaned/corrected/raw
+# file to
 # recover (last_name, first_initial, birth_year). Builds a person key
 # (norm_last + first_init + birth_year + state), drops repeats across editions
 # (keep earliest), and writes a combined geocoded file with edition tag.
@@ -24,6 +25,12 @@ source(file.path(repo_root, "paths.R"))
 
 out_root <- AMWS_OUTPUT
 in_root  <- AMWS_INPUT
+
+edition_cleaned_file <- function(ed) {
+  corrected <- file.path(out_root, sprintf("amws_%s_cleaned_corrected.csv", ed))
+  original <- file.path(out_root, sprintf("amws_%s_cleaned.csv", ed))
+  if (file.exists(corrected)) corrected else original
+}
 
 norm_last <- function(x) {
   x <- iconv(x, to = "ASCII//TRANSLIT", sub = "")
@@ -48,7 +55,7 @@ raw06[, last  := trimws(sub(",.*", "", amsname))]
 raw06[, first := trimws(sub("^[^,]*,\\s*", "", amsname))]
 names06 <- raw06[, .(lineid, last06 = last, first06 = first)]
 
-cl06 <- fread(file.path(out_root, "amws_1906_cleaned.csv"))[, .(lineid, birth_year)]
+cl06 <- fread(edition_cleaned_file("1906"))[, .(lineid, birth_year)]
 g06  <- fread(file.path(out_root, "amws_1906_us_geocoded_final.csv"))
 e06 <- merge(g06, cl06, by = "lineid", all.x = TRUE)
 e06 <- merge(e06, names06, by = "lineid", all.x = TRUE)
@@ -56,7 +63,7 @@ e06[, edition := 1906L]
 e06[, last := last06][, first := first06][, c("last06","first06") := NULL]
 
 # ---- 1938: AMSname from cleaned, birth_year from cleaned -------------------
-cl38 <- fread(file.path(out_root, "amws_1938_cleaned.csv"))[, .(lineid, AMSname, birth_year)]
+cl38 <- fread(edition_cleaned_file("1938"))[, .(lineid, AMSname, birth_year)]
 cl38[, last  := trimws(sub(",.*", "", AMSname))]
 cl38[, first := trimws(sub("^[^,]*,\\s*", "", AMSname))]
 g38  <- fread(file.path(out_root, "amws_1938_us_geocoded_final.csv"))
@@ -64,7 +71,10 @@ e38 <- merge(g38, cl38[, .(lineid, birth_year, last, first)], by = "lineid", all
 e38[, edition := 1938L]
 
 # ---- 1955: names and canonical birth_year from split.csv -------------------
-sp55 <- fread(file.path(out_root, "amws_1955_split.csv"))[, .(
+split55_corrected <- file.path(out_root, "amws_1955_split_corrected.csv")
+split55_original <- file.path(out_root, "amws_1955_split.csv")
+split55_file <- if (file.exists(split55_corrected)) split55_corrected else split55_original
+sp55 <- fread(split55_file)[, .(
   lineid, last, first, birth_year
 )]
 g55 <- fread(file.path(out_root, "amws_1955_us_geocoded_final.csv"))

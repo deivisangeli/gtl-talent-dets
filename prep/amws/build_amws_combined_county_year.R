@@ -1,14 +1,22 @@
 ###############################################################################
-# Yearly county-level panel of AMWS combined post-dedup births.
+# Yearly county-level panel of consolidated AMWS US-born births, 1800-1960.
 #
-# Builds on the existing Wikipedia yearly panel (us_panel_county_stem_year_1800)
-# by merging in AMWS combined counts per county-year. Adds derived AMWS rates.
+# Combines:
+#   - 1906/1938/1955 deduplicated across editions
+#   - 1986 edition, not deduplicated against earlier editions
 #
-# Output: prep/output/us_panel_county_amws_combined_year.csv
+# Builds on the existing yearly county panel (us_panel_county_stem_year_1800),
+# which already contains annual interpolated population and birth denominators.
+#
+# Outputs:
+#   output/us_panel_county_amws_combined_year.csv
+#   output/amws/amws_1986_see_previous_excluded_from_panel.csv
+#   output/amws/amws_consolidated_county_year_summary.csv
 ###############################################################################
 suppressPackageStartupMessages({
   library(data.table)
 })
+
 script_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
 if (length(script_arg)) {
   script_path <- normalizePath(sub("^--file=", "", script_arg[1]), winslash = "/", mustWork = TRUE)
@@ -19,43 +27,200 @@ if (length(script_arg)) {
 source(file.path(repo_root, "paths.R"))
 out_root <- DATA_OUTPUT
 
-# ---- AMWS combined: aggregate to county-year -------------------------------
-amws <- fread(file.path(AMWS_OUTPUT, "amws_combined_us_geocoded.csv"))
-amws <- amws[kept == TRUE & !is.na(birth_year) & !is.na(geoid)]
-amws[, geoid5 := sprintf("%05d", as.integer(geoid))]
-amws[, year   := as.integer(birth_year)]
-amws_cy <- amws[, .(n_amws = .N), by = .(GEOID = geoid5, year)]
+normalize_geoid <- function(x) {
+  out <- suppressWarnings(as.integer(x))
+  sprintf("%05d", out)
+}
 
-# ---- Wikipedia yearly panel (already has GEOID-year, pop, county_births) ---
-wiki <- fread(file.path(out_root, "us_panel_county_stem_year_1800.csv"))
-wiki[, GEOID := sprintf("%05d", as.integer(GEOID))]
+has_value <- function(x) {
+  !is.na(x) & trimws(as.character(x)) != ""
+}
 
-# ---- Merge AMWS into yearly panel ------------------------------------------
-p <- merge(wiki, amws_cy, by = c("GEOID", "year"), all.x = TRUE)
-p[is.na(n_amws), n_amws := 0L]
+kept_flag <- function(x) {
+  as.character(x) %in% c("TRUE", "True", "true", "1")
+}
 
-# ---- Derived AMWS outcomes -------------------------------------------------
-# Per 1000 county population
-p[, amws_per_1000_pop := ifelse(population > 0, 1000 * n_amws / population, NA_real_)]
-# Per 1000 estimated county births (national birth rate × pop)
-p[, amws_per_1000_births := ifelse(county_births_estimate_year > 0,
-                                    1000 * n_amws / county_births_estimate_year,
-                                    NA_real_)]
-# Per 100k pop, for parity with stem_per_100k
-p[, amws_per_100k := ifelse(population > 0, 1e5 * n_amws / population, NA_real_)]
-# log1p
-p[, log1p_n_amws := log1p(n_amws)]
-# Share of total notable (Wikipedia all-wiki + AMWS, deduped only crudely)
-p[, amws_share_of_notable := ifelse((n_all_wiki + n_amws) > 0,
-                                     n_amws / (n_all_wiki + n_amws),
-                                     NA_real_)]
+first_pos <- function(pattern, text) {
+  pos <- regexpr(pattern, text, ignore.case = TRUE, perl = TRUE)
+  as.integer(pos)
+}
 
-# Restrict to the AMWS coverage window 1840-1930
-p_out <- p[year >= 1840 & year <= 1930]
+# A small number of 1986 rows still contain a "see previous edition" entry
+# followed by a different person's "b ..." birth string. In those rows the
+# parsed birth location/year belongs to the following entry, not to the
+# "see previous" entry. Exclude rows where "see previous" appears before any
+# visible birth marker.
+is_see_previous_contaminated <- function(text) {
+  text <- as.character(text)
+  text[is.na(text)] <- ""
+  see_pos <- first_pos("\\bsee\\s+prev(?:ious)?(?:\\s+edition)?\\b", text)
+  birth_pos <- first_pos("(^|[[:space:],.;])b[[:space:]]+", text)
+  see_pos > 0L & (birth_pos < 0L | birth_pos > see_pos)
+}
 
-fwrite(p_out, file.path(out_root, "us_panel_county_amws_combined_year.csv"))
-cat("wrote", file.path(out_root, "us_panel_county_amws_combined_year.csv"), "\n")
+# ---- 1906/1938/1955: already deduplicated across editions ------------------
+amws_early <- fread(file.path(AMWS_OUTPUT, "amws_combined_us_geocoded.csv"))
+required_early <- c("kept", "birth_year", "geoid")
+missing_early <- setdiff(required_early, names(amws_early))
+if (length(missing_early)) {
+  stop("Missing required columns in AMWS 1906/1938/1955 file: ",
+       paste(missing_early, collapse = ", "))
+}
+
+amws_early_valid <- amws_early[
+  kept_flag(kept) & has_value(birth_year) & has_value(geoid)
+]
+amws_early_valid[, year := suppressWarnings(as.integer(birth_year))]
+amws_early_valid[, GEOID := normalize_geoid(geoid)]
+amws_early_valid <- amws_early_valid[
+  !is.na(year) & year >= 1800L & year <= 1960L & !is.na(GEOID)
+]
+
+amws_early_cy <- amws_early_valid[
+  ,
+  .(n_amws_1906_1955_dedup = .N),
+  by = .(GEOID, year)
+]
+
+# ---- 1986: include valid US-geocoded rows, no cross-edition dedup -----------
+ed16_file <- file.path(
+  AMWS_OUTPUT,
+  "regex_all_docs",
+  "amws_ed16_us_geocoded.csv"
+)
+amws_1986 <- fread(ed16_file)
+required_1986 <- c("birth_year", "geoid", "raw_text_adjusted")
+missing_1986 <- setdiff(required_1986, names(amws_1986))
+if (length(missing_1986)) {
+  stop("Missing required columns in AMWS 1986 file: ",
+       paste(missing_1986, collapse = ", "))
+}
+
+amws_1986[, see_previous_contaminated :=
+            is_see_previous_contaminated(raw_text_adjusted)]
+amws_1986[, year := suppressWarnings(as.integer(birth_year))]
+amws_1986[, GEOID := normalize_geoid(geoid)]
+
+amws_1986_candidate <- amws_1986[
+  has_value(birth_year) & has_value(geoid) &
+    !is.na(year) & year >= 1800L & year <= 1960L & !is.na(GEOID)
+]
+
+amws_1986_excluded <- amws_1986_candidate[see_previous_contaminated == TRUE]
+excluded_file <- file.path(
+  AMWS_OUTPUT,
+  "amws_1986_see_previous_excluded_from_panel.csv"
+)
+fwrite(amws_1986_excluded, excluded_file)
+
+amws_1986_valid <- amws_1986_candidate[see_previous_contaminated != TRUE]
+amws_1986_cy <- amws_1986_valid[
+  ,
+  .(n_amws_1986 = .N),
+  by = .(GEOID, year)
+]
+
+# ---- Annual population panel -----------------------------------------------
+panel <- fread(file.path(out_root, "us_panel_county_stem_year_1800.csv"))
+required_panel <- c(
+  "GEOID", "year", "population", "population_source",
+  "us_births_year", "us_pop_year", "us_birth_rate_year",
+  "county_births_estimate_year", "n_all_wiki"
+)
+missing_panel <- setdiff(required_panel, names(panel))
+if (length(missing_panel)) {
+  stop("Missing required columns in yearly population panel: ",
+       paste(missing_panel, collapse = ", "))
+}
+
+panel[, GEOID := normalize_geoid(GEOID)]
+panel[, year := as.integer(year)]
+panel <- panel[
+  year >= 1800L & year <= 1960L &
+    population_source %in% c("nhgis", "manual", "merged_nyc")
+]
+
+# ---- Merge AMWS counts ------------------------------------------------------
+p_out <- merge(panel, amws_early_cy, by = c("GEOID", "year"), all.x = TRUE)
+p_out <- merge(p_out, amws_1986_cy, by = c("GEOID", "year"), all.x = TRUE)
+p_out[is.na(n_amws_1906_1955_dedup), n_amws_1906_1955_dedup := 0L]
+p_out[is.na(n_amws_1986), n_amws_1986 := 0L]
+p_out[, n_amws := n_amws_1906_1955_dedup + n_amws_1986]
+
+# ---- Derived AMWS outcomes --------------------------------------------------
+p_out[, amws_per_1000_pop := ifelse(
+  population > 0,
+  1000 * n_amws / population,
+  NA_real_
+)]
+p_out[, amws_per_1000_births := ifelse(
+  county_births_estimate_year > 0,
+  1000 * n_amws / county_births_estimate_year,
+  NA_real_
+)]
+p_out[, amws_per_100k := ifelse(
+  population > 0,
+  1e5 * n_amws / population,
+  NA_real_
+)]
+p_out[, log1p_n_amws := log1p(n_amws)]
+p_out[, amws_share_of_notable := ifelse(
+  (n_all_wiki + n_amws) > 0,
+  n_amws / (n_all_wiki + n_amws),
+  NA_real_
+)]
+
+setorder(p_out, GEOID, year)
+
+panel_file <- file.path(out_root, "us_panel_county_amws_combined_year.csv")
+fwrite(p_out, panel_file)
+
+summary_dt <- data.table(
+  metric = c(
+    "panel_rows",
+    "panel_counties",
+    "panel_min_year",
+    "panel_max_year",
+    "panel_rows_with_hyde_population_source",
+    "amws_1906_1955_dedup_valid_rows",
+    "amws_1906_1955_dedup_births_in_panel",
+    "amws_1986_candidate_rows",
+    "amws_1986_excluded_see_previous_rows",
+    "amws_1986_valid_rows",
+    "amws_1986_births_in_panel",
+    "total_amws_births_in_panel",
+    "panel_rows_missing_population",
+    "panel_rows_missing_births_denominator"
+  ),
+  value = as.character(c(
+    nrow(p_out),
+    uniqueN(p_out$GEOID),
+    min(p_out$year),
+    max(p_out$year),
+    p_out[population_source == "hyde", .N],
+    nrow(amws_early_valid),
+    sum(p_out$n_amws_1906_1955_dedup),
+    nrow(amws_1986_candidate),
+    nrow(amws_1986_excluded),
+    nrow(amws_1986_valid),
+    sum(p_out$n_amws_1986),
+    sum(p_out$n_amws),
+    p_out[is.na(population) | population <= 0, .N],
+    p_out[is.na(county_births_estimate_year) |
+            county_births_estimate_year <= 0, .N]
+  ))
+)
+summary_file <- file.path(AMWS_OUTPUT, "amws_consolidated_county_year_summary.csv")
+fwrite(summary_dt, summary_file)
+
+cat("wrote", panel_file, "\n")
+cat("wrote", excluded_file, "\n")
+cat("wrote", summary_file, "\n")
 cat("rows:", nrow(p_out),
     "  counties:", uniqueN(p_out$GEOID),
     "  years:", min(p_out$year), "-", max(p_out$year),
     "  total AMWS births in panel:", sum(p_out$n_amws), "\n")
+cat("AMWS 1906/1938/1955 dedup births in panel:",
+    sum(p_out$n_amws_1906_1955_dedup), "\n")
+cat("AMWS 1986 valid births in panel:", sum(p_out$n_amws_1986), "\n")
+cat("AMWS 1986 excluded see-previous rows:", nrow(amws_1986_excluded), "\n")

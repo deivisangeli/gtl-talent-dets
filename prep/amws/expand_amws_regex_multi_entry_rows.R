@@ -6,8 +6,6 @@ repo_root <- if (length(script_arg)) {
 } else {
   normalizePath(Sys.getenv("GTL_REPO", unset = getwd()), winslash = "/", mustWork = TRUE)
 }
-
-target <- file.path(repo_root, "prep", "amws", "amws_1986", "archive",
-                    "compare_amws_regex_vs_gpt_sample.R")
+target <- file.path(repo_root, "prep", "amws", "amws_1986", "03_expand_multi_entry_rows.R")
 status <- system2("Rscript", c(shQuote(target), args))
 if (!identical(status, 0L)) quit(save = "no", status = as.integer(status))
