@@ -58,6 +58,30 @@ world_fairs_us_amws_profile <- function(
       est_method = "reg",
       plot_estimator_label = "CSDID + log population, ref e=-10"
     ),
+    robust_m30_pop_m10_balanced_oldest_g_shift = list(
+      name = "robust_m30_pop_m10_balanced_oldest_g_shift",
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "g_shift_e_m30_p50_balanced_oldest_logpop_m10"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1840L,
+      # Fairs in 1907--1909 map to the shifted cohort g = 1910.
+      treated_cohort_max = 1910L,
+      treatment_timing = "alternative_decade",
+      event_time_min = -30L,
+      event_time_max = 50L,
+      expected_assigned = c(15L, 15L, 42L, 46L),
+      expected_eligible = c(12L, 12L, 32L, 35L),
+      expected_core_controls = c(1164L, 687L, 1140L, 676L),
+      balance_controls_calendar = TRUE,
+      population_control = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, alternative-decade timing, ref e=-10"
+      )
+    ),
     robust_m30_pop_m10_balanced_oldest_single_fair = list(
       name = "robust_m30_pop_m10_balanced_oldest_single_fair",
       results_subdir = paste0(
@@ -81,7 +105,35 @@ world_fairs_us_amws_profile <- function(
       single_fair_event_window = TRUE,
       est_method = "reg",
       plot_estimator_label = paste0(
-        "CSDID + log population, single fair in e=[-30,+50], ref e=-10"
+        "CSDID + log population, single fair in e=[-30,+50], ",
+        "standard-decade timing, ref e=-10"
+      )
+    ),
+    robust_m30_pop_m10_balanced_oldest_single_fair_g_shift = list(
+      name = "robust_m30_pop_m10_balanced_oldest_single_fair_g_shift",
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "g_shift_e_m30_p50_balanced_oldest_logpop_m10_single_fair"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1840L,
+      treated_cohort_max = 1910L,
+      treatment_timing = "alternative_decade",
+      event_time_min = -30L,
+      event_time_max = 50L,
+      expected_assigned = c(11L, 11L, 29L, 30L),
+      expected_eligible = c(8L, 8L, 21L, 22L),
+      expected_core_controls = c(1164L, 687L, 1140L, 676L),
+      balance_controls_calendar = TRUE,
+      control_sample_source_profile =
+        "robust_m30_pop_m10_balanced_oldest_g_shift",
+      population_control = TRUE,
+      single_fair_event_window = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, single fair in e=[-30,+50], ",
+        "alternative-decade timing, ref e=-10"
       )
     ),
     robust_m30_pop_m10_balanced_oldest_treatment_m20 = list(
@@ -122,6 +174,24 @@ world_fairs_us_amws_profile <- function(
 
 standard_decade <- function(year) {
   as.integer(floor(as.numeric(year) / 10) * 10)
+}
+
+alternative_decade <- function(year) {
+  year <- as.integer(year)
+  standard_decade(year) + dplyr::if_else(
+    !is.na(year) & year %% 10L >= 7L,
+    10L,
+    0L
+  )
+}
+
+event_decade <- function(year, timing = "standard_decade") {
+  if (identical(timing, "standard_decade")) return(standard_decade(year))
+  if (identical(timing, "alternative_decade")) return(alternative_decade(year))
+  stop(
+    "Unknown treatment timing: ", timing,
+    ". Expected standard_decade or alternative_decade."
+  )
 }
 
 pad_geoid <- function(x) {
@@ -274,7 +344,8 @@ empty_exposure <- function(target_dt, audit_name) {
 }
 
 classify_first_exposure <- function(audit, treated_event_year_min, treated_event_year_max,
-                                    classification_year_max, distance = FALSE) {
+                                    classification_year_max, distance = FALSE,
+                                    timing = "standard_decade") {
   always_status <- paste0("always_treated_pre_", treated_event_year_min)
   future_status <- paste0("future_treated_after_", treated_event_year_max)
   first <- audit %>%
@@ -292,7 +363,7 @@ classify_first_exposure <- function(audit, treated_event_year_min, treated_event
       geo_country_iso3,
       GEOID,
       first_exposure_year = year_start,
-      first_exposure_decade = standard_decade(first_exposure_year),
+      first_exposure_decade = event_decade(first_exposure_year, timing),
       first_fair_id = fair_id,
       first_parent_fair_id = parent_fair_id,
       first_venue_seq = venue_seq,
@@ -327,7 +398,8 @@ classify_first_exposure <- function(audit, treated_event_year_min, treated_event
 }
 
 build_host_exposure <- function(targets_sf, venues, treated_event_year_min,
-                                treated_event_year_max, classification_year_max) {
+                                treated_event_year_max, classification_year_max,
+                                timing = "standard_decade") {
   target_dt <- targets_sf %>%
     sf::st_drop_geometry() %>%
     tibble::as_tibble()
@@ -360,7 +432,8 @@ build_host_exposure <- function(targets_sf, venues, treated_event_year_min,
     treated_event_year_min,
     treated_event_year_max,
     classification_year_max,
-    distance = FALSE
+    distance = FALSE,
+    timing = timing
   )
 
   never_units <- target_dt %>%
@@ -380,7 +453,8 @@ build_host_exposure <- function(targets_sf, venues, treated_event_year_min,
 
 build_distance_exposure <- function(targets_sf, venues, bin_breaks, bin_labels,
                                     treated_event_year_min, treated_event_year_max,
-                                    classification_year_max) {
+                                    classification_year_max,
+                                    timing = "standard_decade") {
   target_dt <- targets_sf %>%
     sf::st_drop_geometry() %>%
     tibble::as_tibble()
@@ -426,7 +500,8 @@ build_distance_exposure <- function(targets_sf, venues, bin_breaks, bin_labels,
     treated_event_year_min,
     treated_event_year_max,
     classification_year_max,
-    distance = TRUE
+    distance = TRUE,
+    timing = timing
   )
 
   never_units <- target_dt %>%
@@ -445,7 +520,8 @@ build_distance_exposure <- function(targets_sf, venues, bin_breaks, bin_labels,
 }
 
 build_single_fair_window_eligibility <- function(treated, all_event_audit,
-                                                  event_times) {
+                                                  event_times,
+                                                  timing = "standard_decade") {
   if (nrow(treated) == 0L) {
     return(list(
       audit = treated %>%
@@ -483,7 +559,9 @@ build_single_fair_window_eligibility <- function(treated, all_event_audit,
     )
 
   detail <- all_event_audit %>%
-    dplyr::mutate(fair_event_decade = standard_decade(year_start)) %>%
+    dplyr::mutate(
+      fair_event_decade = event_decade(year_start, timing)
+    ) %>%
     dplyr::inner_join(unit_windows, by = "unit_id") %>%
     dplyr::filter(
       fair_event_decade >= fair_window_start,
@@ -819,7 +897,7 @@ world_fairs_output_dir <- function(results_dir, spec_label,
 
 plot_dynamic_att <- function(data, title, n_events, n_treated_units,
                              n_control_units, event_time_min = -20,
-                             event_time_max = 50) {
+                             event_time_max = 50, y_limits = NULL) {
   plot_data <- data %>%
     dplyr::mutate(
       period = factor(
@@ -857,7 +935,10 @@ plot_dynamic_att <- function(data, title, n_events, n_treated_units,
       colour = NULL,
       title = stringr::str_wrap(title, 72)
     ) +
-    ggplot2::coord_cartesian(xlim = c(event_time_min, event_time_max)) +
+    ggplot2::coord_cartesian(
+      xlim = c(event_time_min, event_time_max),
+      ylim = y_limits
+    ) +
     ggplot2::theme_classic() +
     ggplot2::theme(
       plot.title = ggplot2::element_text(

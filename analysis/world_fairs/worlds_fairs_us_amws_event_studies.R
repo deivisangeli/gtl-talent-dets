@@ -147,6 +147,13 @@ if (reuse_control_sample) {
 }
 est_method <- value_or(profile$est_method, "dr")
 treatment_cohort_shift <- as.integer(value_or(profile$treatment_cohort_shift, 0L))
+treatment_timing <- as.character(value_or(
+  profile$treatment_timing,
+  "standard_decade"
+))
+if (!treatment_timing %in% c("standard_decade", "alternative_decade")) {
+  stop("Unsupported treatment timing: ", treatment_timing)
+}
 single_fair_event_window <- isTRUE(value_or(profile$single_fair_event_window, FALSE))
 support_vars <- outcomes
 if (population_control) support_vars <- unique(c(support_vars, "population"))
@@ -254,19 +261,23 @@ message("Building treatment assignments...")
 exposures <- list(
   hosted = build_host_exposure(
     us_targets, venue_data$all,
-    treated_event_year_min, treated_event_year_max, classification_year_max
+    treated_event_year_min, treated_event_year_max, classification_year_max,
+    timing = treatment_timing
   ),
   hosted_visits_100k = build_host_exposure(
     us_targets, venue_data$visits_100k,
-    treated_event_year_min, treated_event_year_max, classification_year_max
+    treated_event_year_min, treated_event_year_max, classification_year_max,
+    timing = treatment_timing
   ),
   venue_distance = build_distance_exposure(
     us_targets, venue_data$all, bin_breaks, bin_labels,
-    treated_event_year_min, treated_event_year_max, classification_year_max
+    treated_event_year_min, treated_event_year_max, classification_year_max,
+    timing = treatment_timing
   ),
   venue_distance_visits_100k = build_distance_exposure(
     us_targets, venue_data$visits_100k, bin_breaks, bin_labels,
-    treated_event_year_min, treated_event_year_max, classification_year_max
+    treated_event_year_min, treated_event_year_max, classification_year_max,
+    timing = treatment_timing
   )
 )
 
@@ -348,7 +359,8 @@ for (spec_label in names(specifications)) {
       single_fair_eligibility <- build_single_fair_window_eligibility(
         treated_assigned_unfiltered,
         all_event_audit,
-        event_times
+        event_times,
+        timing = treatment_timing
       )
       treated_assigned <- single_fair_eligibility$eligible
       write_csv(
@@ -955,6 +967,7 @@ root_notes <- c(
   ),
   paste0("Event-time window: [", min(event_times), ", ", max(event_times), "]"),
   paste0("Population control: ", population_control, "; estimator: ", est_method),
+  paste0("Treatment timing: ", treatment_timing),
   paste0("Treatment cohort shift from fair decade: ", treatment_cohort_shift),
   paste0("Single-fair requirement within event window: ", single_fair_event_window),
   paste0("Controls balanced over full calendar support: ", balance_controls_calendar),
