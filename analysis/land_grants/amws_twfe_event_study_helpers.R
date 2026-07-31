@@ -7,7 +7,10 @@ twfe_safe_filename <- function(x) {
 }
 
 run_twfe_event_study <- function(data, outcome, timing_name, fe_type,
-                                 window = 70) {
+                                 window = 70,
+                                 min_event_time = -window,
+                                 max_event_time = window,
+                                 reference_event_time = -10L) {
  fe_rhs <- switch(
   fe_type,
   stack_county = "stack_unit_num + decade",
@@ -28,8 +31,8 @@ run_twfe_event_study <- function(data, outcome, timing_name, fe_type,
   dplyr::filter(
    !is.na(y),
    !is.na(event_time),
-   event_time >= -window,
-   event_time <= window
+   event_time >= min_event_time,
+   event_time <= max_event_time
   )
 
  if (dplyr::n_distinct(data_es$treated_twfe) < 2) {
@@ -42,13 +45,14 @@ run_twfe_event_study <- function(data, outcome, timing_name, fe_type,
   ))
  }
 
- if (!(-10 %in% unique(data_es$event_time[data_es$treated_twfe == 1]))) {
+ if (!(reference_event_time %in% unique(data_es$event_time[data_es$treated_twfe == 1]))) {
   return(list(
    ok = FALSE,
    outcome = outcome,
    timing = timing_name,
    fe_type = fe_type,
-   error = "Reference period event_time = -10 is absent for treated units."
+   error = paste0("Reference period event_time = ", reference_event_time,
+                  " is absent for treated units.")
   ))
  }
 
@@ -65,7 +69,8 @@ run_twfe_event_study <- function(data, outcome, timing_name, fe_type,
  tryCatch(
   {
    fml <- stats::as.formula(
-    paste0("y ~ i(event_time, treated_twfe, ref = -10) | ", fe_rhs)
+    paste0("y ~ i(event_time, treated_twfe, ref = ", reference_event_time,
+           ") | ", fe_rhs)
    )
 
    model <- fixest::feols(
@@ -80,6 +85,7 @@ run_twfe_event_study <- function(data, outcome, timing_name, fe_type,
     outcome = outcome,
     timing = timing_name,
     fe_type = fe_type,
+    reference_event_time = as.integer(reference_event_time),
     model = model,
     n_rows = nrow(data_es),
     n_units = dplyr::n_distinct(data_es$stack_unit_num),
@@ -121,7 +127,13 @@ extract_twfe_dynamic <- function(model_result) {
 
  se_col <- intersect(c("Std. Error", "Cluster s.e.", "S.E."), names(ct))[1]
 
- ct %>%
+ ref_e <- if (!is.null(model_result$reference_event_time)) {
+  as.integer(model_result$reference_event_time)
+ } else {
+  -10L
+ }
+
+ estimated <- ct %>%
   tibble::as_tibble() %>%
   dplyr::filter(stringr::str_detect(term, "^event_time::")) %>%
   dplyr::mutate(
@@ -136,12 +148,31 @@ extract_twfe_dynamic <- function(model_result) {
   ) %>%
   dplyr::select(
    outcome, timing, fe_type, event_time, estimate, se, ci_low, ci_high, term
-  ) %>%
+  )
+
+ reference_row <- tibble::tibble(
+  outcome = model_result$outcome,
+  timing = model_result$timing,
+  fe_type = model_result$fe_type,
+  event_time = ref_e,
+  estimate = 0,
+  se = 0,
+  ci_low = 0,
+  ci_high = 0,
+  term = "reference"
+ )
+
+ dplyr::bind_rows(estimated, reference_row) %>%
   dplyr::arrange(outcome, timing, fe_type, event_time)
 }
 
 plot_twfe_dynamic <- function(dynamic_att, outcome, timing_name, fe_type,
-                              title_prefix) {
+                              title_prefix,
+                              n_events = NULL,
+                              n_treated_units = NULL,
+                              n_control_units = NULL,
+                              outcome_labels = NULL,
+                              timing_labels = NULL) {
  data_plot <- dynamic_att %>%
   dplyr::filter(
    outcome == !!outcome,
@@ -163,7 +194,7 @@ plot_twfe_dynamic <- function(dynamic_att, outcome, timing_name, fe_type,
  data_plot <- data_plot %>%
   dplyr::mutate(post = as.factor(as.integer(event_time >= 0)))
 
- ggplot2::ggplot(
+ p <- ggplot2::ggplot(
   data_plot,
   ggplot2::aes(
    x = event_time,
@@ -192,7 +223,19 @@ plot_twfe_dynamic <- function(dynamic_att, outcome, timing_name, fe_type,
    x = "Relative Time",
    y = "Effect",
    title = stringr::str_wrap(
-    paste(title_prefix, "-", outcome, timing_name, fe_type),
+    {
+     outcome_display <- if (!is.null(outcome_labels) && outcome %in% names(outcome_labels)) {
+      outcome_labels[[outcome]]
+     } else {
+      outcome
+     }
+     timing_display <- if (!is.null(timing_labels) && timing_name %in% names(timing_labels)) {
+      timing_labels[[timing_name]]
+     } else {
+      timing_name
+     }
+     paste0(outcome_display, " (", title_prefix, ", ", timing_display, ", ", fe_type, ")")
+    },
     width = 72
    ),
    color = NULL
@@ -218,11 +261,30 @@ plot_twfe_dynamic <- function(dynamic_att, outcome, timing_name, fe_type,
    ),
    legend.position = "bottom"
   )
+
+ if (!is.null(n_events) && !is.null(n_treated_units) && !is.null(n_control_units)) {
+  p <- p + ggplot2::annotate(
+   "label",
+   x = Inf, y = Inf, hjust = 1.05, vjust = 1.05,
+   label = sprintf("Events: %d\nTreated units: %d\nControl units: %d",
+                   n_events, n_treated_units, n_control_units),
+   size = 3, label.padding = ggplot2::unit(0.4, "lines"),
+   label.r = ggplot2::unit(0, "lines")
+  )
+ }
+
+ p
 }
 
-run_and_export_twfe_event_studies <- function(panel_by_timing, outcomes, window,
+run_and_export_twfe_event_studies <- function(panel_by_timing, outcomes,
+                                              window = 70,
+                                              min_event_time = -window,
+                                              max_event_time = window,
+                                              reference_event_time = -10L,
                                               results_subdir_path,
-                                              title_prefix) {
+                                              title_prefix,
+                                              outcome_labels = NULL,
+                                              timing_labels = NULL) {
  fe_types <- c("stack_county", "geoid")
  twfe_results <- list()
 
@@ -240,7 +302,10 @@ run_and_export_twfe_event_studies <- function(panel_by_timing, outcomes, window,
       outcome = outcome,
       timing_name = timing_name,
       fe_type = fe_type,
-      window = window
+      window = window,
+      min_event_time = min_event_time,
+      max_event_time = max_event_time,
+      reference_event_time = reference_event_time
      )
    }
   }
@@ -306,7 +371,12 @@ run_and_export_twfe_event_studies <- function(panel_by_timing, outcomes, window,
    model_result$outcome,
    model_result$timing,
    model_result$fe_type,
-   title_prefix
+   title_prefix,
+   n_events = model_result$n_events,
+   n_treated_units = model_result$n_treated_units,
+   n_control_units = model_result$n_control_units,
+   outcome_labels = outcome_labels,
+   timing_labels = timing_labels
   )
 
   ggplot2::ggsave(

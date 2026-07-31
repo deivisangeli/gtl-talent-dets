@@ -321,12 +321,12 @@ treated_units <- event_lookup %>%
  )
 
 runner_unresolved_rows <- pairs_long %>%
- filter(runner_up_match_status != "matched_same_state") %>%
+ filter(!runner_up_match_status %in% c("matched_same_state", "matched_cross_state")) %>%
  distinct(college, experiment_year, runner_up_county, runner_up_state_assumed,
           runner_up_match_status)
 
 runner_units <- pairs_long %>%
- filter(runner_up_match_status == "matched_same_state") %>%
+ filter(runner_up_match_status %in% c("matched_same_state", "matched_cross_state")) %>%
  left_join(
   event_lookup,
   by = c("college", "experiment_year", "college_type",

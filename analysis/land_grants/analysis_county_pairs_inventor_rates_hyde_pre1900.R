@@ -196,12 +196,12 @@ treated_events <- events_pre1900 %>%
  left_join(lookup, by = c("county_norm", "state_abbr"))
 
 runner_unresolved_rows <- events_pre1900 %>%
- filter(runner_up_match_status != "matched_same_state") %>%
+ filter(!runner_up_match_status %in% c("matched_same_state", "matched_cross_state")) %>%
  distinct(college, experiment_year, runner_up_county, runner_up_state_assumed,
           runner_up_match_status)
 
 runner_counties <- events_pre1900 %>%
- filter(runner_up_match_status == "matched_same_state") %>%
+ filter(runner_up_match_status %in% c("matched_same_state", "matched_cross_state")) %>%
  distinct(runner_up_county, runner_up_state_assumed) %>%
  left_join(state_lookup, by = c("runner_up_state_assumed" = "state")) %>%
  mutate(county_norm = normalize_county(runner_up_county)) %>%

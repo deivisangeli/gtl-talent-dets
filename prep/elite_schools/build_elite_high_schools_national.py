@@ -17,6 +17,7 @@ ADDITIONS          = SCHOOLS_INPUT  / "elite_high_schools_revision_additions.csv
 REVISION_DECISIONS = SCHOOLS_INPUT  / "elite_high_schools_revision_decisions.csv"
 REVISION_QUEUE     = SCHOOLS_INPUT  / "elite_high_schools_revision_queue.csv"
 STATE_BATCHES      = SCHOOLS_INPUT  / "elite_high_schools_state_review_batches.csv"
+COUNTY_OVERRIDES   = SCHOOLS_INPUT  / "elite_high_schools_founding_county_overrides.csv"
 COUNTIES           = DATA_OUTPUT    / "national_county2020.txt"
 COUNTY_PANEL       = DATA_OUTPUT    / "us_panel_county.csv"
 OUT_SCHOOLS        = SCHOOLS_OUTPUT / "elite_high_schools_national_1800_1930.csv"
@@ -241,6 +242,96 @@ def norm_text(series: pd.Series) -> pd.Series:
         .str.lower()
         .str.replace(r"\s+", " ", regex=True)
     )
+
+
+def apply_founding_county_overrides(base: pd.DataFrame) -> pd.DataFrame:
+    """Attach audited founding geography without modifying the manual inputs."""
+    if not COUNTY_OVERRIDES.exists():
+        raise FileNotFoundError(f"Required founding-county overrides file not found: {COUNTY_OVERRIDES}")
+
+    overrides = pd.read_csv(COUNTY_OVERRIDES, dtype=str).fillna("")
+    required = {
+        "school_state_abbr", "school", "audit_status", "apply_geography_override",
+        "founding_state_abbr", "founding_city", "founding_county_name",
+        "expected_founding_county_geoid", "core_action", "correction_reason",
+        "primary_source_url", "secondary_source_url",
+    }
+    missing = required - set(overrides.columns)
+    if missing:
+        raise ValueError(f"Founding-county overrides missing columns: {sorted(missing)}")
+
+    overrides = overrides.rename(columns={"school_state_abbr": "state_abbr"})
+    duplicate_mask = overrides.duplicated(subset=["state_abbr", "school"], keep=False)
+    if duplicate_mask.any():
+        raise ValueError(
+            "Duplicate founding-county override keys:\n"
+            + overrides.loc[duplicate_mask, ["state_abbr", "school"]].to_string(index=False)
+        )
+
+    valid_status = {"correction_required", "ambiguous", "insufficient_evidence"}
+    bad_status = sorted(set(overrides["audit_status"]) - valid_status)
+    if bad_status:
+        raise ValueError(f"Unexpected founding-county audit statuses: {bad_status}")
+    if not set(overrides["apply_geography_override"]).issubset({"yes", "no"}):
+        raise ValueError("apply_geography_override must be yes/no")
+    if not set(overrides["core_action"]).issubset({"keep", "exclude_from_core"}):
+        raise ValueError("core_action must be keep/exclude_from_core")
+
+    base_keys = set(zip(base["state_abbr"], base["school"]))
+    override_keys = set(zip(overrides["state_abbr"], overrides["school"]))
+    unmatched = sorted(override_keys - base_keys)
+    if unmatched:
+        raise ValueError(f"Founding-county overrides do not match school inputs: {unmatched}")
+
+    out = base.copy()
+    out["school_state_abbr"] = out["state_abbr"]
+    out["school_city"] = out["city"]
+    out["school_county_name"] = out["county_name"]
+    out["founding_state_abbr"] = out["state_abbr"]
+    out["founding_city"] = out["city"]
+    out["founding_county_name"] = out["county_name"]
+    out["founding_geo_audit_status"] = "confirmed"
+    out["founding_geo_core_action"] = "keep"
+    out["founding_geo_correction_reason"] = ""
+    out["founding_geo_primary_source_url"] = ""
+    out["founding_geo_secondary_source_url"] = ""
+    out["expected_founding_county_geoid"] = ""
+
+    override_cols = [
+        "state_abbr", "school", "audit_status", "apply_geography_override",
+        "founding_state_abbr", "founding_city", "founding_county_name",
+        "expected_founding_county_geoid", "core_action", "correction_reason",
+        "primary_source_url", "secondary_source_url",
+    ]
+    renamed = overrides.loc[:, override_cols].rename(
+        columns={c: f"override_{c}" for c in override_cols if c not in {"state_abbr", "school"}}
+    )
+    out = out.merge(renamed, on=["state_abbr", "school"], how="left")
+
+    audited = out["override_audit_status"].fillna("").ne("")
+    audit_mappings = {
+        "override_audit_status": "founding_geo_audit_status",
+        "override_core_action": "founding_geo_core_action",
+        "override_correction_reason": "founding_geo_correction_reason",
+        "override_primary_source_url": "founding_geo_primary_source_url",
+        "override_secondary_source_url": "founding_geo_secondary_source_url",
+        "override_expected_founding_county_geoid": "expected_founding_county_geoid",
+    }
+    for source, target in audit_mappings.items():
+        out.loc[audited, target] = out.loc[audited, source]
+
+    apply_geo = out["override_apply_geography_override"].fillna("").eq("yes")
+    required_geo = [
+        "override_founding_state_abbr", "override_founding_city",
+        "override_founding_county_name", "override_expected_founding_county_geoid",
+    ]
+    if out.loc[apply_geo, required_geo].eq("").any(axis=None):
+        raise ValueError("Applied founding-county overrides must provide complete geography and expected GEOID")
+    out.loc[apply_geo, "founding_state_abbr"] = out.loc[apply_geo, "override_founding_state_abbr"]
+    out.loc[apply_geo, "founding_city"] = out.loc[apply_geo, "override_founding_city"]
+    out.loc[apply_geo, "founding_county_name"] = out.loc[apply_geo, "override_founding_county_name"]
+
+    return out.drop(columns=[c for c in out.columns if c.startswith("override_")])
 
 
 def derive_current_admission_code(row: pd.Series) -> str:
@@ -707,6 +798,8 @@ def main() -> None:
         dupes = base.loc[duplicate_mask, ["state", "state_abbr", "school", "city"]]
         raise ValueError(f"Duplicate school rows in combined manual inputs:\n{dupes.to_string(index=False)}")
 
+    base = apply_founding_county_overrides(base)
+
     counties = pd.read_csv(COUNTIES, sep="|", dtype=str).fillna("")
     panel = pd.read_csv(COUNTY_PANEL, dtype={"GEOID": str})
 
@@ -717,23 +810,41 @@ def main() -> None:
     )
 
     counties["county_name_norm"] = norm_text(counties["COUNTYNAME"])
-    base["county_name_norm"] = norm_text(base["county_name"])
+    base["founding_county_name_norm"] = norm_text(base["founding_county_name"])
 
     merged = base.merge(
         counties.loc[:, ["STATE", "STATEFP", "COUNTYFP", "COUNTYNAME", "county_name_norm"]],
-        left_on=["state_abbr", "county_name_norm"],
+        left_on=["founding_state_abbr", "founding_county_name_norm"],
         right_on=["STATE", "county_name_norm"],
         how="left",
     )
 
-    missing = merged.loc[merged["STATEFP"].eq(""), ["state", "state_abbr", "school", "county_name"]]
+    missing = merged.loc[
+        merged["STATEFP"].eq(""),
+        ["state", "state_abbr", "school", "founding_state_abbr", "founding_county_name"],
+    ]
     if not missing.empty:
         raise ValueError(f"Unmatched counties:\n{missing.to_string(index=False)}")
 
-    merged["county_geoid"] = merged["STATEFP"] + merged["COUNTYFP"]
+    merged["founding_county_geoid"] = merged["STATEFP"] + merged["COUNTYFP"]
+    expected_mask = merged["expected_founding_county_geoid"].ne("")
+    geoid_mismatch = expected_mask & merged["founding_county_geoid"].ne(
+        merged["expected_founding_county_geoid"]
+    )
+    if geoid_mismatch.any():
+        bad = merged.loc[
+            geoid_mismatch,
+            ["state_abbr", "school", "founding_county_geoid", "expected_founding_county_geoid"],
+        ]
+        raise ValueError(f"Founding-county GEOID validation failed:\n{bad.to_string(index=False)}")
+    # Backward-compatible treatment key used by existing analysis scripts.
+    merged["county_geoid"] = merged["founding_county_geoid"]
     merged = merged.merge(county_centroids, left_on="county_geoid", right_on="GEOID", how="left")
 
-    merged = merged.drop(columns=["STATE", "STATEFP", "COUNTYFP", "COUNTYNAME", "county_name_norm", "GEOID"])
+    merged = merged.drop(columns=[
+        "STATE", "STATEFP", "COUNTYFP", "COUNTYNAME", "county_name_norm",
+        "founding_county_name_norm", "GEOID",
+    ])
 
     merged["admission_selectivity_current"] = merged.apply(derive_current_admission_code, axis=1)
     merged["test_based_admissions_current"] = merged["admission_selectivity_current"].map(derive_test_based)
@@ -845,6 +956,21 @@ def main() -> None:
                 merged[override] = merged[override].fillna("")
                 merged[col] = merged[override].where(merged[override].ne(""), merged[col])
                 merged = merged.drop(columns=[override])
+
+    exclude_uncertain_geo = merged["founding_geo_core_action"].eq("exclude_from_core")
+    merged.loc[exclude_uncertain_geo, "sample_role"] = "robustness_only"
+    merged.loc[exclude_uncertain_geo, "include_in_core_sample"] = "no"
+    merged.loc[exclude_uncertain_geo, "lineage_risk"] = "high"
+    geo_note = "Excluded from core pending adjudication of founding year/lineage and founding geography."
+    merged.loc[exclude_uncertain_geo, "revision_note"] = merged.loc[
+        exclude_uncertain_geo, "revision_note"
+    ].map(lambda x: f"{x} {geo_note}".strip())
+
+    # Recompute aliases after revision decisions and geography exclusions.
+    merged["proper_elite_school"] = merged["include_in_core_sample"]
+    merged["elite_tier"] = merged["sample_role"].map(
+        lambda x: "core" if x in {"core", "core_with_caution"} else "extended"
+    )
 
     merged["review_batch"] = merged["review_batch"].fillna("").replace("", "unassigned")
     merged["review_theme"] = merged["review_theme"].fillna("").replace("", "No targeted revision batch yet")

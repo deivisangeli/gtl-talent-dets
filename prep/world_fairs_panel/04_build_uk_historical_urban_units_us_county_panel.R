@@ -61,14 +61,21 @@ if (!dir.exists(TALENT_DETS_DATA_DIR)) {
 DATA_PROCESSED <- file.path(TALENT_DETS_DATA_DIR, "Data", "processed")
 dir.create(DATA_PROCESSED, recursive = TRUE, showWarnings = FALSE)
 
-uk_file <- file.path(
-  DATA_PROCESSED,
+uk_filename <-
   "uk_historical_urban_units_inventor_panel_1801_1960_census_population.csv"
+us_filename <- "us_county_inventor_panel_1800_1960_census_population.csv"
+uk_file_candidates <- c(
+  file.path(DATA_PROCESSED, uk_filename),
+  file.path(DATA_PROCESSED, "worlds_fairs", uk_filename)
 )
-us_file <- file.path(
-  DATA_PROCESSED,
-  "us_county_inventor_panel_1800_1960_census_population.csv"
+us_file_candidates <- c(
+  file.path(DATA_PROCESSED, us_filename),
+  file.path(DATA_PROCESSED, "worlds_fairs", us_filename)
 )
+uk_file <- uk_file_candidates[file.exists(uk_file_candidates)][1L]
+us_file <- us_file_candidates[file.exists(us_file_candidates)][1L]
+if (is.na(uk_file)) uk_file <- uk_file_candidates[[1L]]
+if (is.na(us_file)) us_file <- us_file_candidates[[1L]]
 county_population_file <- file.path(DATA_OUTPUT, "county_population.csv")
 out_file <- file.path(
   DATA_PROCESSED,
@@ -85,6 +92,19 @@ if (length(missing_files) > 0L) {
   stop("Missing required files:\n", paste(missing_files, collapse = "\n"))
 }
 
+occupation_panel_cols <- c(
+  "population_implied_1801",
+  "agri_share_1801", "trade_share_1801", "other_share_1801",
+  "occupation_share_coverage_1801", "population_density_1801",
+  "population_density_area_coverage_1801"
+)
+swing_population_panel_cols <- c(
+  "population_knot", "population_knot_available",
+  "population_swing_implied", "population_swing_used",
+  "population_swing_geometry_coverage", "population_swing_density_coverage",
+  "population_swing_growth_outlier", "population_swing_exclusion_reason"
+)
+
 ###############################################################################
 # Helpers
 ###############################################################################
@@ -99,6 +119,54 @@ add_missing_columns <- function(data, all_cols) {
 }
 
 summarise_panel <- function(data, panel_name, nhgis_only_us_filter) {
+  has_occupation_shares <- all(occupation_panel_cols %chin% names(data))
+  occupation_rows <- if (has_occupation_shares) {
+    sum(!is.na(data$agri_share_1801))
+  } else {
+    0L
+  }
+  occupation_units <- if (has_occupation_shares) {
+    uniqueN(data$unit_id[!is.na(data$agri_share_1801)])
+  } else {
+    0L
+  }
+  mean_occupation_coverage <- if (
+    has_occupation_shares &&
+      any(!is.na(data$occupation_share_coverage_1801))
+  ) {
+    mean(data$occupation_share_coverage_1801, na.rm = TRUE)
+  } else {
+    NA_real_
+  }
+  density_rows <- if (has_occupation_shares) {
+    sum(!is.na(data$population_density_1801))
+  } else {
+    0L
+  }
+  density_units <- if (has_occupation_shares) {
+    uniqueN(data$unit_id[!is.na(data$population_density_1801)])
+  } else {
+    0L
+  }
+  mean_density_area_coverage <- if (
+    has_occupation_shares &&
+      any(!is.na(data$population_density_area_coverage_1801))
+  ) {
+    mean(data$population_density_area_coverage_1801, na.rm = TRUE)
+  } else {
+    NA_real_
+  }
+  swing_rows <- if ("population_swing_used" %chin% names(data)) {
+    sum(data$population_swing_used == TRUE, na.rm = TRUE)
+  } else {
+    0L
+  }
+  swing_units <- if ("population_swing_used" %chin% names(data)) {
+    uniqueN(data$unit_id[data$population_swing_used == TRUE])
+  } else {
+    0L
+  }
+
   data.table(
     panel = panel_name,
     rows = nrow(data),
@@ -109,7 +177,15 @@ summarise_panel <- function(data, panel_name, nhgis_only_us_filter) {
     missing_population = sum(is.na(data$population)),
     zero_population = sum(data$population == 0, na.rm = TRUE),
     total_inventors = sum(data$n_inventors, na.rm = TRUE),
-    total_stem = sum(data$n_stem, na.rm = TRUE)
+    total_stem = sum(data$n_stem, na.rm = TRUE),
+    occupation_share_rows_1801 = occupation_rows,
+    occupation_share_units_1801 = occupation_units,
+    mean_occupation_share_coverage_1801 = mean_occupation_coverage,
+    population_density_rows_1801 = density_rows,
+    population_density_units_1801 = density_units,
+    mean_population_density_area_coverage_1801 = mean_density_area_coverage,
+    swing_population_knots_used = swing_rows,
+    units_using_swing_population = swing_units
   )
 }
 
@@ -254,6 +330,20 @@ if (length(missing_uk) > 0L) {
 if (length(missing_us) > 0L) {
   stop("Missing required US columns:\n", paste(missing_us, collapse = "\n"))
 }
+missing_occupation_uk <- setdiff(occupation_panel_cols, names(uk))
+if (length(missing_occupation_uk) > 0L) {
+  stop(
+    "UK panel is missing 1801 occupation-share columns:\n",
+    paste(missing_occupation_uk, collapse = "\n")
+  )
+}
+missing_swing_population_uk <- setdiff(swing_population_panel_cols, names(uk))
+if (length(missing_swing_population_uk) > 0L) {
+  stop(
+    "UK panel is missing Swing population columns:\n",
+    paste(missing_swing_population_uk, collapse = "\n")
+  )
+}
 
 uk[, year := as.integer(year)]
 us[, year := as.integer(year)]
@@ -343,6 +433,92 @@ if (any(combined$population < 0, na.rm = TRUE)) {
   stop("Negative population found.")
 }
 
+uk_share_missing_count <- uk[, rowSums(is.na(.SD)),
+                             .SDcols = c(
+                               "agri_share_1801", "trade_share_1801",
+                               "other_share_1801"
+                             )]
+if (any(!uk_share_missing_count %in% c(0L, 3L))) {
+  stop("UK occupation shares must be jointly observed or jointly missing.")
+}
+if (uk[
+      !is.na(agri_share_1801),
+      any(
+        agri_share_1801 < 0 | agri_share_1801 > 1 |
+          trade_share_1801 < 0 | trade_share_1801 > 1 |
+          other_share_1801 < 0 | other_share_1801 > 1 |
+          abs(agri_share_1801 + trade_share_1801 + other_share_1801 - 1) > 1e-6
+      )
+    ]) {
+  stop("Invalid UK 1801 occupation shares in the combined-panel input.")
+}
+if (uk[
+      !is.na(occupation_share_coverage_1801),
+      any(occupation_share_coverage_1801 < 0 |
+          occupation_share_coverage_1801 > 1 + 1e-6)
+    ]) {
+  stop("UK occupation-share coverage must lie in [0, 1].")
+}
+if (uk[
+      !is.na(population_implied_1801),
+      any(!is.finite(population_implied_1801) | population_implied_1801 <= 0)
+    ]) {
+  stop("UK implied 1801 population must be finite and positive.")
+}
+if (uk[
+      !is.na(population_density_1801),
+      any(!is.finite(population_density_1801) | population_density_1801 < 0)
+    ]) {
+  stop("UK 1801 population density must be finite and non-negative.")
+}
+if (uk[
+      !is.na(population_density_area_coverage_1801),
+      any(population_density_area_coverage_1801 < 0 |
+          population_density_area_coverage_1801 > 1 + 1e-6)
+    ]) {
+  stop("UK population-density area coverage must lie in [0, 1].")
+}
+occupation_static_check <- uk[, lapply(.SD, uniqueN),
+                              by = unit_id,
+                              .SDcols = occupation_panel_cols]
+if (occupation_static_check[
+      , any(unlist(.SD, use.names = FALSE) != 1L),
+      .SDcols = occupation_panel_cols
+    ]) {
+  stop("UK 1801 demographic columns are not time invariant by unit.")
+}
+if (combined[
+      iso3 == "USA",
+      any(!is.na(population_implied_1801) |
+          !is.na(agri_share_1801) |
+          !is.na(trade_share_1801) |
+          !is.na(other_share_1801) |
+          !is.na(occupation_share_coverage_1801) |
+          !is.na(population_density_1801) |
+          !is.na(population_density_area_coverage_1801))
+    ]) {
+  stop("US rows must have missing UK-only 1801 demographic variables.")
+}
+if (combined[
+      iso3 == "USA",
+      any(!is.na(population_swing_implied) |
+          !is.na(population_swing_geometry_coverage) |
+          !is.na(population_swing_density_coverage) |
+          !is.na(population_swing_growth_outlier) |
+          !is.na(population_swing_exclusion_reason))
+    ]) {
+  stop("US rows must have missing UK-only Swing population fields.")
+}
+if (uk[
+      population_swing_used == TRUE,
+      any(is.na(population_swing_implied) |
+          population_swing_growth_outlier == TRUE |
+          population_swing_geometry_coverage < 0.95 |
+          population_swing_density_coverage < 0.95)
+    ]) {
+  stop("UK panel contains an invalid used Swing population knot.")
+}
+
 ###############################################################################
 # QC and write
 ###############################################################################
@@ -361,7 +537,33 @@ qc_by_type <- combined[, .(
   missing_population = sum(is.na(population)),
   zero_population = sum(population == 0, na.rm = TRUE),
   total_inventors = sum(n_inventors, na.rm = TRUE),
-  total_stem = sum(n_stem, na.rm = TRUE)
+  total_stem = sum(n_stem, na.rm = TRUE),
+  occupation_share_rows_1801 = sum(!is.na(agri_share_1801)),
+  occupation_share_units_1801 = uniqueN(unit_id[!is.na(agri_share_1801)]),
+  mean_occupation_share_coverage_1801 = if (
+    any(!is.na(occupation_share_coverage_1801))
+  ) {
+    mean(occupation_share_coverage_1801, na.rm = TRUE)
+  } else {
+    NA_real_
+  },
+  population_density_rows_1801 = sum(!is.na(population_density_1801)),
+  population_density_units_1801 = uniqueN(
+    unit_id[!is.na(population_density_1801)]
+  ),
+  mean_population_density_area_coverage_1801 = if (
+    any(!is.na(population_density_area_coverage_1801))
+  ) {
+    mean(population_density_area_coverage_1801, na.rm = TRUE)
+  } else {
+    NA_real_
+  },
+  swing_population_knots_used = sum(
+    population_swing_used == TRUE, na.rm = TRUE
+  ),
+  units_using_swing_population = uniqueN(
+    unit_id[population_swing_used == TRUE]
+  )
 ), by = .(iso3, unit_type)][order(iso3, unit_type)]
 
 qc <- rbindlist(list(
@@ -376,7 +578,15 @@ qc <- rbindlist(list(
     missing_population,
     zero_population,
     total_inventors,
-    total_stem
+    total_stem,
+    occupation_share_rows_1801,
+    occupation_share_units_1801,
+    mean_occupation_share_coverage_1801,
+    population_density_rows_1801,
+    population_density_units_1801,
+    mean_population_density_area_coverage_1801,
+    swing_population_knots_used,
+    units_using_swing_population
   )]
 ), use.names = TRUE)
 

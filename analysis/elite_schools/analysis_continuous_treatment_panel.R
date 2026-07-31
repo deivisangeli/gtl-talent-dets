@@ -28,6 +28,8 @@ if (length(file_arg) > 0) {
   repo_root <- if (basename(cwd) == "analysis") dirname(cwd) else if (basename(dirname(cwd)) == "analysis") dirname(dirname(cwd)) else cwd
 }
 source(file.path(repo_root, "paths.R"))
+source(file.path(repo_root, "analysis", "elite_schools", "amws_timing_helpers.R"))
+timing <- elite_timing_config()
 
 # ---- Load school list + enrollment v2 --------------------------------------
 s <- fread(file.path(SCHOOLS_OUTPUT, "elite_high_schools_core_1800_1930.csv"))
@@ -45,8 +47,8 @@ print(hi[, .(school, GEOID, founding_year_used,
 
 # ---- Build school-level capacity by year ----------------------------------
 # For each school s and each year t, capacity_s(t).
-cap_for_school <- function(t, founding, y10, y20, y30) {
-  age <- t - founding
+cap_for_school <- function(t, treatment_start, y10, y20, y30) {
+  age <- t - treatment_start
   out <- rep(0, length(age))
   # piecewise linear
   out[age <= 0] <- 0
@@ -72,8 +74,9 @@ cap_for_school <- function(t, founding, y10, y20, y30) {
 years <- 1840:1930
 school_caps <- rbindlist(lapply(seq_len(nrow(hi)), function(i) {
   r <- hi[i]
+  treatment_start <- elite_event_year(r$founding_year_used, timing)
   data.table(GEOID = r$GEOID, school = r$school, year = years,
-             cap = cap_for_school(years, r$founding_year_used,
+             cap = cap_for_school(years, treatment_start,
                                   r$year10_seats, r$year20_seats, r$year30_seats))
 }))
 # Sum across schools per county-year
@@ -102,7 +105,9 @@ OUTCOMES <- c("n_amws", "amws_per_1000_pop", "amws_per_1000_births",
               "n_stem", "stem_per_1000_pop", "stem_per_1000_births",
               "population")
 
-out_dir <- file.path(TALENT_DETS_DATA_DIR, "results", "elite_schools", "continuous_treatment_panel")
+out_dir <- elite_results_dir(
+  TALENT_DETS_DATA_DIR, "continuous_treatment_panel", timing
+)
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 estimates <- list()
@@ -123,9 +128,8 @@ for (oc in OUTCOMES) {
               ct$`t value`, mean(d[[oc]]), nrow(d)))
 }
 all_est <- rbindlist(estimates, fill = TRUE)
-fwrite(all_est, file.path(out_dir, "continuous_treatment_estimates.csv"))
-
 # Per-1000-seat scaled effect for interpretation
 all_est[, beta_per_1000_seats := Estimate * 1000]
+all_est[, `:=`(timing_mode = timing$mode, school_age = timing$school_age)]
 fwrite(all_est, file.path(out_dir, "continuous_treatment_estimates.csv"))
 cat("\nwrote", file.path(out_dir, "continuous_treatment_estimates.csv"), "\n")

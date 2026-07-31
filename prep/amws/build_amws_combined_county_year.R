@@ -33,7 +33,8 @@ normalize_geoid <- function(x) {
 }
 
 has_value <- function(x) {
-  !is.na(x) & trimws(as.character(x)) != ""
+  x <- trimws(as.character(x))
+  !is.na(x) & x != "" & !toupper(x) %in% c("NA", "N/A")
 }
 
 kept_flag <- function(x) {
@@ -84,12 +85,15 @@ amws_early_cy <- amws_early_valid[
 
 # ---- 1986: include valid US-geocoded rows, no cross-edition dedup -----------
 ed16_file <- file.path(
-  AMWS_OUTPUT,
-  "regex_all_docs",
-  "amws_ed16_us_geocoded.csv"
+  TALENT_DETS_DATA_DIR,
+  "Data",
+  "processed",
+  "amws",
+  "amws_ed86_final.csv"
 )
+if (!file.exists(ed16_file)) stop("Missing AMWS 1986 source file: ", ed16_file)
 amws_1986 <- fread(ed16_file)
-required_1986 <- c("birth_year", "geoid", "raw_text_adjusted")
+required_1986 <- c("birth_year", "birth_country", "geo_geoid", "raw_text_adjusted")
 missing_1986 <- setdiff(required_1986, names(amws_1986))
 if (length(missing_1986)) {
   stop("Missing required columns in AMWS 1986 file: ",
@@ -99,10 +103,11 @@ if (length(missing_1986)) {
 amws_1986[, see_previous_contaminated :=
             is_see_previous_contaminated(raw_text_adjusted)]
 amws_1986[, year := suppressWarnings(as.integer(birth_year))]
-amws_1986[, GEOID := normalize_geoid(geoid)]
+amws_1986[, GEOID := normalize_geoid(geo_geoid)]
 
 amws_1986_candidate <- amws_1986[
-  has_value(birth_year) & has_value(geoid) &
+  birth_country == "USA" &
+    has_value(birth_year) & has_value(geo_geoid) &
     !is.na(year) & year >= 1800L & year <= 1960L & !is.na(GEOID)
 ]
 
@@ -146,6 +151,9 @@ p_out <- merge(p_out, amws_1986_cy, by = c("GEOID", "year"), all.x = TRUE)
 p_out[is.na(n_amws_1906_1955_dedup), n_amws_1906_1955_dedup := 0L]
 p_out[is.na(n_amws_1986), n_amws_1986 := 0L]
 p_out[, n_amws := n_amws_1906_1955_dedup + n_amws_1986]
+if (p_out[, any(n_amws != n_amws_1906_1955_dedup + n_amws_1986)]) {
+  stop("AMWS component counts do not reconcile")
+}
 
 # ---- Derived AMWS outcomes --------------------------------------------------
 p_out[, amws_per_1000_pop := ifelse(
@@ -177,6 +185,10 @@ fwrite(p_out, panel_file)
 
 summary_dt <- data.table(
   metric = c(
+    "amws_1986_source_file",
+    "amws_1986_source_mtime",
+    "amws_early_dedup_scope",
+    "amws_combination_rule",
     "panel_rows",
     "panel_counties",
     "panel_min_year",
@@ -193,6 +205,10 @@ summary_dt <- data.table(
     "panel_rows_missing_births_denominator"
   ),
   value = as.character(c(
+    basename(ed16_file),
+    format(file.info(ed16_file)$mtime, "%Y-%m-%d %H:%M:%S %Z"),
+    "1906+1938+1955 only; keep earliest matched appearance",
+    "n_amws = n_amws_1906_1955_dedup + n_amws_1986; no cross-dedup with 1986",
     nrow(p_out),
     uniqueN(p_out$GEOID),
     min(p_out$year),

@@ -2,11 +2,25 @@
 # Project: GTL Talent Determinants
 # Goal: Build Andrews college site-selection county-pairs workbook
 #
-# Input:
-#   raw/andrews_2023_appendix_table_a1.xlsx
+# Inputs:
+#   raw/andrews_2023_appendix_table_a1.xlsx        (event list = published Table A1)
+#   Data/raw/land_grants/College_Control_Towns.csv (Andrews 2023 replication package)
 #
 # Output:
 #   raw/andrews_2023_county_pairs_long.xlsx
+#
+# Design (hybrid):
+#   The set of experiments (winners) and the runner-up membership come from the
+#   published Appendix Table A1 (63 high-quality experiments; each county appears
+#   as a college OR a runner-up exactly once -- Andrews 2023, footnote 12). We do
+#   NOT rebuild the sample from the replication file, which is a broader working
+#   set (would yield 65+ in-window experiments and reintroduce counties Andrews
+#   deliberately de-duplicated).
+#
+#   Geocoding is taken from the replication file's real town-level State/Latitude/
+#   Longitude, replacing the previous "assume runner-up is in the college's state"
+#   rule. This resolves genuinely cross-state runner-ups (e.g. Lincoln College's
+#   Warrick County, Indiana) instead of dropping them.
 #
 # The output path intentionally keeps the historical "county_pairs" filename
 # because AMWS and land_grants analysis scripts already consume it.
@@ -47,14 +61,8 @@ source(file.path(repo_root, "prep", "raw_paths.R"))
 
 source_workbook <- raw_file_path("andrews_2023_appendix_table_a1.xlsx")
 source_sheet <- "table_a1"
+replication_file <- file.path(require_det_dir(), "Data", "raw", "land_grants", "College_Control_Towns.csv")
 output_workbook <- raw_file_path("andrews_2023_county_pairs_long.xlsx")
-
-gazetteer_url <- paste0(
-  "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/",
-  "2025_Gazetteer/2025_Gaz_counties_national.zip"
-)
-gazetteer_zip <- raw_file_path("2025_Gaz_counties_national.zip")
-gazetteer_file <- raw_file_path("2025_Gaz_counties_national.txt")
 
 ###############################################################################
 # Helpers
@@ -75,93 +83,106 @@ normalize_county <- function(x) {
     str_squish()
 }
 
-ensure_county_gazetteer <- function() {
-  if (file.exists(gazetteer_file)) {
-    return(invisible(gazetteer_file))
-  }
-
-  message("Downloading Census county gazetteer: ", gazetteer_url)
-  download.file(gazetteer_url, gazetteer_zip, mode = "wb", quiet = FALSE)
-  utils::unzip(gazetteer_zip, files = basename(gazetteer_file), exdir = dirname(gazetteer_file), overwrite = TRUE)
-
-  if (!file.exists(gazetteer_file)) {
-    stop("County gazetteer download/unzip failed: ", gazetteer_file)
-  }
-
-  invisible(gazetteer_file)
-}
-
-state_lookup <- tibble(
-  state = c(state.name, "District of Columbia"),
-  state_abbr = c(state.abb, "DC")
-)
-
 ###############################################################################
-# Load source and gazetteer
+# Load Table A1 (event list) and Andrews replication file (geocoding)
 ###############################################################################
 
 if (!file.exists(source_workbook)) {
   stop("Missing Andrews appendix workbook: ", source_workbook)
 }
-
-ensure_county_gazetteer()
+if (!file.exists(replication_file)) {
+  stop("Missing Andrews replication file: ", replication_file)
+}
 
 appendix <- readxl::read_excel(source_workbook, sheet = source_sheet) %>%
   mutate(
     row_id = row_number(),
     across(c(college, county, state, runner_up_counties, college_type), as.character),
-    experiment_year = as.integer(experiment_year)
+    experiment_year = as.integer(experiment_year),
+    selected_county_norm = normalize_county(county)
   )
 
-gazetteer <- readr::read_delim(gazetteer_file, delim = "|", show_col_types = FALSE, trim_ws = TRUE) %>%
+replication <- readr::read_csv(replication_file, show_col_types = FALSE) %>%
   transmute(
-    state_abbr = USPS,
-    county_norm = normalize_county(NAME),
-    lat = as.numeric(INTPTLAT),
-    lon = as.numeric(INTPTLONG)
+    experiment = as.character(Experiment),
+    county = as.character(County),
+    state = as.character(State),
+    county_norm = normalize_county(County),
+    treatment = suppressWarnings(as.integer(Treatment)),
+    year = suppressWarnings(as.integer(Year_Experiment)),
+    lat = suppressWarnings(as.numeric(Latitude)),
+    lon = suppressWarnings(as.numeric(Longitude))
   )
 
 ###############################################################################
-# Build long county-pairs table
+# Match each Table A1 experiment (winner) to a replication experiment id
+# Key = normalized county + state + experiment year (year disambiguates the
+# many counties that host more than one experiment, e.g. El Paso/CO hosts both
+# Colorado College 1874 and the US Air Force Academy 1954).
 ###############################################################################
 
-selected_coords <- appendix %>%
-  distinct(row_id, selected_county = county, selected_state = state) %>%
-  left_join(state_lookup, by = c("selected_state" = "state")) %>%
-  mutate(selected_county_norm = normalize_county(selected_county)) %>%
-  left_join(
-    gazetteer,
-    by = c("state_abbr", "selected_county_norm" = "county_norm")
-  ) %>%
+winners <- replication %>%
+  filter(treatment == 1L) %>%
   transmute(
-    row_id,
+    experiment,
+    county_norm,
+    state,
+    experiment_year = year,
     selected_lat = lat,
     selected_lon = lon
   )
 
-unmatched_selected <- selected_coords %>%
-  filter(is.na(selected_lat) | is.na(selected_lon))
+appendix_matched <- appendix %>%
+  left_join(
+    winners,
+    by = c("selected_county_norm" = "county_norm", "state", "experiment_year")
+  )
 
-if (nrow(unmatched_selected) > 0) {
-  stop("Some selected counties could not be matched to the Census county gazetteer.")
+ambiguous_winner <- appendix_matched %>% count(row_id, name = "n") %>% filter(n > 1L)
+if (nrow(ambiguous_winner) > 0) {
+  stop("Ambiguous winner match (>1 replication experiment) for row_id: ",
+       paste(ambiguous_winner$row_id, collapse = ", "))
 }
 
-county_pairs_long <- appendix %>%
+unmatched_selected <- appendix_matched %>% filter(is.na(experiment))
+if (nrow(unmatched_selected) > 0) {
+  stop("Selected experiments not found in replication file: ",
+       paste(sprintf("%s (%s, %s, %d)",
+                     unmatched_selected$college, unmatched_selected$county,
+                     unmatched_selected$state, unmatched_selected$experiment_year),
+             collapse = "; "))
+}
+
+###############################################################################
+# Runner-up geocoding: for each experiment, collapse loser towns to one row per
+# county, taking the real state and the mean town coordinate.
+###############################################################################
+
+losers <- replication %>%
+  filter(treatment == 0L) %>%
+  group_by(experiment, county_norm) %>%
+  summarise(
+    runner_up_state = dplyr::first(state),
+    runner_up_lat = mean(lat, na.rm = TRUE),
+    runner_up_lon = mean(lon, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    runner_up_lat = ifelse(is.nan(runner_up_lat), NA_real_, runner_up_lat),
+    runner_up_lon = ifelse(is.nan(runner_up_lon), NA_real_, runner_up_lon)
+  )
+
+county_pairs_long <- appendix_matched %>%
   mutate(runner_up_county = str_split(runner_up_counties, "\\s*,\\s*")) %>%
   unnest_longer(runner_up_county, indices_to = "runner_up_order") %>%
   mutate(
     runner_up_order = as.integer(runner_up_order),
-    runner_up_county = str_squish(as.character(runner_up_county))
-  ) %>%
-  left_join(selected_coords, by = "row_id") %>%
-  left_join(state_lookup, by = c("state" = "state")) %>%
-  mutate(
-    runner_up_state_assumed = state,
+    runner_up_county = str_squish(as.character(runner_up_county)),
     runner_up_county_norm = normalize_county(runner_up_county)
   ) %>%
   left_join(
-    gazetteer,
-    by = c("state_abbr", "runner_up_county_norm" = "county_norm")
+    losers,
+    by = c("experiment", "runner_up_county_norm" = "county_norm")
   ) %>%
   transmute(
     college,
@@ -173,41 +194,49 @@ county_pairs_long <- appendix %>%
     selected_lon,
     runner_up_order,
     runner_up_county,
-    runner_up_state_assumed,
-    runner_up_lat = lat,
-    runner_up_lon = lon,
-    runner_up_match_status = if_else(
-      is.na(runner_up_lat) | is.na(runner_up_lon),
-      "unmatched_not_in_state",
-      "matched_same_state"
+    # Column name kept for backward compatibility; now holds the REAL state
+    # from the Andrews replication file (no longer a same-state assumption).
+    runner_up_state_assumed = dplyr::coalesce(runner_up_state, state),
+    runner_up_lat,
+    runner_up_lon,
+    runner_up_match_status = dplyr::case_when(
+      is.na(runner_up_state) ~ "unmatched",
+      runner_up_state == state ~ "matched_same_state",
+      TRUE ~ "matched_cross_state"
     )
   ) %>%
   arrange(experiment_year, college, runner_up_order)
 
+###############################################################################
+# Provenance sheet
+###############################################################################
+
 source_sheet_tbl <- tibble(
   field = c(
-    "source_workbook",
-    "source_sheet",
+    "appendix_workbook",
+    "appendix_sheet",
+    "replication_file",
     "output_workbook",
-    "gazetteer_url",
-    "gazetteer_file",
-    "county_coordinate_definition",
+    "coordinate_definition",
     "runner_up_matching_rule",
+    "baseline_note",
     "extracted_on",
     "pair_rows",
-    "selected_rows"
+    "selected_rows",
+    "cross_state_runner_ups"
   ),
   value = c(
     source_workbook,
     source_sheet,
+    replication_file,
     output_workbook,
-    gazetteer_url,
-    basename(gazetteer_file),
-    "Census representative point coordinates (INTPTLAT, INTPTLONG)",
-    "Match runner-up county only within the row state; leave coordinates blank when not matched with high confidence",
+    "Andrews replication town coordinates (Latitude/Longitude); county-level mean when a county hosts >1 town",
+    "Event list anchored on published Table A1; runner-up real state and coordinates taken from Andrews replication College_Control_Towns.csv (no same-state assumption)",
+    "Baseline = 63 published high-quality experiments; each county is a college OR a runner-up exactly once (Andrews 2023, footnote 12)",
     as.character(Sys.Date()),
     as.character(nrow(county_pairs_long)),
-    as.character(nrow(appendix))
+    as.character(nrow(appendix)),
+    as.character(sum(county_pairs_long$runner_up_match_status == "matched_cross_state"))
   )
 )
 
@@ -224,6 +253,11 @@ if (nrow(appendix) != 63L) {
 
 if (nrow(county_pairs_long) != 128L) {
   warning("Expected 128 county-pair rows; found ", nrow(county_pairs_long), ".")
+}
+
+n_unmatched <- sum(county_pairs_long$runner_up_match_status == "unmatched")
+if (n_unmatched > 0L) {
+  warning(n_unmatched, " runner-up(s) could not be geocoded from the replication file.")
 }
 
 writexl::write_xlsx(

@@ -13,6 +13,9 @@
 # Sources:
 # - Law-Robson-Bennett settlement population, 1801-1911.
 # - Nomis historical census CR03 district population, 1921-1961.
+# - Caprettini-Voth 1801 parish occupation shares and 1801-1831 parish
+#   population densities, allocated from 1851 parish polygons to the fixed 1921
+#   target geography.
 # - Laouan et al. cross-verified Wikipedia people database for inventor/scientist
 #   birth outcomes.
 #
@@ -31,6 +34,7 @@ rm(list = ls()); gc()
 
 suppressPackageStartupMessages({
   library(data.table)
+  library(haven)
   library(readxl)
   library(sf)
 })
@@ -105,6 +109,12 @@ london_population_sources_file <- file.path(
   "world_fairs_london_population_sources_1871_1961.csv"
 )
 london_raw_file <- file.path(gbr_dir, "raw", "population_1801_to_2021.xlsx")
+caprettini_voth_dir <- file.path(
+  TALENT_DETS_DATA_DIR, "Data", "raw", "world_fairs", "data_c_voth"
+)
+occupation_shares_file <- file.path(caprettini_voth_dir, "swing-cross.dta")
+population_panel_file <- file.path(caprettini_voth_dir, "swing-panel.dta")
+occupation_parishes_file <- file.path(caprettini_voth_dir, "Parishes1851.shp")
 
 observed_file <- file.path(
   gbr_dir,
@@ -150,10 +160,27 @@ inventor_unmatched_file <- file.path(
   DATA_OUTPUT,
   "uk_historical_urban_units_inventor_unmatched_people.csv"
 )
+occupation_unit_file <- file.path(
+  DATA_PROCESSED,
+  "uk_historical_urban_units_1801_occupation_shares.csv"
+)
+occupation_crosswalk_file <- file.path(
+  DATA_PROCESSED,
+  "uk_historical_urban_units_1801_occupation_share_crosswalk.csv"
+)
+occupation_qc_file <- file.path(
+  DATA_PROCESSED,
+  "uk_historical_urban_units_1801_occupation_shares_qc.csv"
+)
+swing_population_audit_file <- file.path(
+  DATA_PROCESSED,
+  "uk_historical_urban_units_swing_population_1801_1831_audit.csv"
+)
 
 required_files <- c(
   law_panel_file, scientists_file, benchmark_1911_file, boundary_gpkg,
-  lau_gpkg, greater_london_1911_crosswalk_file
+  lau_gpkg, greater_london_1911_crosswalk_file, occupation_shares_file,
+  population_panel_file, occupation_parishes_file
 )
 missing_files <- required_files[!file.exists(required_files)]
 if (length(missing_files) > 0L) {
@@ -165,6 +192,10 @@ census_years_nomis <- c(1921L, 1931L, 1951L, 1961L)
 census_years <- c(census_years_law, census_years_nomis)
 annual_years <- 1801L:1961L
 inventor_panel_years <- 1801L:1960L
+swing_period_year <- c("1" = 1801L, "3" = 1811L, "4" = 1821L, "5" = 1831L)
+swing_population_years <- unname(swing_period_year)
+swing_min_geometry_coverage <- 0.95
+swing_max_growth_factor_per_decade <- 5
 
 target_types <- c("Urban District", "Municipal Borough", "County Borough")
 london_origin_types <- c(
@@ -394,6 +425,40 @@ interp_no_extrapolate <- function(year, population, years_out) {
     rule = 1,
     ties = sum
   )$y
+}
+
+screen_swing_population_growth <- function(year, population, eligible,
+                                           factor_per_decade = 5) {
+  year <- as.integer(year)
+  population <- as.numeric(population)
+  eligible <- as.logical(eligible)
+  accepted <- rep(FALSE, length(year))
+  outlier <- rep(FALSE, length(year))
+  previous <- NA_integer_
+
+  for (i in order(year)) {
+    if (!isTRUE(eligible[[i]]) || !is.finite(population[[i]]) ||
+        population[[i]] <= 0) {
+      next
+    }
+    if (is.na(previous)) {
+      accepted[[i]] <- TRUE
+      previous <- i
+      next
+    }
+    decades <- (year[[i]] - year[[previous]]) / 10
+    allowed_factor <- factor_per_decade ^ decades
+    ratio <- population[[i]] / population[[previous]]
+    if (!is.finite(ratio) || ratio > allowed_factor ||
+        ratio < 1 / allowed_factor) {
+      outlier[[i]] <- TRUE
+    } else {
+      accepted[[i]] <- TRUE
+      previous <- i
+    }
+  }
+
+  list(accepted = accepted, outlier = outlier)
 }
 
 validate_manual_harmonization_groups <- function(groups, target_ids) {
@@ -879,6 +944,660 @@ cat("Greater London Nomis 1911 population: ",
     greater_london_1911_population, "\n", sep = "")
 cat("Greater London Nomis 1921 population: ",
     greater_london_1921_population, "\n", sep = "")
+
+###############################################################################
+# Caprettini-Voth 1801 occupation shares
+###############################################################################
+
+cat("Allocating 1801 parish occupation shares to target units...\n")
+
+occupation_share_cols_raw <- c("agri_share", "trade_share", "other_share")
+occupation_source_cols <- c(
+  "GAZ_CNTY", "PARISH", "PARISH_ID", "AREA_m2", "LATo_WGS84",
+  "LOGo_WGS84", "LOGx_BNG", "LATx_BNG", "density",
+  occupation_share_cols_raw
+)
+occupation_source <- as.data.table(read_dta(occupation_shares_file))
+missing_occupation_cols <- setdiff(occupation_source_cols, names(occupation_source))
+if (length(missing_occupation_cols)) {
+  stop(
+    "Caprettini-Voth occupation data are missing required columns: ",
+    paste(missing_occupation_cols, collapse = ", ")
+  )
+}
+occupation_source <- occupation_source[, ..occupation_source_cols]
+occupation_source[, PARISH_ID := as.integer(PARISH_ID)]
+
+if (occupation_source[, anyNA(PARISH_ID)] ||
+    occupation_source[, anyDuplicated(PARISH_ID)] > 0L) {
+  stop("Caprettini-Voth PARISH_ID must be complete and unique.")
+}
+
+occupation_share_missing_count <- occupation_source[, rowSums(is.na(.SD)),
+                                                     .SDcols = occupation_share_cols_raw]
+if (any(!occupation_share_missing_count %in% c(0L, 3L))) {
+  stop("The three 1801 occupation shares must be jointly observed or jointly missing.")
+}
+occupation_source[, shares_complete := occupation_share_missing_count == 0L]
+if (occupation_source[
+      shares_complete == TRUE,
+      any(unlist(.SD, use.names = FALSE) < 0 |
+          unlist(.SD, use.names = FALSE) > 1)
+    , .SDcols = occupation_share_cols_raw]) {
+  stop("Observed 1801 occupation shares must lie in [0, 1].")
+}
+occupation_source[, occupation_share_sum :=
+  agri_share + trade_share + other_share]
+if (occupation_source[
+      shares_complete == TRUE,
+      any(abs(occupation_share_sum - 1) > 1e-6)
+    ]) {
+  stop("Observed 1801 occupation shares do not sum to one.")
+}
+occupation_source[, population_1801_implied := density * AREA_m2 / 1e6]
+if (occupation_source[
+      !is.na(population_1801_implied),
+      any(!is.finite(population_1801_implied) | population_1801_implied < 0)
+    ]) {
+  stop("Invalid implied 1801 parish population in Caprettini-Voth data.")
+}
+
+occupation_parishes_sf <- st_read(occupation_parishes_file, quiet = TRUE)
+if (!"PARISH_ID" %in% names(occupation_parishes_sf)) {
+  stop("Parishes1851.shp is missing PARISH_ID.")
+}
+occupation_parishes_sf$PARISH_ID <- as.integer(occupation_parishes_sf$PARISH_ID)
+occupation_parishes_sf <- occupation_parishes_sf[
+  !is.na(occupation_parishes_sf$PARISH_ID) &
+    occupation_parishes_sf$PARISH_ID > 0L,
+]
+if (anyDuplicated(occupation_parishes_sf$PARISH_ID) > 0L) {
+  stop("Parishes1851.shp contains duplicate positive PARISH_ID values.")
+}
+
+missing_parish_shapes <- setdiff(
+  occupation_source$PARISH_ID,
+  occupation_parishes_sf$PARISH_ID
+)
+extra_parish_shapes <- setdiff(
+  occupation_parishes_sf$PARISH_ID,
+  occupation_source$PARISH_ID
+)
+if (length(missing_parish_shapes) || length(extra_parish_shapes)) {
+  stop(
+    "Caprettini-Voth data and parish polygons do not match one-to-one. ",
+    "Missing shapes: ", length(missing_parish_shapes),
+    "; extra shapes: ", length(extra_parish_shapes), "."
+  )
+}
+
+occupation_parishes_sf <- occupation_parishes_sf[, "PARISH_ID"]
+occupation_parishes_sf <- st_make_valid(st_transform(occupation_parishes_sf, 27700))
+occupation_parishes_sf$parish_geometry_area_m2 <- as.numeric(
+  st_area(occupation_parishes_sf)
+)
+if (any(!is.finite(occupation_parishes_sf$parish_geometry_area_m2) |
+        occupation_parishes_sf$parish_geometry_area_m2 <= 0)) {
+  stop("Caprettini-Voth parish polygons must have positive finite area.")
+}
+occupation_parishes_sf <- merge(
+  occupation_parishes_sf,
+  occupation_source,
+  by = "PARISH_ID",
+  all.x = TRUE,
+  sort = FALSE
+)
+
+# The fixed target polygons have a few sub-square-metre topology slivers. Audit
+# them and fail only if an overlap exceeds 0.001% of the smaller target.
+target_overlap_index <- st_overlaps(targets_sf)
+target_overlap_pairs <- rbindlist(lapply(
+  seq_along(target_overlap_index),
+  function(i) {
+    hits <- target_overlap_index[[i]]
+    hits <- hits[hits > i]
+    if (!length(hits)) return(NULL)
+    data.table(target_row_1 = i, target_row_2 = hits)
+  }
+))
+target_overlap_max_relative <- 0
+if (nrow(target_overlap_pairs)) {
+  target_overlap_pairs[, overlap_area_m2 := vapply(
+    seq_len(.N),
+    function(i) {
+      suppressWarnings(as.numeric(st_area(st_intersection(
+        targets_sf[target_row_1[[i]], ],
+        targets_sf[target_row_2[[i]], ]
+      ))))
+    },
+    numeric(1L)
+  )]
+  target_overlap_pairs[, smaller_target_area_m2 := pmin(
+    targets_sf$target_area_m2[target_row_1],
+    targets_sf$target_area_m2[target_row_2]
+  )]
+  target_overlap_pairs[, relative_overlap :=
+    overlap_area_m2 / smaller_target_area_m2]
+  target_overlap_max_relative <- max(
+    target_overlap_pairs$relative_overlap,
+    na.rm = TRUE
+  )
+}
+if (!is.finite(target_overlap_max_relative) ||
+    target_overlap_max_relative > 1e-5) {
+  stop(
+    "Target geometry overlap exceeds tolerance: ",
+    signif(target_overlap_max_relative, 6L)
+  )
+}
+
+occupation_intersections_sf <- suppressWarnings(st_intersection(
+  targets_sf[, c("target_unit_id", "target_unit_name", "target_area_type")],
+  occupation_parishes_sf[, c(
+    "PARISH_ID", "GAZ_CNTY", "PARISH", "AREA_m2", "density",
+    "population_1801_implied", "shares_complete", occupation_share_cols_raw,
+    "parish_geometry_area_m2"
+  )]
+))
+occupation_crosswalk <- as.data.table(st_drop_geometry(occupation_intersections_sf))
+occupation_crosswalk[, intersection_area_m2 := as.numeric(
+  st_area(occupation_intersections_sf)
+)]
+occupation_crosswalk <- occupation_crosswalk[
+  is.finite(intersection_area_m2) & intersection_area_m2 > 0
+]
+occupation_crosswalk[, parish_overlap_share :=
+  intersection_area_m2 / parish_geometry_area_m2]
+if (occupation_crosswalk[
+      , any(!is.finite(parish_overlap_share) |
+            parish_overlap_share < 0 | parish_overlap_share > 1 + 1e-6)
+    ]) {
+  stop("Invalid parish overlap share in the occupation crosswalk.")
+}
+occupation_crosswalk[, allocated_population_1801 :=
+  population_1801_implied * parish_overlap_share]
+occupation_crosswalk[, allocated_source_area_m2 :=
+  AREA_m2 * parish_overlap_share]
+if (occupation_crosswalk[
+      , any(!is.finite(allocated_source_area_m2) |
+            allocated_source_area_m2 <= 0)
+    ]) {
+  stop("Invalid allocated source area in the demographic crosswalk.")
+}
+
+occupation_crosswalk_counts <- occupation_crosswalk[, .(
+  n_intersecting_parishes = uniqueN(PARISH_ID),
+  n_complete_parishes = uniqueN(PARISH_ID[shares_complete == TRUE])
+), by = target_unit_id]
+occupation_crosswalk_population <- occupation_crosswalk[
+  is.finite(allocated_population_1801) & allocated_population_1801 > 0,
+  .(
+    occupation_share_population_total_1801 = sum(allocated_population_1801),
+    occupation_share_population_covered_1801 = sum(
+      allocated_population_1801[shares_complete == TRUE]
+    )
+  ),
+  by = target_unit_id
+]
+occupation_crosswalk_observed <- occupation_crosswalk[
+  shares_complete == TRUE &
+    is.finite(allocated_population_1801) & allocated_population_1801 > 0,
+  .(
+    agri_share_1801 = weighted.mean(agri_share, allocated_population_1801),
+    trade_share_1801 = weighted.mean(trade_share, allocated_population_1801),
+    other_share_1801 = weighted.mean(other_share, allocated_population_1801)
+  ),
+  by = target_unit_id
+]
+population_density_area <- occupation_crosswalk[, .(
+  population_density_area_total_1801 = sum(allocated_source_area_m2),
+  population_density_area_covered_1801 = sum(
+    allocated_source_area_m2[is.finite(density)]
+  )
+), by = target_unit_id]
+population_density_observed <- occupation_crosswalk[
+  is.finite(density) & is.finite(allocated_population_1801),
+  .(
+    population_density_1801 = sum(allocated_population_1801) /
+      (sum(allocated_source_area_m2) / 1e6),
+    population_density_1801_area_weighted_check = weighted.mean(
+      density,
+      allocated_source_area_m2
+    )
+  ),
+  by = target_unit_id
+]
+
+occupation_unit <- Reduce(
+  function(x, y) merge(x, y, by = "target_unit_id", all.x = TRUE, sort = FALSE),
+  list(
+    target_dt[, .(
+      target_unit_id, target_unit_name, target_area_type, target_boundary_id
+    )],
+    occupation_crosswalk_counts,
+    occupation_crosswalk_population,
+    occupation_crosswalk_observed,
+    population_density_area,
+    population_density_observed
+  )
+)
+occupation_unit[is.na(n_intersecting_parishes), n_intersecting_parishes := 0L]
+occupation_unit[is.na(n_complete_parishes), n_complete_parishes := 0L]
+occupation_unit[, occupation_share_coverage_1801 := fifelse(
+  !is.na(occupation_share_population_total_1801) &
+    occupation_share_population_total_1801 > 0,
+  occupation_share_population_covered_1801 /
+    occupation_share_population_total_1801,
+  NA_real_
+)]
+occupation_unit[, population_density_area_coverage_1801 := fifelse(
+  !is.na(population_density_area_total_1801) &
+    population_density_area_total_1801 > 0,
+  population_density_area_covered_1801 /
+    population_density_area_total_1801,
+  NA_real_
+)]
+occupation_unit[, population_implied_1801 :=
+  occupation_share_population_total_1801]
+occupation_unit[, `:=`(
+  occupation_share_source =
+    "Caprettini and Voth (2020), 1801 census occupation shares and density",
+  occupation_share_crosswalk_method =
+    "1851 parish polygon intersection weighted by implied 1801 population"
+)]
+
+occupation_panel_cols <- c(
+  "population_implied_1801",
+  "agri_share_1801", "trade_share_1801", "other_share_1801",
+  "occupation_share_coverage_1801", "population_density_1801",
+  "population_density_area_coverage_1801"
+)
+if (nrow(occupation_unit) != nrow(target_dt) ||
+    occupation_unit[, anyDuplicated(target_unit_id)] > 0L) {
+  stop("Occupation-share output must contain one row per target unit.")
+}
+if (occupation_unit[
+      !is.na(agri_share_1801),
+      any(abs(agri_share_1801 + trade_share_1801 + other_share_1801 - 1) > 1e-6)
+    ]) {
+  stop("Aggregated 1801 occupation shares do not sum to one.")
+}
+if (occupation_unit[
+      !is.na(occupation_share_coverage_1801),
+      any(occupation_share_coverage_1801 < 0 |
+          occupation_share_coverage_1801 > 1 + 1e-6)
+    ]) {
+  stop("Occupation-share population coverage must lie in [0, 1].")
+}
+if (occupation_unit[
+      !is.na(population_implied_1801),
+      any(!is.finite(population_implied_1801) | population_implied_1801 <= 0)
+    ]) {
+  stop("Implied 1801 target-unit population must be finite and positive.")
+}
+if (occupation_unit[
+      !is.na(population_density_1801),
+      any(!is.finite(population_density_1801) | population_density_1801 < 0)
+    ]) {
+  stop("Aggregated 1801 population density must be finite and non-negative.")
+}
+if (occupation_unit[
+      !is.na(population_density_area_coverage_1801),
+      any(population_density_area_coverage_1801 < 0 |
+          population_density_area_coverage_1801 > 1 + 1e-6)
+    ]) {
+  stop("Population-density area coverage must lie in [0, 1].")
+}
+if (occupation_unit[
+      !is.na(population_density_1801),
+      any(abs(
+        population_density_1801 - population_density_1801_area_weighted_check
+      ) > 1e-8)
+    ]) {
+  stop("Population-density aggregation identity failed.")
+}
+
+# Compare the chosen polygon overlay with the provided within-parish BNG points.
+valid_bng_centroid <- occupation_source[
+  is.finite(LOGx_BNG) & is.finite(LATx_BNG) &
+    LOGx_BNG != 0 & LATx_BNG != 0
+]
+occupation_centroid_points <- st_as_sf(
+  valid_bng_centroid,
+  coords = c("LOGx_BNG", "LATx_BNG"),
+  crs = 27700,
+  remove = FALSE
+)
+occupation_centroid_hits <- st_intersects(occupation_centroid_points, targets_sf)
+occupation_centroid_match <- data.table(
+  PARISH_ID = occupation_centroid_points$PARISH_ID,
+  target_row = vapply(
+    occupation_centroid_hits,
+    function(hit) if (length(hit)) hit[[1L]] else NA_integer_,
+    integer(1L)
+  ),
+  n_target_hits = lengths(occupation_centroid_hits),
+  shares_complete = occupation_centroid_points$shares_complete,
+  population_1801_implied = occupation_centroid_points$population_1801_implied
+)
+
+occupation_qc <- data.table(
+  metric = c(
+    "source_parishes", "source_parishes_complete_shares",
+    "target_units", "target_units_with_occupation_shares",
+    "target_units_missing_occupation_shares",
+    "target_units_coverage_ge_0_99", "crosswalk_rows",
+    "centroid_points_matched_to_target", "centroid_target_units_with_shares",
+    "source_parishes_with_population_density",
+    "target_units_with_population_density",
+    "target_units_missing_population_density",
+    "target_units_density_area_coverage_ge_0_95",
+    "target_units_density_area_coverage_ge_0_99",
+    "max_population_density_identity_deviation",
+    "max_aggregated_share_sum_deviation",
+    "target_overlap_pairs", "target_overlap_max_relative"
+  ),
+  value = c(
+    nrow(occupation_source),
+    occupation_source[shares_complete == TRUE, .N],
+    nrow(occupation_unit),
+    occupation_unit[!is.na(agri_share_1801), .N],
+    occupation_unit[is.na(agri_share_1801), .N],
+    occupation_unit[occupation_share_coverage_1801 >= 0.99, .N],
+    nrow(occupation_crosswalk),
+    occupation_centroid_match[!is.na(target_row), .N],
+    occupation_centroid_match[
+      !is.na(target_row) & shares_complete == TRUE &
+        is.finite(population_1801_implied) & population_1801_implied > 0,
+      uniqueN(target_row)
+    ],
+    occupation_source[is.finite(density), .N],
+    occupation_unit[!is.na(population_density_1801), .N],
+    occupation_unit[is.na(population_density_1801), .N],
+    occupation_unit[population_density_area_coverage_1801 >= 0.95, .N],
+    occupation_unit[population_density_area_coverage_1801 >= 0.99, .N],
+    occupation_unit[
+      !is.na(population_density_1801),
+      max(abs(
+        population_density_1801 - population_density_1801_area_weighted_check
+      ))
+    ],
+    occupation_unit[
+      !is.na(agri_share_1801),
+      max(abs(agri_share_1801 + trade_share_1801 + other_share_1801 - 1))
+    ],
+    nrow(target_overlap_pairs),
+    target_overlap_max_relative
+  )
+)
+
+target_dt <- merge(
+  target_dt,
+  occupation_unit[, c("target_unit_id", occupation_panel_cols), with = FALSE],
+  by = "target_unit_id",
+  all.x = TRUE,
+  sort = FALSE
+)
+
+cat(
+  "Occupation shares available for target units: ",
+  occupation_unit[!is.na(agri_share_1801), .N],
+  "/", nrow(occupation_unit), "\n",
+  sep = ""
+)
+cat(
+  "Population density available for target units: ",
+  occupation_unit[!is.na(population_density_1801), .N],
+  "/", nrow(occupation_unit), "\n",
+  sep = ""
+)
+
+###############################################################################
+# Caprettini-Voth 1801-1831 population knots
+###############################################################################
+
+cat("Allocating 1801-1831 Swing population densities to target units...\n")
+
+swing_panel <- as.data.table(read_dta(population_panel_file))
+swing_required_cols <- c("period", "PARISH_ID", "density")
+swing_missing_cols <- setdiff(swing_required_cols, names(swing_panel))
+if (length(swing_missing_cols)) {
+  stop(
+    "Caprettini-Voth panel is missing required columns: ",
+    paste(swing_missing_cols, collapse = ", ")
+  )
+}
+swing_panel <- swing_panel[, ..swing_required_cols]
+swing_panel[, `:=`(
+  period = as.integer(period),
+  PARISH_ID = as.integer(PARISH_ID),
+  density = as.numeric(density)
+)]
+if (swing_panel[!is.na(PARISH_ID), anyDuplicated(paste(PARISH_ID, period))] > 0L) {
+  stop("swing-panel.dta contains duplicate PARISH_ID-period keys.")
+}
+
+swing_period_map <- data.table(
+  period = as.integer(names(swing_period_year)),
+  census_year = as.integer(unname(swing_period_year))
+)
+if (!all(swing_period_map$period %in% unique(swing_panel$period))) {
+  stop("swing-panel.dta is missing one or more required census periods.")
+}
+
+# Periods 1 and 2 intentionally repeat the 1801 baseline. Validate that fact,
+# and validate that period 1 is the same density field used by swing-cross.dta.
+swing_p12 <- dcast(
+  swing_panel[period %in% c(1L, 2L) & !is.na(PARISH_ID)],
+  PARISH_ID ~ period,
+  value.var = "density"
+)
+if (!all(c("1", "2") %chin% names(swing_p12)) ||
+    swing_p12[
+      is.finite(get("1")) & is.finite(get("2")),
+      any(abs(get("1") - get("2")) > 1e-8)
+    ]) {
+  stop("Swing periods 1 and 2 do not contain identical 1801 densities.")
+}
+swing_p1_check <- merge(
+  swing_panel[period == 1L, .(PARISH_ID, density_panel = density)],
+  occupation_source[, .(PARISH_ID, density_cross = density)],
+  by = "PARISH_ID",
+  all = FALSE
+)
+if (swing_p1_check[
+      is.finite(density_panel) & is.finite(density_cross),
+      any(abs(density_panel - density_cross) > 1e-8)
+    ]) {
+  stop("Swing period 1 does not match the 1801 density in swing-cross.dta.")
+}
+
+swing_crosswalk <- occupation_crosswalk[, .(
+  period = swing_period_map$period,
+  census_year = swing_period_map$census_year,
+  intersection_area_m2,
+  allocated_source_area_m2
+), by = .(
+  target_unit_id, target_unit_name, target_area_type, PARISH_ID
+)]
+swing_crosswalk <- merge(
+  swing_crosswalk,
+  swing_panel[period %in% swing_period_map$period],
+  by = c("PARISH_ID", "period"),
+  all.x = TRUE,
+  sort = FALSE
+)
+swing_crosswalk[, valid_density := is.finite(density) & density > 0]
+swing_crosswalk[, allocated_population := fifelse(
+  valid_density,
+  density * allocated_source_area_m2 / 1e6,
+  NA_real_
+)]
+
+swing_population_raw <- swing_crosswalk[, .(
+  population_swing_implied_raw = if (any(valid_density)) {
+    sum(allocated_population, na.rm = TRUE)
+  } else {
+    NA_real_
+  },
+  swing_intersection_area_m2_raw = sum(intersection_area_m2, na.rm = TRUE),
+  swing_valid_density_area_m2_raw = sum(
+    intersection_area_m2[valid_density], na.rm = TRUE
+  ),
+  swing_n_intersecting_parishes_raw = uniqueN(PARISH_ID),
+  swing_n_valid_density_parishes_raw = uniqueN(PARISH_ID[valid_density])
+), by = .(target_unit_id, census_year, period)]
+
+swing_population_knots <- merge(
+  CJ(
+    target_unit_id = target_dt$target_unit_id,
+    census_year = swing_population_years
+  ),
+  swing_population_raw,
+  by = c("target_unit_id", "census_year"),
+  all.x = TRUE,
+  sort = FALSE
+)
+swing_population_knots <- merge(
+  swing_population_knots,
+  target_dt[, .(
+    target_unit_id, target_unit_name, target_area_type, target_boundary_id,
+    target_area_m2
+  )],
+  by = "target_unit_id",
+  all.x = TRUE,
+  sort = FALSE
+)
+swing_population_knots[, `:=`(
+  population_swing_implied = population_swing_implied_raw,
+  swing_target_area_m2 = target_area_m2,
+  swing_intersection_area_m2 = swing_intersection_area_m2_raw,
+  swing_valid_density_area_m2 = swing_valid_density_area_m2_raw,
+  swing_n_intersecting_parishes = swing_n_intersecting_parishes_raw,
+  swing_n_valid_density_parishes = swing_n_valid_density_parishes_raw,
+  swing_manual_harmonization = "none"
+)]
+
+# Match the population geography used for the Law-Robson manual composites:
+# sum all component polygons into the primary unit and suppress components.
+swing_population_original <- copy(swing_population_knots)
+for (gid in unique(manual_harmonization_groups$group_id)) {
+  group <- manual_harmonization_groups[group_id == gid]
+  primary_id <- unique(group$primary_target_unit_id)
+  member_ids <- group$member_target_unit_id
+  component_ids <- group[member_role == "component", member_target_unit_id]
+
+  for (yr in swing_population_years) {
+    member_rows <- swing_population_original[
+      target_unit_id %chin% member_ids & census_year == yr
+    ]
+    aggregate_population <- if (
+      member_rows[is.finite(population_swing_implied_raw), .N] > 0L
+    ) {
+      member_rows[, sum(population_swing_implied_raw, na.rm = TRUE)]
+    } else {
+      NA_real_
+    }
+    swing_population_knots[
+      target_unit_id == primary_id & census_year == yr,
+      `:=`(
+        population_swing_implied = aggregate_population,
+        swing_target_area_m2 = sum(member_rows$target_area_m2, na.rm = TRUE),
+        swing_intersection_area_m2 = sum(
+          member_rows$swing_intersection_area_m2_raw, na.rm = TRUE
+        ),
+        swing_valid_density_area_m2 = sum(
+          member_rows$swing_valid_density_area_m2_raw, na.rm = TRUE
+        ),
+        swing_n_intersecting_parishes = sum(
+          member_rows$swing_n_intersecting_parishes_raw, na.rm = TRUE
+        ),
+        swing_n_valid_density_parishes = sum(
+          member_rows$swing_n_valid_density_parishes_raw, na.rm = TRUE
+        ),
+        swing_manual_harmonization = paste0(
+          "manual_composite_", gid
+        )
+      )
+    ]
+    if (length(component_ids)) {
+      swing_population_knots[
+        target_unit_id %chin% component_ids & census_year == yr,
+        `:=`(
+          population_swing_implied = NA_real_,
+          swing_manual_harmonization = paste0(
+            "component_merged_into_", primary_id
+          )
+        )
+      ]
+    }
+  }
+}
+
+swing_population_knots[, `:=`(
+  population_swing_geometry_coverage = swing_intersection_area_m2 /
+    swing_target_area_m2,
+  population_swing_density_coverage = swing_valid_density_area_m2 /
+    swing_target_area_m2
+)]
+swing_population_knots[, population_swing_eligible_pre_growth :=
+  is.finite(population_swing_implied) & population_swing_implied > 0 &
+  is.finite(population_swing_geometry_coverage) &
+    population_swing_geometry_coverage >= swing_min_geometry_coverage &
+  is.finite(population_swing_density_coverage) &
+    population_swing_density_coverage >= swing_min_geometry_coverage &
+  !grepl("^component_merged_into_", swing_manual_harmonization)]
+setorder(swing_population_knots, target_unit_id, census_year)
+swing_population_knots[, c(
+  "population_swing_usable", "population_swing_growth_outlier"
+) := {
+  screened <- screen_swing_population_growth(
+    census_year,
+    population_swing_implied,
+    population_swing_eligible_pre_growth,
+    factor_per_decade = swing_max_growth_factor_per_decade
+  )
+  list(screened$accepted, screened$outlier)
+}, by = target_unit_id]
+swing_population_knots[, population_swing_exclusion_reason := fcase(
+  grepl("^component_merged_into_", swing_manual_harmonization),
+    swing_manual_harmonization,
+  !is.finite(population_swing_implied) | population_swing_implied <= 0,
+    "missing_or_nonpositive_implied_population",
+  !is.finite(population_swing_geometry_coverage) |
+    population_swing_geometry_coverage < swing_min_geometry_coverage,
+    "target_geometry_coverage_below_0.95",
+  !is.finite(population_swing_density_coverage) |
+    population_swing_density_coverage < swing_min_geometry_coverage,
+    "valid_density_coverage_below_0.95",
+  population_swing_growth_outlier, "growth_outlier_gt_factor_5_per_decade",
+  population_swing_usable, "usable",
+  default = "not_usable"
+)]
+
+if (swing_population_knots[
+      !is.na(population_swing_geometry_coverage),
+      any(population_swing_geometry_coverage < 0 |
+          population_swing_geometry_coverage > 1 + 1e-5)
+    ] || swing_population_knots[
+      !is.na(population_swing_density_coverage),
+      any(population_swing_density_coverage < 0 |
+          population_swing_density_coverage > 1 + 1e-5)
+    ]) {
+  stop("Invalid Swing target-geometry coverage.")
+}
+
+cat("Usable Swing population knots by year:\n")
+print(swing_population_knots[, .(
+  usable = sum(population_swing_usable),
+  growth_outliers = sum(population_swing_growth_outlier),
+  geometry_or_density_incomplete = sum(
+    population_swing_exclusion_reason %chin% c(
+      "target_geometry_coverage_below_0.95",
+      "valid_density_coverage_below_0.95"
+    )
+  )
+), by = census_year][order(census_year)])
 
 ###############################################################################
 # Law-Robson allocation
@@ -1454,6 +2173,60 @@ observed <- manual_population_result$observed
 manual_harmonization_audit <- manual_population_result$audit
 setorder(observed, target_unit_name, census_year)
 
+swing_merge_cols <- c(
+  "target_unit_id", "census_year", "period",
+  "population_swing_implied_raw", "population_swing_implied",
+  "population_swing_geometry_coverage", "population_swing_density_coverage",
+  "population_swing_eligible_pre_growth", "population_swing_growth_outlier",
+  "population_swing_usable", "population_swing_exclusion_reason",
+  "swing_manual_harmonization", "swing_n_intersecting_parishes",
+  "swing_n_valid_density_parishes"
+)
+observed <- merge(
+  observed,
+  swing_population_knots[, ..swing_merge_cols],
+  by = c("target_unit_id", "census_year"),
+  all.x = TRUE,
+  sort = FALSE
+)
+setnames(observed, "period", "population_swing_period")
+observed[, population_swing_used :=
+  is.na(population_observed) & population_swing_usable == TRUE]
+observed[population_swing_used == TRUE, `:=`(
+  population = population_swing_implied,
+  population_available = TRUE,
+  population_quality = "swing_implied_parish_density_knot",
+  n_source_units = as.integer(swing_n_valid_density_parishes),
+  n_source_allocations = as.integer(swing_n_intersecting_parishes),
+  share_population_density_weighted = NA_real_,
+  allocation_method = "caprettini_voth_parish_density_area_allocation",
+  population_source = "Caprettini and Voth (2020), British census parish density",
+  any_match_needs_review = population_swing_growth_outlier == TRUE
+)]
+observed[, population_available := !is.na(population)]
+setorder(observed, target_unit_name, census_year)
+
+swing_population_audit <- observed[
+  census_year %in% swing_population_years,
+  .(
+    target_unit_id, target_unit_name, target_area_type, target_boundary_id,
+    census_year, population_swing_period, population_observed,
+    population_swing_implied_raw, population_swing_implied,
+    population_swing_geometry_coverage, population_swing_density_coverage,
+    population_swing_eligible_pre_growth, population_swing_growth_outlier,
+    population_swing_usable, population_swing_used,
+    population_swing_exclusion_reason, swing_manual_harmonization,
+    swing_n_intersecting_parishes, swing_n_valid_density_parishes,
+    observed_to_swing_ratio = safe_ratio(
+      population_observed, population_swing_implied
+    ),
+    final_population_knot = population,
+    final_population_quality = population_quality,
+    final_population_source = population_source
+  )
+]
+setorder(swing_population_audit, census_year, target_area_type, target_unit_name)
+
 ###############################################################################
 # Annual population and inventor/scientist outcomes
 ###############################################################################
@@ -1472,7 +2245,14 @@ annual <- merge(
   observed[, .(
     target_unit_id,
     year = census_year,
+    population_knot = population,
     population_observed,
+    population_swing_implied,
+    population_swing_used,
+    population_swing_geometry_coverage,
+    population_swing_density_coverage,
+    population_swing_growth_outlier,
+    population_swing_exclusion_reason,
     n_source_units,
     n_source_allocations,
     share_population_density_weighted,
@@ -1485,22 +2265,27 @@ annual <- merge(
   sort = FALSE
 )
 annual[, population := interp_no_extrapolate(
-  year = year[!is.na(population_observed)],
-  population = population_observed[!is.na(population_observed)],
+  year = year[!is.na(population_knot)],
+  population = population_knot[!is.na(population_knot)],
   years_out = year
 ), by = target_unit_id]
 annual[, `:=`(
+  population_knot_available = !is.na(population_knot),
   population_interpolated = is.na(population_observed) & !is.na(population),
   population_available = !is.na(population)
 )]
 annual[
-  population_interpolated == TRUE & is.na(population_quality),
-  population_quality := "interpolated_between_census_years"
+  population_interpolated == TRUE & is.na(population_knot),
+  `:=`(
+    population_quality = "interpolated_between_observed_or_swing_knots",
+    population_source = "Linear interpolation between observed or Swing population knots"
+  )
 ]
 annual[
   is.na(population_quality),
   population_quality := "missing_no_source_population"
 ]
+annual[is.na(population_swing_used), population_swing_used := FALSE]
 
 people_cols <- c(
   "wikidata_code", "name", "birth", "death", "bplo1", "bpla1",
@@ -1616,7 +2401,6 @@ inventor_panel[, `:=`(
     NA_real_
   ),
   population_original = population_observed,
-  population_source = "UK historical urban census harmonized to 1921 urban units",
   population_interp_status = population_quality,
   match_status = "matched",
   match_method = "birth_point_within_historical_urban_unit",
@@ -1636,7 +2420,15 @@ inventor_columns <- c(
   "stem_per_1000_pop", "match_status", "match_method", "match_distance_km",
   "match_needs_review", "source_panel", "population_interpolated",
   "population_available", "n_source_units", "n_source_allocations",
-  "share_population_density_weighted", "allocation_method"
+  "share_population_density_weighted", "allocation_method",
+  "population_knot", "population_knot_available",
+  "population_swing_implied", "population_swing_used",
+  "population_swing_geometry_coverage", "population_swing_density_coverage",
+  "population_swing_growth_outlier", "population_swing_exclusion_reason",
+  "population_implied_1801",
+  "agri_share_1801", "trade_share_1801", "other_share_1801",
+  "occupation_share_coverage_1801", "population_density_1801",
+  "population_density_area_coverage_1801"
 )
 inventor_panel <- inventor_panel[, ..inventor_columns]
 setorder(inventor_panel, target_unit_id, year)
@@ -1655,6 +2447,59 @@ inventor_qc <- rbindlist(list(
   data.table(
     metric = "rows_missing_population",
     value = inventor_panel[is.na(population), .N]
+  ),
+  data.table(
+    metric = "swing_population_knots_used",
+    value = inventor_panel[population_swing_used == TRUE, .N]
+  ),
+  data.table(
+    metric = "target_units_using_swing_population",
+    value = inventor_panel[
+      population_swing_used == TRUE, uniqueN(target_unit_id)
+    ]
+  ),
+  data.table(
+    metric = "swing_population_growth_outliers",
+    value = swing_population_audit[population_swing_growth_outlier == TRUE, .N]
+  ),
+  data.table(
+    metric = "swing_population_knots_incomplete_coverage",
+    value = swing_population_audit[
+      population_swing_exclusion_reason %chin% c(
+        "target_geometry_coverage_below_0.95",
+        "valid_density_coverage_below_0.95"
+      ), .N
+    ]
+  ),
+  data.table(
+    metric = "target_units_with_occupation_shares_1801",
+    value = inventor_panel[
+      !is.na(agri_share_1801), uniqueN(target_unit_id)
+    ]
+  ),
+  data.table(
+    metric = "target_units_missing_occupation_shares_1801",
+    value = inventor_panel[
+      is.na(agri_share_1801), uniqueN(target_unit_id)
+    ]
+  ),
+  data.table(
+    metric = "target_units_with_population_implied_1801",
+    value = inventor_panel[
+      !is.na(population_implied_1801), uniqueN(target_unit_id)
+    ]
+  ),
+  data.table(
+    metric = "target_units_with_population_density_1801",
+    value = inventor_panel[
+      !is.na(population_density_1801), uniqueN(target_unit_id)
+    ]
+  ),
+  data.table(
+    metric = "target_units_missing_population_density_1801",
+    value = inventor_panel[
+      is.na(population_density_1801), uniqueN(target_unit_id)
+    ]
   )
 ), use.names = TRUE)
 
@@ -1808,8 +2653,42 @@ if (observed[!is.na(population), any(population < 0)] ||
     annual[!is.na(population), any(population < 0)]) {
   stop("Negative population found in final panels.")
 }
+if (observed[
+      !is.na(population_observed),
+      any(abs(population - population_observed) > 1e-8)
+    ]) {
+  stop("A Swing population knot overwrote an observed population.")
+}
+if (observed[
+      population_swing_used == TRUE,
+      any(!is.na(population_observed) | population_swing_usable != TRUE)
+    ]) {
+  stop("Invalid Swing population-knot precedence.")
+}
+if (observed[
+      population_swing_growth_outlier == TRUE,
+      any(population_swing_used == TRUE)
+    ]) {
+  stop("A growth-outlier Swing knot was used in the final population panel.")
+}
+annual_knot_check <- annual[
+  !is.na(population_knot),
+  abs(population - population_knot)
+]
+if (length(annual_knot_check) && any(annual_knot_check > 1e-8)) {
+  stop("Annual population does not reproduce an observed or Swing knot.")
+}
 if (sum(inventor_panel$n_inventors) != nrow(people_matched)) {
   stop("Inventor totals do not match the matched person-level records.")
+}
+occupation_static_check <- inventor_panel[, lapply(.SD, uniqueN),
+                                          by = target_unit_id,
+                                          .SDcols = occupation_panel_cols]
+if (occupation_static_check[
+      , any(unlist(.SD, use.names = FALSE) != 1L),
+      .SDcols = occupation_panel_cols
+    ]) {
+  stop("The 1801 demographic columns are not time invariant by target unit.")
 }
 
 cat("Writing outputs...\n")
@@ -1824,6 +2703,10 @@ fwrite(nomis_unmatched, nomis_unmatched_file)
 fwrite(inventor_panel, inventor_panel_file)
 fwrite(inventor_qc, inventor_qc_file)
 fwrite(people_unmatched, inventor_unmatched_file)
+fwrite(occupation_unit, occupation_unit_file)
+fwrite(occupation_crosswalk, occupation_crosswalk_file)
+fwrite(occupation_qc, occupation_qc_file)
+fwrite(swing_population_audit, swing_population_audit_file)
 
 cat("\nDone.\n")
 cat("Observed panel: ", observed_file, "\n", sep = "")
@@ -1837,6 +2720,10 @@ cat("Nomis outside-target sources: ", nomis_unmatched_file, "\n", sep = "")
 cat("Inventor panel: ", inventor_panel_file, "\n", sep = "")
 cat("Inventor QC: ", inventor_qc_file, "\n", sep = "")
 cat("Inventor unmatched people: ", inventor_unmatched_file, "\n", sep = "")
+cat("Occupation shares: ", occupation_unit_file, "\n", sep = "")
+cat("Occupation-share crosswalk: ", occupation_crosswalk_file, "\n", sep = "")
+cat("Occupation-share QC: ", occupation_qc_file, "\n", sep = "")
+cat("Swing population audit: ", swing_population_audit_file, "\n", sep = "")
 
 cat("\nCoverage by census year:\n")
 print(observed[, .(

@@ -75,11 +75,66 @@ if (!dir.exists(TALENT_DETS_DATA_DIR)) {
 ###############################################################################
 
 data_processed <- file.path(TALENT_DETS_DATA_DIR, "Data", "processed")
+donor_min_distance_km <- as.numeric(Sys.getenv(
+  "WORLD_FAIRS_DONOR_MIN_DISTANCE_KM", unset = "50"
+))
+donor_density_ratio <- as.numeric(Sys.getenv(
+  "WORLD_FAIRS_DONOR_DENSITY_RATIO", unset = "2"
+))
+donor_occupation_caliper_pp <- as.numeric(Sys.getenv(
+  "WORLD_FAIRS_DONOR_OCCUPATION_CALIPER_PP", unset = "10"
+))
+donor_match_mode <- tolower(Sys.getenv(
+  "WORLD_FAIRS_DONOR_MATCH_MODE", unset = "demographic"
+))
+min_density_area_coverage <- as.numeric(Sys.getenv(
+  "WORLD_FAIRS_MIN_DENSITY_AREA_COVERAGE", unset = "0.95"
+))
+anticipation_decades <- as.integer(Sys.getenv(
+  "WORLD_FAIRS_ANTICIPATION_DECADES", unset = "2"
+))
+if (!is.finite(donor_min_distance_km) || donor_min_distance_km <= 20 ||
+    !is.finite(donor_density_ratio) || donor_density_ratio <= 1 ||
+    !is.finite(donor_occupation_caliper_pp) || donor_occupation_caliper_pp < 0 ||
+    !donor_match_mode %in% c("demographic", "density_only") ||
+    !is.finite(min_density_area_coverage) || min_density_area_coverage < 0 ||
+      min_density_area_coverage > 1 ||
+    is.na(anticipation_decades) || anticipation_decades < 0L) {
+  stop("Invalid restricted-donor event-study configuration.")
+}
+anticipation_years <- 10L * anticipation_decades
+analysis_end_decade <- 1930L
+analysis_year_max <- analysis_end_decade + 9L
+expected_treated_units <- 42L
+expected_donor_units <- 101L
+expected_donor_units_density_only_ge30 <- 472L
+result_spec_tag <- paste0(
+  "ge", format(donor_min_distance_km, trim = TRUE, scientific = FALSE),
+  "km_density", format(donor_density_ratio, trim = TRUE, scientific = FALSE),
+  "x_",
+  if (donor_match_mode == "demographic") {
+    paste0(
+      "occ",
+      format(donor_occupation_caliper_pp, trim = TRUE, scientific = FALSE),
+      "pp"
+    )
+  } else {
+    "density_only"
+  },
+  "_cov", format(100 * min_density_area_coverage, trim = TRUE, scientific = FALSE),
+  "_pop1801_1800_", analysis_end_decade,
+  if (anticipation_decades > 0L) {
+    paste0("_anticipation", anticipation_decades, "decades")
+  } else {
+    ""
+  }
+)
 results_dir <- file.path(
   TALENT_DETS_DATA_DIR,
   "results",
   "worlds_fair",
-  "worlds_fairs_uk_venue_distance_crystal_palace_1851_event_studies_0_20km"
+  "event_study",
+  paste0("cp1851_es_0_20km_", result_spec_tag)
 )
 dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -144,15 +199,19 @@ bin_dirs <- c(
   "18-20" = "bin_18_20km",
   "0-20" = "bin_0_20km"
 )
-analysis_bin_labels <- c(bin_labels, aggregate_bin_label)
+analysis_bin_labels <- aggregate_bin_label
 classification_year_min <- 1790L
 classification_year_max <- 1961L
 treated_event_year_min <- 1840L
 treated_event_year_max <- 1910L
 panel_year_min <- 1800L
-panel_year_max <- 1960L
+panel_year_max <- analysis_year_max
 event_window <- 50L
-control_group_name <- "nevertreated"
+control_group_name <- paste0(
+  "restricted_ge", format(donor_min_distance_km, trim = TRUE), "km_",
+  donor_match_mode, "_match"
+)
+did_control_group <- "nevertreated"
 
 filter_outcomes <- function(default_outcomes) {
   env <- Sys.getenv("WORLD_FAIRS_OUTCOMES", unset = "")
@@ -197,6 +256,13 @@ first_nonmissing <- function(x) {
   as.character(x[[1L]])
 }
 
+first_nonmissing_numeric <- function(x) {
+  x <- as.numeric(x)
+  x <- x[is.finite(x)]
+  if (length(x) == 0L) return(NA_real_)
+  x[[1L]]
+}
+
 standard_decade <- function(year) {
   as.integer(floor(year / 10) * 10)
 }
@@ -220,7 +286,8 @@ extract_dynamic_att <- function(es, outcome, bin_label) {
     outcome = outcome,
     distance_bin_km = bin_label,
     control_group = control_group_name,
-    event_time = es$egt,
+    event_time_from_treatment = es$egt,
+    event_time = es$egt - anticipation_years,
     estimate = es$att.egt,
     se = es$se.egt,
     ci_low = estimate - 1.96 * se,
@@ -283,8 +350,19 @@ format_sample_annotation <- function(sample_summary) {
   )
 }
 
-plot_dynamic_event_study <- function(es, outcome, bin_label, y_limits, sample_annotation) {
-  did::ggdid(es) +
+plot_dynamic_event_study <- function(
+    dynamic_att, outcome, bin_label, y_limits, sample_annotation) {
+  ggplot(dynamic_att, aes(x = event_time, y = estimate)) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "grey45") +
+    geom_vline(
+      xintercept = -anticipation_years,
+      linetype = "dashed",
+      color = "#d95f02"
+    ) +
+    geom_vline(xintercept = 0, linetype = "dotted", color = "#333333") +
+    geom_errorbar(aes(ymin = ci_low, ymax = ci_high), width = 2) +
+    geom_line(color = "#1f78b4", linewidth = 0.7) +
+    geom_point(color = "#1f78b4", size = 2) +
     annotate(
       "label",
       x = Inf,
@@ -306,9 +384,14 @@ plot_dynamic_event_study <- function(es, outcome, bin_label, y_limits, sample_an
           outcome
         ),
         width = 72
+      ),
+      caption = paste(
+        "Orange dashed line marks anticipated treatment onset;",
+        "black dotted line marks the actual fair decade."
       )
     ) +
-    coord_cartesian(ylim = y_limits)
+    coord_cartesian(ylim = y_limits) +
+    theme_minimal(base_size = 12)
 }
 
 check_balanced_panel <- function(data, id_col, time_col) {
@@ -706,7 +789,7 @@ run_event_study <- function(data, outcome, bin_label, window = event_window, cor
         idname = "unit_num",
         gname = "g",
         data = data_es,
-        control_group = control_group_name,
+        control_group = did_control_group,
         est_method = "dr",
         base_period = "universal",
         cores = cores
@@ -716,8 +799,8 @@ run_event_study <- function(data, outcome, bin_label, window = event_window, cor
         out,
         type = "dynamic",
         na.rm = TRUE,
-        min_e = -window,
-        max_e = window
+        min_e = -window + anticipation_years,
+        max_e = window + anticipation_years
       )
       simple <- did::aggte(out, type = "simple", na.rm = TRUE)
 
@@ -733,6 +816,8 @@ run_event_study <- function(data, outcome, bin_label, window = event_window, cor
         n_treated_units = n_distinct(data_es$unit_num[data_es$g > 0]),
         n_control_units = n_distinct(data_es$unit_num[data_es$g == 0]),
         n_treated_cohorts = n_distinct(data_es$g[data_es$g > 0]),
+        treatment_decade = unique(data_es$g[data_es$g > 0]),
+        actual_event_decade = unique(data_es$g[data_es$g > 0]) + anticipation_years,
         effective_sample_summary = effective_sample_summary,
         n_units_dropped_for_incomplete_outcome = n_distinct(data$unit_num) - length(complete_units),
         min_decade = min(data_es$decade, na.rm = TRUE),
@@ -810,6 +895,319 @@ always_units <- exposure$always_units
 future_units <- exposure$future_units
 distance_audit <- exposure$distance_audit
 
+message("Building the restricted donor design...")
+demographic_columns <- c(
+  "population_implied_1801", "population_density_1801",
+  "population_density_area_coverage_1801", "agri_share_1801",
+  "trade_share_1801", "other_share_1801",
+  "occupation_share_coverage_1801"
+)
+missing_demographic_columns <- setdiff(demographic_columns, names(panel_year))
+if (length(missing_demographic_columns) > 0L) {
+  stop(
+    "Panel is missing required 1801 demographic fields: ",
+    paste(missing_demographic_columns, collapse = ", ")
+  )
+}
+
+unit_demographics <- panel_year %>%
+  group_by(unit_id, target_unit_id) %>%
+  summarise(
+    across(all_of(demographic_columns), first_nonmissing_numeric),
+    .groups = "drop"
+  )
+
+venue_point <- venues %>%
+  st_as_sf(
+    coords = c("venue_longitude", "venue_latitude"),
+    crs = 4326,
+    remove = FALSE
+  ) %>%
+  st_transform(st_crs(uk_targets))
+if (nrow(venue_point) != 1L) {
+  stop("Restricted Crystal Palace design requires exactly one venue point.")
+}
+
+distance_to_venue_km <- as.numeric(st_distance(uk_targets, venue_point)) / 1000
+unit_distance_demographics <- uk_targets %>%
+  mutate(distance_to_venue_km = distance_to_venue_km) %>%
+  st_drop_geometry() %>%
+  as_tibble() %>%
+  left_join(unit_demographics, by = c("unit_id", "target_unit_id"))
+
+treated_initial_ids <- first_exposure %>%
+  filter(
+    exposure_status == "treated",
+    distance_bin_km %in% bin_labels,
+    first_exposure_year >= treated_event_year_min,
+    first_exposure_year <= treated_event_year_max
+  ) %>%
+  pull(unit_id)
+
+treated_demographic_audit <- unit_distance_demographics %>%
+  filter(unit_id %in% treated_initial_ids) %>%
+  mutate(
+    density_data_complete = if_all(
+      all_of(c("population_implied_1801", "population_density_1801")),
+      ~ is.finite(.x)
+    ) & population_implied_1801 > 0 & population_density_1801 > 0,
+    occupation_data_complete = if_all(
+      all_of(c("agri_share_1801", "trade_share_1801", "other_share_1801")),
+      ~ is.finite(.x)
+    ),
+    demographics_complete = density_data_complete & occupation_data_complete,
+    match_data_complete = density_data_complete &
+      (donor_match_mode == "density_only" | occupation_data_complete),
+    density_coverage_ok = density_data_complete & coalesce(
+      population_density_area_coverage_1801 >= min_density_area_coverage,
+      FALSE
+    ),
+    selected_treated = match_data_complete & density_coverage_ok,
+    exclusion_reason = case_when(
+      !density_data_complete ~ "missing_1801_density_data",
+      donor_match_mode == "demographic" & !occupation_data_complete ~
+        "missing_1801_occupation_data",
+      !density_coverage_ok ~ "density_area_coverage_below_threshold",
+      TRUE ~ "selected"
+    )
+  ) %>%
+  arrange(distance_to_venue_km, unit_id)
+
+selected_treated_ids <- treated_demographic_audit %>%
+  filter(selected_treated) %>%
+  pull(unit_id)
+treated_reference <- treated_demographic_audit %>%
+  filter(selected_treated) %>%
+  summarise(
+    donor_match_mode = donor_match_mode,
+    n_treated_units = n(),
+    mean_population_density_1801 = mean(population_density_1801),
+    mean_agri_share_1801 = mean_or_na(agri_share_1801),
+    mean_trade_share_1801 = mean_or_na(trade_share_1801),
+    mean_other_share_1801 = mean_or_na(other_share_1801),
+    log_density_caliper = log(donor_density_ratio),
+    occupation_caliper_pp = donor_occupation_caliper_pp,
+    min_density_area_coverage = min_density_area_coverage
+  )
+if (nrow(treated_reference) != 1L ||
+    !is.finite(treated_reference$mean_population_density_1801)) {
+  stop("Could not construct the treated demographic reference.")
+}
+
+occupation_caliper <- donor_occupation_caliper_pp / 100
+donor_pool_eligibility_audit <- unit_distance_demographics %>%
+  mutate(
+    distance_ok = distance_to_venue_km >= donor_min_distance_km,
+    density_data_complete = if_all(
+      all_of(c("population_implied_1801", "population_density_1801")),
+      ~ is.finite(.x)
+    ) & population_implied_1801 > 0 & population_density_1801 > 0,
+    occupation_data_complete = if_all(
+      all_of(c("agri_share_1801", "trade_share_1801", "other_share_1801")),
+      ~ is.finite(.x)
+    ),
+    density_coverage_ok = density_data_complete & coalesce(
+      population_density_area_coverage_1801 >= min_density_area_coverage,
+      FALSE
+    ),
+    log_density_difference = abs(
+      log(population_density_1801) -
+        log(treated_reference$mean_population_density_1801)
+    ),
+    density_caliper_ok = density_coverage_ok & coalesce(
+      log_density_difference <= log(donor_density_ratio), FALSE
+    ),
+    agri_share_difference = abs(
+      agri_share_1801 - treated_reference$mean_agri_share_1801
+    ),
+    trade_share_difference = abs(
+      trade_share_1801 - treated_reference$mean_trade_share_1801
+    ),
+    other_share_difference = abs(
+      other_share_1801 - treated_reference$mean_other_share_1801
+    ),
+    occupation_calipers_ok = density_caliper_ok & occupation_data_complete &
+      coalesce(
+        agri_share_difference <= occupation_caliper &
+          trade_share_difference <= occupation_caliper &
+          other_share_difference <= occupation_caliper,
+        FALSE
+      ),
+    selected_donor = distance_ok & if (donor_match_mode == "density_only") {
+      density_caliper_ok
+    } else {
+      occupation_calipers_ok
+    },
+    exclusion_reason = case_when(
+      !distance_ok ~ "distance_below_donor_minimum",
+      !density_data_complete ~ "missing_1801_density_data",
+      donor_match_mode == "demographic" & !occupation_data_complete ~
+        "missing_1801_occupation_data",
+      !density_coverage_ok ~ "density_area_coverage_below_threshold",
+      !density_caliper_ok ~ "outside_log_density_caliper",
+      donor_match_mode == "demographic" & !occupation_calipers_ok ~
+        "outside_occupation_share_caliper",
+      TRUE ~ "selected"
+    )
+  ) %>%
+  arrange(desc(selected_donor), distance_to_venue_km, unit_id)
+
+selected_donor_units <- donor_pool_eligibility_audit %>% filter(selected_donor)
+donor_pool_filter_counts <- bind_rows(
+  tibble(
+    stage = c(
+      "eligible_urban_units", "distance_ge_minimum",
+      "complete_1801_density_data", "density_area_coverage_ge_minimum",
+      "within_log_density_caliper"
+    ),
+    n_units = c(
+      nrow(donor_pool_eligibility_audit),
+      sum(donor_pool_eligibility_audit$distance_ok),
+      sum(donor_pool_eligibility_audit$distance_ok &
+            donor_pool_eligibility_audit$density_data_complete),
+      sum(donor_pool_eligibility_audit$distance_ok &
+            donor_pool_eligibility_audit$density_coverage_ok),
+      sum(donor_pool_eligibility_audit$distance_ok &
+            donor_pool_eligibility_audit$density_caliper_ok)
+    )
+  ),
+  if (donor_match_mode == "demographic") {
+    tibble(
+      stage = "within_all_occupation_calipers",
+      n_units = nrow(selected_donor_units)
+    )
+  } else {
+    tibble()
+  }
+)
+
+default_restricted_spec <- donor_match_mode == "demographic" &&
+  isTRUE(all.equal(donor_min_distance_km, 50)) &&
+  isTRUE(all.equal(donor_density_ratio, 2)) &&
+  isTRUE(all.equal(donor_occupation_caliper_pp, 10)) &&
+  isTRUE(all.equal(min_density_area_coverage, 0.95))
+if (default_restricted_spec &&
+    (length(selected_treated_ids) != expected_treated_units ||
+     nrow(selected_donor_units) != expected_donor_units)) {
+  stop(
+    "Restricted event-study count mismatch: expected ",
+    expected_treated_units, " treated and ", expected_donor_units,
+    " donors; found ", length(selected_treated_ids), " and ",
+    nrow(selected_donor_units), "."
+  )
+}
+density_only_ge30_spec <- donor_match_mode == "density_only" &&
+  isTRUE(all.equal(donor_min_distance_km, 30)) &&
+  isTRUE(all.equal(donor_density_ratio, 2)) &&
+  isTRUE(all.equal(min_density_area_coverage, 0.95))
+if (density_only_ge30_spec &&
+    (length(selected_treated_ids) != expected_treated_units ||
+     nrow(selected_donor_units) != expected_donor_units_density_only_ge30)) {
+  stop(
+    "Density-only >=30 km event-study count mismatch: expected ",
+    expected_treated_units, " treated and ",
+    expected_donor_units_density_only_ge30, " donors; found ",
+    length(selected_treated_ids), " and ", nrow(selected_donor_units), "."
+  )
+}
+
+treated_units_selected <- first_exposure %>%
+  filter(unit_id %in% selected_treated_ids) %>%
+  transmute(
+    unit_id,
+    target_unit_id,
+    geo_country_iso3,
+    event_year = first_exposure_year,
+    actual_event_decade = first_exposure_decade,
+    g = first_exposure_decade - anticipation_years,
+    distance_bin_km = aggregate_bin_label,
+    source_distance_bin_km = distance_bin_km,
+    first_distance_km,
+    first_fair_id = as.character(first_fair_id),
+    first_parent_fair_id = as.character(first_parent_fair_id),
+    first_venue_seq,
+    first_fair_name,
+    first_fair_city,
+    first_fair_country,
+    first_fair_venue
+  )
+controls_selected <- selected_donor_units %>%
+  transmute(
+    unit_id,
+    target_unit_id,
+    geo_country_iso3,
+    g = 0L,
+    actual_event_decade = NA_integer_,
+    first_parent_fair_id = NA_character_,
+    first_fair_id = NA_character_
+  )
+analysis_units_selected <- bind_rows(
+  treated_units_selected %>%
+    select(
+      unit_id, target_unit_id, geo_country_iso3, g, actual_event_decade,
+      first_parent_fair_id, first_fair_id
+    ),
+  controls_selected
+)
+
+message("Using canonical population with observed and Swing knots from prep panel...")
+canonical_population_columns <- c(
+  "population", "population_original", "population_knot",
+  "population_swing_implied", "population_swing_used",
+  "population_swing_geometry_coverage", "population_swing_density_coverage",
+  "population_swing_growth_outlier", "population_swing_exclusion_reason",
+  "population_source", "population_interp_status"
+)
+missing_population_columns <- setdiff(
+  canonical_population_columns, names(panel_year)
+)
+if (length(missing_population_columns) > 0L) {
+  stop(
+    "The final panel predates the Swing population integration. Missing: ",
+    paste(missing_population_columns, collapse = ", ")
+  )
+}
+invalid_swing_knots <- panel_year %>%
+  filter(
+    coalesce(population_swing_used, FALSE) &
+      (
+        !is.na(population_original) |
+          !is.finite(population_swing_implied) |
+          coalesce(population_swing_growth_outlier, FALSE) |
+          coalesce(population_swing_geometry_coverage, 0) < 0.95 |
+          coalesce(population_swing_density_coverage, 0) < 0.95
+      )
+  )
+if (nrow(invalid_swing_knots) > 0L) {
+  stop("The canonical panel contains invalid or overriding Swing knots.")
+}
+
+write_csv(treated_reference, file.path(results_dir, "treated_demographic_reference.csv"))
+write_csv(
+  treated_demographic_audit,
+  file.path(results_dir, "treated_demographic_eligibility_audit.csv")
+)
+write_csv(donor_pool_filter_counts, file.path(results_dir, "donor_pool_filter_counts.csv"))
+write_csv(
+  donor_pool_eligibility_audit,
+  file.path(results_dir, "donor_pool_eligibility_audit.csv")
+)
+write_csv(selected_donor_units, file.path(results_dir, "selected_donor_units.csv"))
+write_csv(
+  panel_year %>%
+    semi_join(analysis_units_selected, by = c("unit_id", "target_unit_id")) %>%
+    select(
+      unit_id, target_unit_id, place_name, year,
+      population_original, population_knot, population,
+      population_implied_1801, population_swing_implied,
+      population_swing_used, population_swing_geometry_coverage,
+      population_swing_density_coverage, population_swing_growth_outlier,
+      population_swing_exclusion_reason, population_source,
+      population_interp_status
+    ),
+  file.path(results_dir, "population_swing_knot_audit.csv")
+)
+
 write_csv(venue_quality_audit, file.path(results_dir, "venue_quality_audit.csv"))
 write_csv(distance_audit, file.path(results_dir, "venue_distance_match_audit_all_bins.csv"))
 write_csv(first_exposure, file.path(results_dir, "first_exposure_all_bins.csv"))
@@ -846,6 +1244,20 @@ panel_decade_base <- panel_year %>%
     n_stem = sum(n_stem, na.rm = TRUE),
     n_nonstem = sum(n_nonstem, na.rm = TRUE),
     population = mean_or_na(population),
+    population_original = mean_or_na(population_original),
+    population_knot = mean_or_na(population_knot),
+    population_implied_1801 = first_nonmissing_numeric(population_implied_1801),
+    population_swing_used = any(population_swing_used),
+    population_swing_growth_outlier = any(
+      coalesce(population_swing_growth_outlier, FALSE)
+    ),
+    population_density_1801 = first_nonmissing_numeric(population_density_1801),
+    population_density_area_coverage_1801 = first_nonmissing_numeric(
+      population_density_area_coverage_1801
+    ),
+    agri_share_1801 = first_nonmissing_numeric(agri_share_1801),
+    trade_share_1801 = first_nonmissing_numeric(trade_share_1801),
+    other_share_1801 = first_nonmissing_numeric(other_share_1801),
     source_panel = first_nonmissing(source_panel),
     .groups = "drop"
   ) %>%
@@ -867,6 +1279,38 @@ panel_decade_base <- panel_year %>%
     )
   )
 
+population_balance_audit <- panel_decade_base %>%
+  semi_join(analysis_units_selected, by = c("unit_id", "target_unit_id")) %>%
+  left_join(
+    analysis_units_selected %>% select(unit_id, target_unit_id, g),
+    by = c("unit_id", "target_unit_id")
+  ) %>%
+  group_by(unit_id, target_unit_id, g) %>%
+  summarise(
+    n_decades = n_distinct(decade),
+    n_valid_population_decades = sum(is.finite(population) & population > 0),
+    min_decade = min(decade),
+    max_decade = max(decade),
+    used_swing_population = any(population_swing_used),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    treatment_status = if_else(g > 0, "treated", "donor"),
+    balanced_population =
+      n_decades == 14L & n_valid_population_decades == 14L &
+      min_decade == panel_year_min & max_decade == analysis_end_decade
+  ) %>%
+  arrange(desc(treatment_status), unit_id)
+write_csv(
+  population_balance_audit,
+  file.path(results_dir, "population_balance_audit_1800_1930.csv")
+)
+if (nrow(population_balance_audit) !=
+      length(selected_treated_ids) + nrow(selected_donor_units) ||
+    any(!population_balance_audit$balanced_population)) {
+  stop("The restricted event-study population panel is not balanced as expected.")
+}
+
 ###############################################################################
 # Run event studies by distance bin
 ###############################################################################
@@ -879,50 +1323,9 @@ for (bin_label in analysis_bin_labels) {
   bin_dir <- file.path(results_dir, bin_dirs[[bin_label]])
   dir.create(bin_dir, recursive = TRUE, showWarnings = FALSE)
 
-  treated_units <- first_exposure %>%
-    filter(
-      exposure_status == "treated",
-      if (bin_label == aggregate_bin_label) {
-        distance_bin_km %in% bin_labels
-      } else {
-        distance_bin_km == bin_label
-      },
-      first_exposure_year >= treated_event_year_min,
-      first_exposure_year <= treated_event_year_max
-    ) %>%
-    transmute(
-      unit_id,
-      target_unit_id,
-      geo_country_iso3,
-      event_year = first_exposure_year,
-      g = first_exposure_decade,
-      distance_bin_km = bin_label,
-      source_distance_bin_km = distance_bin_km,
-      first_distance_km,
-      first_fair_id = as.character(first_fair_id),
-      first_parent_fair_id = as.character(first_parent_fair_id),
-      first_venue_seq,
-      first_fair_name,
-      first_fair_city,
-      first_fair_country,
-      first_fair_venue
-    )
-
-  controls <- never_units %>%
-    transmute(
-      unit_id,
-      target_unit_id,
-      geo_country_iso3,
-      g = 0L,
-      first_parent_fair_id = NA_character_,
-      first_fair_id = NA_character_
-    )
-
-  analysis_units <- bind_rows(
-    treated_units %>%
-      select(unit_id, target_unit_id, geo_country_iso3, g, first_parent_fair_id, first_fair_id),
-    controls
-  )
+  treated_units <- treated_units_selected
+  controls <- controls_selected
+  analysis_units <- analysis_units_selected
 
   panel_decade <- panel_decade_base %>%
     semi_join(analysis_units, by = c("unit_id", "target_unit_id")) %>%
@@ -1017,6 +1420,9 @@ for (bin_label in analysis_bin_labels) {
       n_treated_units = value_or(.x$n_treated_units, NA_integer_),
       n_control_units = value_or(.x$n_control_units, NA_integer_),
       n_treated_cohorts = value_or(.x$n_treated_cohorts, NA_integer_),
+      treatment_decade = value_or(.x$treatment_decade, NA_integer_),
+      actual_event_decade = value_or(.x$actual_event_decade, NA_integer_),
+      anticipation_decades = anticipation_decades,
       n_events = value_or(.x$effective_sample_summary$n_events, NA_integer_),
       n_treated_gbr = value_or(.x$effective_sample_summary$n_treated_gbr, NA_integer_),
       n_treated_usa = value_or(.x$effective_sample_summary$n_treated_usa, NA_integer_),
@@ -1073,19 +1479,33 @@ for (bin_label in analysis_bin_labels) {
   write_csv(dynamic_att, file.path(bin_dir, "dynamic_att.csv"))
   write_csv(simple_att, file.path(bin_dir, "simple_att.csv"))
 
+  if (any(!model_status$ok)) {
+    failed_outcomes <- model_status %>% filter(!ok) %>% pull(outcome)
+    stop(
+      "Event-study estimation failed for: ",
+      paste(failed_outcomes, collapse = ", "),
+      ". See ", file.path(bin_dir, "model_status.csv"), "."
+    )
+  }
+
   if (nrow(dynamic_att) > 0L) {
     y_limits_by_outcome <- dynamic_att %>%
       group_by(outcome) %>%
       summarise(y_limits = list(dynamic_y_limits(pick(everything()))), .groups = "drop")
 
     for (model in successful_models) {
+      model_dynamic_att <- dynamic_att %>%
+        filter(
+          outcome == model$outcome,
+          distance_bin_km == model$distance_bin_km
+        )
       y_limits <- y_limits_by_outcome %>%
         filter(outcome == model$outcome) %>%
         pull(y_limits) %>%
         pluck(1)
 
       plot_es <- plot_dynamic_event_study(
-        model$es,
+        model_dynamic_att,
         model$outcome,
         model$distance_bin_km,
         y_limits,
@@ -1105,7 +1525,7 @@ for (bin_label in analysis_bin_labels) {
 
       if (bin_label == aggregate_bin_label && model$outcome == "stem_per_100k_pop") {
         plot_es_zoomed <- plot_dynamic_event_study(
-          model$es,
+          model_dynamic_att,
           model$outcome,
           model$distance_bin_km,
           zoomed_display_y_limits,
@@ -1143,6 +1563,17 @@ for (bin_label in analysis_bin_labels) {
     ),
     paste0("Selected venue coordinate source: ", crystal_palace_1851_coordinate_source),
     paste0("Control group: ", control_group_name),
+    paste0("Donor matching mode: ", donor_match_mode, "."),
+    paste0("Analysis decades: ", panel_year_min, "-", analysis_end_decade, "."),
+    paste0("Anticipation: ", anticipation_decades, " decades."),
+    paste0("Anticipated treatment onset: ", 1850L - anticipation_years, "."),
+    paste0("Minimum donor distance: ", donor_min_distance_km, " km."),
+    paste0("Density ratio caliper: ", donor_density_ratio, "."),
+    if (donor_match_mode == "demographic") {
+      paste0("Occupation-share caliper: ", donor_occupation_caliper_pp, " pp.")
+    } else {
+      "Occupation-share calipers: not applied."
+    },
     "Greater London included using Nomis/ONS 1921 districts selected by >=50% overlap with 1911 Greater London.",
     "The Crystal Palace 1851 venue is used to classify exposure for Greater London and nearby units.",
     "Distance is polygon-to-venue; venues inside polygons have distance 0.",
@@ -1161,7 +1592,7 @@ for (bin_label in analysis_bin_labels) {
     "Future-treated units are units first exposed after 1910 and before or during 1961.",
     paste0("Dynamic window: -", event_window, " to +", event_window, " years."),
     paste0("Treated units: ", sample_summary$n_treated_units),
-    paste0("Never-treated control units: ", sample_summary$n_control_units),
+    paste0("Restricted donor units: ", sample_summary$n_control_units),
     paste0("Always-treated units excluded: ", nrow(always_units)),
     paste0("Future-treated units after 1910 excluded: ", nrow(future_units)),
     paste0("Successful models: ", sum(model_status$ok), " / ", nrow(model_status))
@@ -1200,24 +1631,32 @@ root_notes <- c(
   ),
   paste0("Selected venue coordinate source: ", crystal_palace_1851_coordinate_source),
   paste0("Results directory: ", results_dir),
+  paste0("Donor matching mode: ", donor_match_mode, "."),
+  paste0("Analysis decades: ", panel_year_min, "-", analysis_end_decade, "."),
+  paste0("Anticipation: ", anticipation_decades, " decades."),
+  paste0("Anticipated treatment onset: ", 1850L - anticipation_years, "."),
   paste0(
-    "Distance specifications: ",
-    paste(bin_labels, collapse = ", "),
-    ", and cumulative ",
+    "Distance specification: cumulative ",
     aggregate_bin_label,
     " km."
   ),
   paste0("Exposure classification window: ", classification_year_min, "-", classification_year_max, "."),
   paste0("Included treated event window: ", treated_event_year_min, "-", treated_event_year_max, "."),
+  paste0("Donors are at least ", donor_min_distance_km, " km from the venue."),
   paste0(
-    "Control group is strictly never treated within ",
-    max_treatment_distance_km,
-    " km of Crystal Palace 1851 over ",
-    classification_year_min,
-    "-",
-    classification_year_max,
-    "."
+    "Donor density must be within a factor of ", donor_density_ratio,
+    " of the treated mean."
   ),
+  if (donor_match_mode == "demographic") {
+    paste0(
+      "Each donor occupation share must be within ",
+      donor_occupation_caliper_pp, " pp of the treated mean."
+    )
+  } else {
+    "Occupation-share calipers are not applied."
+  },
+  paste0("Selected treated units: ", length(selected_treated_ids), "."),
+  paste0("Selected donor units: ", nrow(selected_donor_units), "."),
   "Greater London is included using Nomis/ONS 1921 districts selected by >=50% overlap with 1911 Greater London.",
   "US counties are excluded from the panel and control group.",
   "Venue coordinates with low-quality automated geocoding notes are excluded.",

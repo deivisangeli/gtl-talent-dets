@@ -25,7 +25,13 @@ if (length(script_arg)) {
 source(file.path(repo_root, "paths.R"))
 out_root <- DATA_OUTPUT
 
-ed16_file <- file.path(AMWS_OUTPUT, "regex_all_docs", "amws_ed16_us_geocoded.csv")
+ed16_file <- file.path(
+  TALENT_DETS_DATA_DIR,
+  "Data",
+  "processed",
+  "amws",
+  "amws_ed86_final.csv"
+)
 panel_file <- file.path(out_root, "us_panel_county_stem_year_1800.csv")
 
 if (!file.exists(ed16_file)) {
@@ -36,9 +42,14 @@ if (!file.exists(panel_file)) {
 }
 
 # ---- AMWS 1986: aggregate to county-year -----------------------------------
+has_value <- function(x) {
+  x <- trimws(as.character(x))
+  !is.na(x) & x != "" & !toupper(x) %in% c("NA", "N/A")
+}
+
 amws <- fread(ed16_file)
 
-required_amws_cols <- c("birth_year", "geoid")
+required_amws_cols <- c("birth_year", "birth_country", "geo_geoid")
 missing_amws_cols <- setdiff(required_amws_cols, names(amws))
 if (length(missing_amws_cols)) {
   stop("Missing required columns in AMWS 1986 file: ",
@@ -46,13 +57,12 @@ if (length(missing_amws_cols)) {
 }
 
 amws_valid <- amws[
-  !is.na(birth_year) &
-    !is.na(geoid) &
-    trimws(as.character(birth_year)) != "" &
-    trimws(as.character(geoid)) != ""
+  birth_country == "USA" &
+    has_value(birth_year) &
+    has_value(geo_geoid)
 ]
 amws_valid[, year := suppressWarnings(as.integer(birth_year))]
-amws_valid[, geoid_int := suppressWarnings(as.integer(geoid))]
+amws_valid[, geoid_int := suppressWarnings(as.integer(geo_geoid))]
 amws_valid <- amws_valid[!is.na(year) & !is.na(geoid_int)]
 amws_valid <- amws_valid[year >= 1800 & year <= 1986]
 amws_valid[, GEOID := sprintf("%05d", geoid_int)]
@@ -113,6 +123,7 @@ fwrite(p_out, panel_out_file)
 
 summary_dt <- data.table(
   metric = c(
+    "amws_1986_source_file",
     "input_rows",
     "rows_with_birth_year_and_geoid",
     "county_year_rows",
@@ -131,6 +142,7 @@ summary_dt <- data.table(
     "panel_rows_missing_births_denominator"
   ),
   value = as.character(c(
+    basename(ed16_file),
     nrow(amws),
     nrow(amws_valid),
     nrow(amws_cy),

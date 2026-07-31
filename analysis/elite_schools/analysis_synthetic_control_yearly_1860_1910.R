@@ -23,15 +23,20 @@ if (length(file_arg) > 0) {
   repo_root <- if (basename(cwd) == "analysis") dirname(cwd) else if (basename(dirname(cwd)) == "analysis") dirname(dirname(cwd)) else cwd
 }
 source(file.path(repo_root, "paths.R"))
+source(file.path(repo_root, "analysis", "elite_schools", "amws_timing_helpers.R"))
+timing <- elite_timing_config()
 
-out_root <- file.path(TALENT_DETS_DATA_DIR, "results", "elite_schools", "event_study_yearly_1860_1910", "sc")
+out_root <- elite_results_dir(
+  TALENT_DETS_DATA_DIR, "event_study_yearly_1860_1910", timing, "sc"
+)
 dir.create(out_root, recursive = TRUE, showWarnings = FALSE)
 
 events <- data.table(
   GEOID      = c("36061",        "11001",         "39061"),
   unit_label = c("NY_Manhattan", "Washington_DC", "Hamilton_Co_OH"),
-  event_year = c(1869,           1870,            1895)
+  opening_year = c(1869L,        1870L,           1895L)
 )
+events[, event_year := elite_event_year(opening_year, timing)]
 # Baltimore city + Baltimore Co merged and dropped (pre-1860 BCC/Western HS)
 contaminate <- c("25025","06075","24510","24005","42101")
 NYC_OTHER <- c("36005","36047","36081","36085")  # other boroughs excluded as donors
@@ -39,12 +44,15 @@ NYC_OTHER <- c("36005","36047","36081","36085")  # other boroughs excluded as do
 # ---- Load panel ------------------------------------------------------------
 p <- fread(file.path(DATA_OUTPUT, "us_panel_county_amws_combined_year.csv"))
 p[, GEOID := sprintf("%05d", as.integer(GEOID))]
-p <- p[year >= 1840 & year <= 1925]   # +20y post for Hamilton (event 1895)
+p <- p[year >= min(events$event_year) - 20L &
+       year <= max(events$event_year) + 20L]
 
-# ---- Donor pool: top 100 counties by 1860 population -----------------------
-pop1860 <- p[year == 1860, .(GEOID, population)]
-setorder(pop1860, -population)
-top100_donors <- pop1860[1:100]$GEOID
+# ---- Donor pool: top 100 counties by pre-treatment 1820 population ---------
+panel_full <- fread(file.path(DATA_OUTPUT, "us_panel_county_amws_combined_year.csv"))
+panel_full[, GEOID := sprintf("%05d", as.integer(GEOID))]
+pop1820 <- panel_full[year == 1820, .(GEOID, population)]
+setorder(pop1820, -population)
+top100_donors <- pop1820[1:100]$GEOID
 # Exclude treated, contaminated, and other NYC boroughs from donors
 donors <- setdiff(top100_donors,
                   c(events$GEOID, contaminate, NYC_OTHER))
@@ -75,7 +83,7 @@ run_sc <- function(treated_geoid, ev_year, label) {
   treated_id <- ids[GEOID == treated_geoid]$unit_id
   donor_ids  <- ids[GEOID %in% donors]$unit_id
 
-  pre_yrs  <- 1860:(ev_year - 1)
+  pre_yrs  <- (ev_year - 20L):(ev_year - 1L)
   post_yrs <- ev_year:(ev_year + 20)
   all_yrs  <- min(pre_yrs):max(post_yrs)
   d_unit   <- as.data.table(p_sc)[unit_id %in% c(treated_id, donor_ids) &
@@ -137,8 +145,8 @@ run_sc <- function(treated_geoid, ev_year, label) {
                                     "Synthetic" = "#D55E00"),  # vermillion
                          name = NULL) +
       labs(title = sprintf("SC: %s  |  event %d", label, ev_year),
-           subtitle = sprintf("Outcome: %s  |  pre: 1860-%d  |  donors: top 100 by 1860 pop",
-                            outcome, ev_year - 1),
+           subtitle = sprintf("Outcome: %s | timing: %s | pre: %d-%d | donors: top 100 by 1820 pop",
+                            outcome, timing$label, min(pre_yrs), max(pre_yrs)),
            x = "Year", y = outcome) +
       theme_minimal(base_size = 11) + theme(legend.position = "bottom")
     ggsave(file.path(out_dir, sprintf("sc_%s.png", outcome)),
@@ -153,5 +161,7 @@ for (i in seq_len(nrow(events))) {
   all_sc[[i]] <- run_sc(events$GEOID[i], events$event_year[i], events$unit_label[i])
 }
 combined <- rbindlist(all_sc, fill = TRUE)
+combined[, `:=`(timing_mode = timing$mode, school_age = timing$school_age)]
 fwrite(combined, file.path(out_root, "all_sc_estimates.csv"))
+fwrite(events, file.path(out_root, "treatment_events.csv"))
 cat("\nAll SC done. Results in", out_root, "\n")

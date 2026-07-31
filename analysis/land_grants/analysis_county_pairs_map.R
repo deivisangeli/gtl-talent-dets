@@ -74,7 +74,7 @@ treated_counties <- pairs_long %>%
  )
 
 untreated_counties <- pairs_long %>%
- filter(runner_up_match_status == "matched_same_state") %>%
+ filter(runner_up_match_status %in% c("matched_same_state", "matched_cross_state")) %>%
  distinct(runner_up_county, runner_up_state_assumed) %>%
  transmute(
   county = runner_up_county,
@@ -93,7 +93,7 @@ county_roles <- bind_rows(untreated_counties, treated_counties) %>%
  select(county, state, state_abbr, county_norm, map_role)
 
 unresolved_runner_ups <- pairs_long %>%
- filter(runner_up_match_status != "matched_same_state") %>%
+ filter(!runner_up_match_status %in% c("matched_same_state", "matched_cross_state")) %>%
  distinct(college, runner_up_county, runner_up_state_assumed, runner_up_match_status) %>%
  arrange(college, runner_up_county)
 

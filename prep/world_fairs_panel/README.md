@@ -19,8 +19,9 @@ Recommended order:
 ```powershell
 Rscript 01_scrape_worlds_fairs.R
 Rscript 02_build_worlds_fairs_enriched.R
-Rscript 03_build_uk_historical_urban_unit_population_1801_1961.R
 Rscript 03a_build_greater_london_1911_parish_crosswalk.R
+Rscript 03_build_uk_historical_urban_unit_population_1801_1961.R
+Rscript 04_build_uk_historical_urban_units_us_county_panel.R
 ```
 
 The active world's-fairs enrichment stage is now intentionally compact:
@@ -41,10 +42,40 @@ scripts are not part of the main run order.
 The current UK panel builder is
 `03_build_uk_historical_urban_unit_population_1801_1961.R`. It builds the
 harmonized 1921 urban-unit geography, attaches Law-Robson and Nomis population,
-and adds Wikipedia scientist/inventor outcomes from geocoded birth points. The
+adds Wikipedia scientist/inventor outcomes from geocoded birth points, and
+attaches the 1801 population density and agriculture, trade, and
+other-occupation shares from the Caprettini-Voth `swing-cross.dta` replication
+data. It also reads `swing-panel.dta` to recover parish-density population
+knots for 1801, 1811, 1821, and 1831. The demographic variables are
+joined to `Parishes1851.shp` by `PARISH_ID`, allocated to the fixed 1921 target
+units by polygon intersection, and weighted by implied 1801 parish population.
+Population density is expressed as persons per square kilometre and aggregated
+as allocated 1801 population divided by allocated source area. All variables
+are time-invariant baseline characteristics named with the `_1801` suffix;
+missing and partial source coverage is retained rather than imputed. The source files live
+under `Data/raw/world_fairs/data_c_voth/` in Dropbox. The
 old numbered scripts from `03` through `21`, including the LAU/GISCO outcomes
 workflow, are archived in `legacy/numbered_03_21/` for traceability and are not
 part of the main run order.
+
+The occupation-share stage writes a unit-level file, a parish-to-target
+crosswalk, and a QC summary under `Data/processed/`. The annual UK panel carries
+`agri_share_1801`, `trade_share_1801`, `other_share_1801`,
+`occupation_share_coverage_1801`, `population_density_1801`, and
+`population_density_area_coverage_1801`. It also carries
+`population_implied_1801`, the target-unit population implied by parish density
+and spatially allocated parish area. For population years 1801, 1811, 1821,
+and 1831, an uncalibrated Swing knot is used only when the harmonized census
+population is missing, at least 95% of the real target geometry and its valid
+density area are covered, and the sequential change relative to the last
+accepted Swing knot is no greater than a factor of five per decade. Observed
+population always takes precedence. Annual population is then linearly
+interpolated in levels between observed or accepted Swing knots, without
+extrapolation. The full candidate/usage/exclusion audit is written to
+`Data/processed/uk_historical_urban_units_swing_population_1801_1831_audit.csv`.
+Script `04` propagates these fields to the combined UK-US panel and leaves the
+Swing-specific fields missing for US counties. Current analysis scripts do not
+use the new fields as regression controls.
 
 `03a_build_greater_london_1911_parish_crosswalk.R` is a diagnostic/refinement
 step for London. It reads the BBCE 1911 parish list added under
