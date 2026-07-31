@@ -203,7 +203,11 @@ if (sum(panel_year$n_amws_1986, na.rm = TRUE) <= 0) {
 }
 
 panel_decade <- panel_year %>%
-  mutate(decade = standard_decade(year)) %>%
+  # Bin AMWS births (numerator), population, and the births denominator onto the
+  # SAME decade grid as the treatment cohort. For standard profiles this reduces
+  # to standard_decade(); for alternative-decade (g_shift) profiles it shifts
+  # birth years ending in 7-9 forward one decade, matching the treatment timing.
+  mutate(decade = event_decade(year, treatment_timing)) %>%
   group_by(GEOID, decade) %>%
   summarise(
     n_amws_1906_1955_dedup = sum(n_amws_1906_1955_dedup, na.rm = TRUE),

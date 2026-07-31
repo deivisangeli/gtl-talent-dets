@@ -74,7 +74,7 @@ world_fairs_us_amws_profile <- function(
       event_time_max = 50L,
       expected_assigned = c(15L, 15L, 42L, 46L),
       expected_eligible = c(12L, 12L, 32L, 35L),
-      expected_core_controls = c(1164L, 687L, 1140L, 676L),
+      expected_core_controls = c(1164L, 688L, 1140L, 677L),
       balance_controls_calendar = TRUE,
       population_control = TRUE,
       est_method = "reg",
@@ -124,7 +124,7 @@ world_fairs_us_amws_profile <- function(
       event_time_max = 50L,
       expected_assigned = c(11L, 11L, 29L, 30L),
       expected_eligible = c(8L, 8L, 21L, 22L),
-      expected_core_controls = c(1164L, 687L, 1140L, 676L),
+      expected_core_controls = c(1164L, 688L, 1140L, 677L),
       balance_controls_calendar = TRUE,
       control_sample_source_profile =
         "robust_m30_pop_m10_balanced_oldest_g_shift",

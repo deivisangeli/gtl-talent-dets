@@ -241,33 +241,57 @@ panel_year[is.na(n_amws_1906_1955_dedup), n_amws_1906_1955_dedup := 0L]
 panel_year[is.na(n_amws_1986), n_amws_1986 := 0L]
 panel_year[, n_amws := n_amws_1906_1955_dedup + n_amws_1986]
 panel_year[, county_births_estimate_year := population * us_birth_rate_year]
-panel_year[, decade := floor(year / 10) * 10L]
-
-panel_decade <- panel_year[, .(
-  n_amws_1906_1955_dedup = sum(n_amws_1906_1955_dedup),
-  n_amws_1986 = sum(n_amws_1986),
-  n_amws = sum(n_amws),
-  population = if (all(is.na(population))) NA_real_ else mean(population, na.rm = TRUE),
-  county_births_estimate = if (all(is.na(county_births_estimate_year))) NA_real_ else sum(county_births_estimate_year, na.rm = TRUE),
-  population_source = collapse_source(population_source)
-), by = .(GEOID, decade)]
-
-panel_decade[, `:=`(
-  log1p_n_amws = log1p(n_amws),
-  amws_per_100k = fifelse(population > 0, 1e5 * n_amws / population, NA_real_),
-  amws_per_1000_births = fifelse(county_births_estimate > 0, 1000 * n_amws / county_births_estimate, NA_real_)
+# Two decade-binning rules for the outcome/denominator panel, matching the two
+# treatment-timing conventions built above (g_std vs g_shift):
+#   decade_std : standard calendar decades, floor(year / 10) * 10
+#   decade_alt : alternative decades, shifted forward one decade when the birth
+#                year ends in 7, 8, or 9 (the same year %% 10 >= 7 rule as g_shift)
+# Re-binning births/population/denominator with decade_alt keeps the numerator,
+# denominator, baseline covariate, and treatment cohort on one coherent grid in
+# the alternative specification.
+panel_year[, decade_std := floor(year / 10) * 10L]
+panel_year[, decade_alt := fifelse(
+  year %% 10 >= 7,
+  floor(year / 10) * 10L + 10L,
+  floor(year / 10) * 10L
 )]
+
+# Aggregate the annual panel to a county-decade panel under a given decade rule.
+# The grouping column is renamed to `decade` so downstream scripts consume both
+# panels through the same column name.
+build_decade_panel <- function(dt, decade_col) {
+  dp <- dt[, .(
+    n_amws_1906_1955_dedup = sum(n_amws_1906_1955_dedup),
+    n_amws_1986 = sum(n_amws_1986),
+    n_amws = sum(n_amws),
+    population = if (all(is.na(population))) NA_real_ else mean(population, na.rm = TRUE),
+    county_births_estimate = if (all(is.na(county_births_estimate_year))) NA_real_ else sum(county_births_estimate_year, na.rm = TRUE),
+    population_source = collapse_source(population_source)
+  ), by = c("GEOID", decade_col)]
+  setnames(dp, decade_col, "decade")
+  dp[, `:=`(
+    log1p_n_amws = log1p(n_amws),
+    amws_per_100k = fifelse(population > 0, 1e5 * n_amws / population, NA_real_),
+    amws_per_1000_births = fifelse(county_births_estimate > 0, 1000 * n_amws / county_births_estimate, NA_real_)
+  )]
+  dp[]
+}
+
+panel_decade     <- build_decade_panel(panel_year, "decade_std")
+panel_decade_alt <- build_decade_panel(panel_year, "decade_alt")
 
 ###############################################################################
 # Outputs and audits
 ###############################################################################
 
 panel_out <- output_file_path("land_grants", "amws_temporal_support_county_decade_1830_1950.csv")
+panel_alt_out <- output_file_path("land_grants", "amws_temporal_support_county_decade_1830_1950_alt.csv")
 units_out <- output_file_path("land_grants", "andrews_event_county_units_1850_1920.csv")
 audit_out <- output_file_path("land_grants", "amws_temporal_support_build_audit.csv")
 unresolved_out <- output_file_path("land_grants", "andrews_runner_unresolved_1850_1920.csv")
 
 fwrite(panel_decade, panel_out)
+fwrite(panel_decade_alt, panel_alt_out)
 write_csv(units, units_out, na = "")
 write_csv(runner_unresolved, unresolved_out, na = "")
 
@@ -293,6 +317,7 @@ audit <- tibble(
 write_csv(audit, audit_out, na = "")
 
 cat("wrote", panel_out, "\n")
+cat("wrote", panel_alt_out, "\n")
 cat("wrote", units_out, "\n")
 cat("events:", n_distinct(units$event_id), " treated:", sum(units$sample_role == "treated"),
     " controls:", sum(units$sample_role == "runner_up"), " stacked units:", nrow(units), "\n")

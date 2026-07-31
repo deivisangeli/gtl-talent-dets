@@ -84,6 +84,13 @@ if (!isTRUE(profile$population_control) || !balance_controls_calendar) {
 cores <- suppressWarnings(as.integer(Sys.getenv("WORLD_FAIRS_CORES", unset = "4")))
 if (is.na(cores) || cores < 1L) cores <- 1L
 treatment_cohort_shift <- as.integer(value_or(profile$treatment_cohort_shift, 0L))
+treatment_timing <- as.character(value_or(
+  profile$treatment_timing,
+  "standard_decade"
+))
+if (!treatment_timing %in% c("standard_decade", "alternative_decade")) {
+  stop("Unsupported treatment timing: ", treatment_timing)
+}
 single_fair_event_window <- isTRUE(value_or(profile$single_fair_event_window, FALSE))
 plot_estimator_label <- value_or(
   profile$plot_estimator_label,
@@ -172,7 +179,10 @@ panel_decade <- panel_year %>%
     n_amws = as.numeric(n_amws)
   ) %>%
   filter(year >= 1800L, year <= 1960L, !is.na(GEOID)) %>%
-  mutate(decade = standard_decade(year)) %>%
+  # Bin outcomes on the same decade grid as the treatment cohort (see the main
+  # event-studies script). Standard profiles -> standard_decade(); g_shift
+  # profiles -> alternative_decade() (birth years ending 7-9 shift forward).
+  mutate(decade = event_decade(year, treatment_timing)) %>%
   group_by(GEOID, decade) %>%
   summarise(
     n_amws_1906_1955_dedup = sum(n_amws_1906_1955_dedup, na.rm = TRUE),

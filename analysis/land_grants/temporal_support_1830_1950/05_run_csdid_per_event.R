@@ -85,13 +85,22 @@ panel <- read_csv(
   mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0")) %>%
   filter(between(decade, analysis_min_decade, analysis_max_decade))
 
+# Alternative-decade outcome/denominator panel (births ending 7-9 shifted forward
+# one decade), used only by the alternative_decade timing.
+panel_alt <- read_csv(
+  output_file_path("land_grants", "amws_temporal_support_county_decade_1830_1950_alt.csv"),
+  show_col_types = FALSE
+) %>%
+  mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0")) %>%
+  filter(between(decade, analysis_min_decade, analysis_max_decade))
+
 units <- read_csv(
   output_file_path("land_grants", "andrews_event_county_units_1850_1920.csv"),
   show_col_types = FALSE
 ) %>%
   mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0"))
 
-build_stack <- function(timing_var, timing_name) {
+build_stack <- function(timing_var, timing_name, panel_src) {
   stack_units <- units %>%
     mutate(
       treatment_decade = .data[[timing_var]],
@@ -105,7 +114,7 @@ build_stack <- function(timing_var, timing_name) {
   baseline <- stack_units %>%
     select(stack_unit_id, GEOID, control_decade) %>%
     left_join(
-      panel %>% select(GEOID, control_decade = decade,
+      panel_src %>% select(GEOID, control_decade = decade,
                        population_baseline = population,
                        baseline_population_source = population_source,
                        births_baseline = county_births_estimate),
@@ -119,13 +128,13 @@ build_stack <- function(timing_var, timing_name) {
 
   stack_units %>%
     left_join(baseline, by = c("stack_unit_id", "GEOID", "control_decade")) %>%
-    inner_join(panel, by = "GEOID") %>%
+    inner_join(panel_src, by = "GEOID") %>%
     arrange(event_id, sample_role, GEOID, decade)
 }
 
 panel_by_timing <- list(
-  standard_decade = build_stack("g_std", "standard_decade"),
-  alternative_decade = build_stack("g_shift", "alternative_decade")
+  standard_decade = build_stack("g_std", "standard_decade", panel),
+  alternative_decade = build_stack("g_shift", "alternative_decade", panel_alt)
 )
 
 filter_balanced_event_time <- function(stack_panel,
