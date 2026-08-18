@@ -1,9 +1,18 @@
 ###############################################################################
-# CSDID event studies per cohort, each cohort using its MAXIMUM available
-# event-time window [-20, 1950 - g]. Balance is applied per cohort on calendar
-# decades [g-20, 1950]. Each cohort estimated on its own subpanel (treated of
-# that cohort + all never-treated runner_ups pooled). Facet by cohort with
-# free x/y scales (each cohort has a different post-treatment horizon).
+# CSDID event studies per cohort, estimated on EXACTLY the sample used by the
+# pooled event studies in 03_run_baseline_population_controls.R.
+#
+# The sample (balance rule, cohort filter, event-retention rule) is built by the
+# shared helpers in _sample_helpers.R and is then split by treatment cohort, so
+# the treated counts in the cohort facets sum to the pooled "Events" count. The
+# defaults reproduce the main-text pooled specification
+# (BALANCE_EVENT_TIME = TRUE, e in [-20, +70]); the same env vars as script 03
+# override them.
+#
+# Within that fixed sample each cohort is still followed as far as the panel
+# supports it: et_max(g) is the largest event time at which every retained unit
+# in the cohort subpanel still has an observation. Units are never dropped to
+# extend the horizon. Facet by cohort on a calendar axis.
 ###############################################################################
 
 rm(list = ls())
@@ -24,11 +33,42 @@ file_arg <- args[grepl("^--file=", args)]
 script_path <- normalizePath(sub("^--file=", "", file_arg[[1]]), winslash = "/", mustWork = TRUE)
 repo_root <- normalizePath(file.path(dirname(script_path), "..", "..", ".."), winslash = "/", mustWork = TRUE)
 source(file.path(repo_root, "prep", "raw_paths.R"))
+source(file.path(dirname(script_path), "_sample_helpers.R"))
 
-analysis_min_decade <- 1830L
-analysis_max_decade <- 1950L
-min_event_time <- -20L
+# Defaults are the main-text pooled specification, so a bare run of this script
+# decomposes the figures produced by
+#   BALANCE_EVENT_TIME=TRUE MAX_EVENT_TIME=70 Rscript 03_...R
+min_event_time_raw <- Sys.getenv("MIN_EVENT_TIME", unset = "-20")
+min_event_time <- suppressWarnings(as.integer(min_event_time_raw))
+if (is.na(min_event_time) || min_event_time >= 0) {
+  stop("Invalid MIN_EVENT_TIME (must be negative integer): ", min_event_time_raw)
+}
+max_event_time_raw <- Sys.getenv("MAX_EVENT_TIME", unset = "70")
+max_event_time <- suppressWarnings(as.integer(max_event_time_raw))
+if (is.na(max_event_time) || max_event_time <= 0) {
+  stop("Invalid MAX_EVENT_TIME: ", max_event_time_raw)
+}
 reference_event_time <- 0L
+
+cohorts_raw <- Sys.getenv("COHORTS", unset = "")
+cohorts_filter <- if (nzchar(cohorts_raw)) {
+  suppressWarnings(as.integer(unlist(strsplit(cohorts_raw, "[,\\s]+"))))
+} else {
+  NULL
+}
+if (!is.null(cohorts_filter) && any(is.na(cohorts_filter))) {
+  stop("Invalid COHORTS: ", cohorts_raw)
+}
+
+balance_mode_raw <- toupper(Sys.getenv("BALANCE_EVENT_TIME", unset = "TRUE"))
+balance_mode <- switch(
+  balance_mode_raw,
+  "TRUE" = "full",
+  "FULL" = "full",
+  "PRE" = "pre",
+  "none"
+)
+
 outcomes <- c("n_amws", "amws_per_1000_births", "county_births_estimate")
 control_var <- "births_baseline"
 
@@ -42,66 +82,53 @@ timing_labels <- c(
   alternative_decade = "alternative decade"
 )
 
+# The unsuffixed directory holds the manuscript specification. Any override of
+# the sample definition writes elsewhere so the two cannot be confused.
 results_subdir <- "amws_county_pairs_temporal_support_1830_1950_baseline_pop_per_cohort_max_e"
+if (balance_mode != "full") {
+  results_subdir <- paste0(results_subdir, "_bal", tolower(balance_mode))
+}
+if (max_event_time != 70L) {
+  results_subdir <- paste0(results_subdir, "_max", max_event_time)
+}
+if (min_event_time != -20L) {
+  results_subdir <- paste0(results_subdir, "_min", abs(min_event_time))
+}
+if (!is.null(cohorts_filter)) {
+  results_subdir <- paste0(results_subdir, "_cohorts_",
+                           paste(sort(cohorts_filter), collapse = "_"))
+}
 results_subdir_path <- function(...) {
   path <- results_file_path("land_grants", "event_studies", results_subdir, ...)
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
   path
 }
 
-panel <- read_csv(
-  output_file_path("land_grants", "amws_temporal_support_county_decade_1830_1950.csv"),
-  show_col_types = FALSE
-) %>%
-  mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0")) %>%
-  filter(between(decade, analysis_min_decade, analysis_max_decade))
-
-# Alternative-decade outcome/denominator panel (births ending 7-9 shifted forward
-# one decade), used only by the alternative_decade timing.
-panel_alt <- read_csv(
-  output_file_path("land_grants", "amws_temporal_support_county_decade_1830_1950_alt.csv"),
-  show_col_types = FALSE
-) %>%
-  mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0")) %>%
-  filter(between(decade, analysis_min_decade, analysis_max_decade))
-
-units <- read_csv(
-  output_file_path("land_grants", "andrews_event_county_units_1850_1920.csv"),
-  show_col_types = FALSE
-) %>%
-  mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0"))
-
-build_stack <- function(timing_var, timing_name, panel_src) {
-  stack_units <- units %>%
-    mutate(
-      treatment_decade = .data[[timing_var]],
-      control_decade = treatment_decade - 10L,
-      g = if_else(sample_role == "treated", treatment_decade, 0L),
-      timing = timing_name,
-      stack_unit_id = paste(event_id, GEOID, sample_role, sep = "_"),
-      stack_unit_num = dense_rank(stack_unit_id)
-    )
-
-  baseline <- stack_units %>%
-    select(stack_unit_id, GEOID, control_decade) %>%
-    left_join(
-      panel_src %>% select(GEOID, control_decade = decade,
-                       population_baseline = population,
-                       baseline_population_source = population_source,
-                       births_baseline = county_births_estimate),
-      by = c("GEOID", "control_decade")
-    )
-
-  stack_units %>%
-    left_join(baseline, by = c("stack_unit_id", "GEOID", "control_decade")) %>%
-    inner_join(panel_src, by = "GEOID") %>%
-    arrange(event_id, sample_role, GEOID, decade)
-}
+inputs <- read_temporal_support_inputs()
 
 panel_by_timing <- list(
-  standard_decade = build_stack("g_std", "standard_decade", panel),
-  alternative_decade = build_stack("g_shift", "alternative_decade", panel_alt)
+  standard_decade = build_stack(inputs$units, inputs$panel,
+                                "g_std", "standard_decade"),
+  alternative_decade = build_stack(inputs$units, inputs$panel_alt,
+                                   "g_shift", "alternative_decade")
 )
+
+panel_by_timing <- lapply(panel_by_timing, filter_cohorts, cohorts_filter = cohorts_filter)
+
+balance_event_times <- switch(
+  balance_mode,
+  full = seq(min_event_time, max_event_time, 10L),
+  pre = c(-20L, -10L),
+  NULL
+)
+
+if (!is.null(balance_event_times)) {
+  panel_by_timing <- lapply(
+    panel_by_timing,
+    filter_balanced_event_time,
+    event_times = balance_event_times
+  )
+}
 
 renormalize_dynamic_at <- function(dynamic, ref_e = 0L) {
   if_mat <- dynamic$inf.function$dynamic.inf.func.e
@@ -124,33 +151,40 @@ renormalize_dynamic_at <- function(dynamic, ref_e = 0L) {
   )
 }
 
-run_csdid_one_cohort <- function(panel_full, cohort, outcome_col) {
-  et_max <- analysis_max_decade - cohort
-  needed_decades <- seq(cohort + min_event_time, cohort + et_max, 10L)
-
-  sub <- panel_full %>%
-    filter(g == cohort | g == 0)
-
-  # per-cohort calendar balance on population support (consistent across outcomes):
-  # keep stack_units with non-NA population at all needed calendar decades and
-  # non-NA covariate (baseline births is unit-level, constant within stack_unit)
-  sub <- sub %>%
-    group_by(stack_unit_num) %>%
-    mutate(
-      .ok = all(needed_decades %in% decade[!is.na(population)]) &&
-        all(!is.na(.data[[control_var]]))
+# Longest horizon this cohort supports: every treated county of the cohort must
+# still be observed, and at least one never-treated runner-up must be observed,
+# at each event time from 0 up to the returned value. Controls inherited from
+# other cohorts' events are allowed to be unbalanced at the extremes, exactly as
+# in the pooled model (allow_unbalanced_panel = TRUE); no unit is ever dropped
+# to extend the horizon.
+supported_event_time_max <- function(data_sub, cohort) {
+  n_treated <- n_distinct(data_sub$stack_unit_num[data_sub$g > 0])
+  decades_ok <- data_sub %>%
+    group_by(decade) %>%
+    summarise(
+      n_treated_present = n_distinct(stack_unit_num[g > 0]),
+      n_control_present = n_distinct(stack_unit_num[g == 0]),
+      .groups = "drop"
     ) %>%
-    ungroup() %>%
-    filter(.ok) %>%
-    select(-.ok)
+    filter(n_treated_present == n_treated, n_control_present > 0L) %>%
+    pull(decade)
 
-  data_es <- sub %>%
-    select(stack_unit_num, GEOID, decade, g, event_id, sample_role,
-           all_of(outcome_col), all_of(control_var)) %>%
-    rename(y = all_of(outcome_col), x = all_of(control_var)) %>%
-    filter(!is.na(y), is.finite(y), !is.na(x), is.finite(x))
+  et <- NA_integer_
+  for (e in seq(reference_event_time, max(data_sub$decade) - cohort, 10L)) {
+    if (!((cohort + e) %in% decades_ok)) break
+    et <- as.integer(e)
+  }
+  et
+}
 
+run_csdid_one_cohort <- function(data_fixed, cohort) {
+  # Treated counties of this cohort plus every never-treated runner-up of the
+  # retained events -- the same control pool the pooled model uses.
+  data_es <- data_fixed %>% filter(g == cohort | g == 0)
   if (!any(data_es$g > 0) || !any(data_es$g == 0)) return(NULL)
+
+  et_max <- supported_event_time_max(data_es, cohort)
+  if (is.na(et_max)) return(NULL)
 
   tryCatch(
     suppressWarnings({
@@ -169,6 +203,7 @@ run_csdid_one_cohort <- function(panel_full, cohort, outcome_col) {
         renorm = renorm,
         n_treated = n_distinct(data_es$stack_unit_num[data_es$g > 0]),
         n_control = n_distinct(data_es$stack_unit_num[data_es$g == 0]),
+        event_ids = sort(unique(data_es$event_id[data_es$g > 0])),
         et_max = et_max
       )
     }),
@@ -176,29 +211,59 @@ run_csdid_one_cohort <- function(panel_full, cohort, outcome_col) {
   )
 }
 
-drop_cohorts <- c(1850L)
-
 results <- list()
+event_audit <- list()
 for (timing_name in names(panel_by_timing)) {
-  panel_t <- panel_by_timing[[timing_name]]
-  cohorts <- sort(setdiff(unique(panel_t$g[panel_t$g > 0]), drop_cohorts))
   for (outcome_col in outcomes) {
+    # Identical to the pooled sample for this (timing, outcome) model.
+    data_fixed <- prepare_event_study_sample(
+      panel_by_timing[[timing_name]], outcome_col, control_var
+    )
+    pooled_events <- sort(unique(data_fixed$event_id))
+    cohorts <- sort(unique(data_fixed$g[data_fixed$g > 0]))
+
     for (cohort in cohorts) {
-      message("Running per-cohort (max-e) CSDID: ", timing_name, " | ",
-              outcome_col, " | g = ", cohort, " (e_max = ",
-              analysis_max_decade - cohort, ")")
-      res <- run_csdid_one_cohort(panel_t, cohort, outcome_col)
-      if (!is.null(res)) {
-        results[[length(results) + 1L]] <- res$renorm %>%
-          mutate(
-            cohort = cohort,
-            outcome = outcome_col,
-            timing = timing_name,
-            n_treated = res$n_treated,
-            n_control = res$n_control,
-            et_max = res$et_max
-          )
+      message("Running per-cohort CSDID: ", timing_name, " | ",
+              outcome_col, " | g = ", cohort)
+      res <- run_csdid_one_cohort(data_fixed, cohort)
+      if (is.null(res)) {
+        stop("Cohort model failed: ", timing_name, " | ", outcome_col,
+             " | g = ", cohort,
+             " — the facets would no longer sum to the pooled event count.")
       }
+      results[[length(results) + 1L]] <- res$renorm %>%
+        mutate(
+          cohort = cohort,
+          outcome = outcome_col,
+          timing = timing_name,
+          n_treated = res$n_treated,
+          n_control = res$n_control,
+          et_max = res$et_max
+        )
+      event_audit[[length(event_audit) + 1L]] <- tibble(
+        timing = timing_name,
+        outcome = outcome_col,
+        cohort = cohort,
+        n_treated = res$n_treated,
+        n_control = res$n_control,
+        et_max = res$et_max,
+        event_ids = paste(res$event_ids, collapse = "|")
+      )
+    }
+
+    # Hard guard: the per-cohort facets must decompose the pooled sample.
+    facet_events <- event_audit %>%
+      bind_rows() %>%
+      filter(timing == timing_name, outcome == outcome_col) %>%
+      pull(event_ids) %>%
+      strsplit("\\|") %>%
+      unlist() %>%
+      as.integer() %>%
+      sort()
+    if (!identical(facet_events, as.integer(pooled_events))) {
+      stop("Per-cohort events do not match the pooled sample for ",
+           timing_name, " | ", outcome_col, ": ",
+           length(facet_events), " vs ", length(pooled_events), ".")
     }
   }
 }
@@ -209,10 +274,18 @@ dynamic_att <- bind_rows(results) %>%
   mutate(decade_calendar = cohort + event_time)
 write_csv(dynamic_att, results_subdir_path("dynamic_att_per_cohort.csv"), na = "")
 
+events_by_cohort <- bind_rows(event_audit) %>%
+  arrange(timing, outcome, cohort)
+write_csv(events_by_cohort, results_subdir_path("events_by_cohort.csv"), na = "")
+
 status <- dynamic_att %>%
   distinct(outcome, timing, cohort, n_treated, n_control, et_max) %>%
   arrange(outcome, timing, cohort)
 write_csv(status, results_subdir_path("status.csv"), na = "")
+
+pooled_totals <- events_by_cohort %>%
+  group_by(timing, outcome) %>%
+  summarise(n_events = sum(n_treated), .groups = "drop")
 
 # Shared axis limits per outcome (identical for standard and alternative timing,
 # and fixed across all cohort facets, so cohorts/timings are directly comparable)
@@ -237,6 +310,9 @@ for (o in outcomes) {
       )
     if (nrow(df_plot) == 0L) next
     n_cohorts <- n_distinct(df_plot$cohort)
+    n_events_total <- pooled_totals %>%
+      filter(timing == t, outcome == o) %>%
+      pull(n_events)
     p <- ggplot(df_plot, aes(x = decade_calendar, y = estimate,
                              ymin = ci_low, ymax = ci_high)) +
       geom_vline(aes(xintercept = cohort), linetype = "dotted",
@@ -263,11 +339,14 @@ for (o in outcomes) {
                  " - Controlled by baseline births (per-cohort CSDID, ",
                  "calendar axis, ", timing_labels[[t]], ")"),
           80
-        )
+        ),
+        subtitle = paste0("Events: ", n_events_total,
+                          " (same sample as the pooled event study)")
       ) +
       theme_classic() +
       theme(
         plot.title = element_text(color = "darkgray", face = "bold", size = 11),
+        plot.subtitle = element_text(color = "darkgray", size = 9),
         axis.title = element_text(color = "darkgray", face = "bold", size = 11),
         strip.text = element_text(color = "darkgray", face = "bold", size = 9),
         strip.background = element_rect(fill = "white", color = "white"),
@@ -284,19 +363,31 @@ for (o in outcomes) {
 }
 
 notes <- c(
-  "Per-cohort CSDID with each cohort using its MAXIMUM available event-time window.",
-  "For cohort g the window is [-20, 1950 - g]: g=1850 -> +100, g=1910 -> +40.",
-  "Balance is applied per cohort on calendar decades [g-20, 1950]:",
-  "each stack_unit must have non-NA outcome at all those decades and non-NA covariate.",
-  "Each cohort estimated on its own subpanel (treated of cohort g + never-treated runner_ups).",
-  paste0("Dropped cohorts (too few treated to inform the aggregate): ",
-         paste(drop_cohorts, collapse = ", ")),
+  "Per-cohort CSDID estimated on exactly the pooled event-study sample.",
+  paste0("Sample rules (shared with 03_run_baseline_population_controls.R): ",
+         "BALANCE_EVENT_TIME = ", balance_mode_raw, " (mode = ", balance_mode, "), ",
+         "event-time window [", min_event_time, ", ", max_event_time, "], ",
+         "cohort restriction: ",
+         if (is.null(cohorts_filter)) "all cohorts" else paste(cohorts_filter, collapse = ", "),
+         "."),
+  paste0("A stack unit is kept only if it has non-NA population at every event ",
+         "time in the window relative to its own event; an event is kept only ",
+         "if both its treated county and one of its own runner-ups survive."),
+  paste0("Each cohort is then estimated on its own subpanel (treated of cohort ",
+         "g + all never-treated runner-ups of the retained events)."),
+  paste0("et_max(g) is the longest horizon every retained unit in the cohort ",
+         "subpanel supports; no unit is dropped to extend it."),
   paste0("Reference: e = ", reference_event_time, ". Covariate: baseline estimated births."),
+  "Treated counts across facets sum to the pooled event count, by construction",
+  "and enforced by a hard check.",
   paste0("Generated: ", Sys.Date()), "",
+  "Events per (timing, outcome):",
+  capture.output(print(pooled_totals, n = Inf)), "",
   "Cohorts included per (outcome, timing):",
   capture.output(print(status, n = Inf))
 )
 writeLines(notes, results_subdir_path("notes.txt"))
 
 cat("wrote results to", results_subdir_path("."), "\n")
+print(pooled_totals, n = Inf)
 print(status, n = Inf)

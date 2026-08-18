@@ -19,6 +19,9 @@ file_arg <- args[grepl("^--file=", args)]
 script_path <- normalizePath(sub("^--file=", "", file_arg[[1]]), winslash = "/", mustWork = TRUE)
 repo_root <- normalizePath(file.path(dirname(script_path), "..", "..", ".."), winslash = "/", mustWork = TRUE)
 source(file.path(repo_root, "prep", "raw_paths.R"))
+# Sample construction is shared with 07_run_csdid_per_cohort_max_e.R so the
+# per-cohort figures decompose exactly these events.
+source(file.path(dirname(script_path), "_sample_helpers.R"))
 
 min_event_time_raw <- Sys.getenv("MIN_EVENT_TIME", unset = "-20")
 min_event_time <- suppressWarnings(as.integer(min_event_time_raw))
@@ -130,88 +133,16 @@ results_subdir_path <- function(...) {
   path
 }
 
-panel <- read_csv(
-  output_file_path("land_grants", "amws_temporal_support_county_decade_1830_1950.csv"),
-  show_col_types = FALSE
-) %>%
-  mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0"))
-
-# Alternative-decade outcome/denominator panel (births ending 7-9 shifted forward
-# one decade), used only by the alternative_decade timing so its outcomes,
-# denominator, and baseline covariate share the g_shift grid.
-panel_alt <- read_csv(
-  output_file_path("land_grants", "amws_temporal_support_county_decade_1830_1950_alt.csv"),
-  show_col_types = FALSE
-) %>%
-  mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0"))
-
-units <- read_csv(
-  output_file_path("land_grants", "andrews_event_county_units_1850_1920.csv"),
-  show_col_types = FALSE
-) %>%
-  mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0"))
-
-build_stack <- function(timing_var, timing_name, panel_src) {
-  stack_units <- units %>%
-    mutate(
-      treatment_decade = .data[[timing_var]],
-      control_decade = treatment_decade - 10L,
-      g = if_else(sample_role == "treated", treatment_decade, 0L),
-      timing = timing_name,
-      stack_unit_id = paste(event_id, GEOID, sample_role, sep = "_"),
-      stack_unit_num = dense_rank(stack_unit_id)
-    )
-
-  baseline <- stack_units %>%
-    select(stack_unit_id, GEOID, control_decade) %>%
-    left_join(
-      panel_src %>% select(GEOID, control_decade = decade,
-                       population_baseline = population,
-                       baseline_population_source = population_source,
-                       births_baseline = county_births_estimate),
-      by = c("GEOID", "control_decade")
-    ) %>%
-    mutate(
-      log_population_baseline = if_else(
-        population_baseline > 0, log(population_baseline), NA_real_
-      )
-    )
-
-  stack_units %>%
-    left_join(baseline, by = c("stack_unit_id", "GEOID", "control_decade")) %>%
-    inner_join(panel_src, by = "GEOID") %>%
-    arrange(event_id, sample_role, GEOID, decade)
-}
+inputs <- read_temporal_support_inputs()
 
 panel_by_timing <- list(
-  standard_decade = build_stack("g_std", "standard_decade", panel),
-  alternative_decade = build_stack("g_shift", "alternative_decade", panel_alt)
+  standard_decade = build_stack(inputs$units, inputs$panel,
+                                "g_std", "standard_decade"),
+  alternative_decade = build_stack(inputs$units, inputs$panel_alt,
+                                   "g_shift", "alternative_decade")
 )
 
-if (!is.null(cohorts_filter)) {
-  panel_by_timing <- lapply(panel_by_timing, function(p) {
-    treated_events_in_cohorts <- p %>%
-      filter(sample_role == "treated", treatment_decade %in% cohorts_filter) %>%
-      distinct(event_id) %>%
-      pull(event_id)
-    p %>% filter(event_id %in% treated_events_in_cohorts)
-  })
-}
-
-filter_balanced_event_time <- function(stack_panel,
-                                       event_times = seq(min_event_time, max_event_time, 10L)) {
-  stack_panel %>%
-    mutate(.et = decade - treatment_decade) %>%
-    group_by(stack_unit_num) %>%
-    mutate(.has_full = all(event_times %in% .et[!is.na(population)])) %>%
-    ungroup() %>%
-    filter(.has_full) %>%
-    group_by(event_id) %>%
-    mutate(.has_treated = any(sample_role == "treated")) %>%
-    ungroup() %>%
-    filter(.has_treated) %>%
-    select(-.et, -.has_full, -.has_treated)
-}
+panel_by_timing <- lapply(panel_by_timing, filter_cohorts, cohorts_filter = cohorts_filter)
 
 balance_event_times <- switch(
   balance_mode,
@@ -228,28 +159,8 @@ if (!is.null(balance_event_times)) {
   )
 }
 
-prepare_sample <- function(data, outcome, control) {
-  d <- data %>%
-    select(stack_unit_num, GEOID, decade, g, event_id, sample_role,
-           all_of(outcome), all_of(control)) %>%
-    rename(y = all_of(outcome), x = all_of(control)) %>%
-    filter(!is.na(y), is.finite(y), !is.na(x), is.finite(x))
-
-  retained <- d %>%
-    group_by(event_id) %>%
-    summarise(
-      has_treated = any(g > 0),
-      has_control = any(g == 0),
-      .groups = "drop"
-    ) %>%
-    filter(has_treated, has_control) %>%
-    select(event_id)
-
-  semi_join(d, retained, by = "event_id")
-}
-
 run_controlled <- function(data, outcome, control, spec, timing_name) {
-  data_es <- prepare_sample(data, outcome, control)
+  data_es <- prepare_event_study_sample(data, outcome, control)
   tryCatch({
     att <- did::att_gt(
       yname = "y", tname = "decade", idname = "stack_unit_num", gname = "g",
