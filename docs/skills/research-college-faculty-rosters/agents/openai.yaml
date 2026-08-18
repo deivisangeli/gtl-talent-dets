@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research College Faculty Rosters"
+  short_description: "Transcribe historical college faculty rosters"
+  default_prompt: "Use $research-college-faculty-rosters to research annual instructional-faculty rosters for the assigned colleges."
