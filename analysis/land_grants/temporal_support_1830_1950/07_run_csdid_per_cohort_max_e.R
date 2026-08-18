@@ -12,7 +12,8 @@
 # Within that fixed sample each cohort is still followed as far as the panel
 # supports it: et_max(g) is the largest event time at which every retained unit
 # in the cohort subpanel still has an observation. Units are never dropped to
-# extend the horizon. Facet by cohort on a calendar axis.
+# extend the horizon. Facet by cohort on a relative-event-time axis, shared across
+# facets and both timings, with every estimated relative year ticked.
 ###############################################################################
 
 rm(list = ls())
@@ -288,14 +289,21 @@ pooled_totals <- events_by_cohort %>%
   summarise(n_events = sum(n_treated), .groups = "drop")
 
 # Shared axis limits per outcome (identical for standard and alternative timing,
-# and fixed across all cohort facets, so cohorts/timings are directly comparable)
+# and fixed across all cohort facets, so cohorts/timings are directly comparable).
+# The x axis is relative event time, so e = +50 sits at the same position in every
+# facet; a cohort that ends at its own et_max simply leaves the right tail blank.
 lims <- dynamic_att %>%
   group_by(outcome) %>%
   summarise(
-    xmin = min(decade_calendar), xmax = max(decade_calendar),
+    xmin = min(event_time), xmax = max(event_time),
     ymin = min(ci_low, na.rm = TRUE), ymax = max(ci_high, na.rm = TRUE),
     .groups = "drop"
   )
+
+# Every estimated relative year gets a tick, on every facet of both timing rows.
+# Taken over the whole result set rather than per timing, so the standard row
+# (which stops at +90) still labels the +100 edge and both rows share one grid.
+x_breaks <- sort(unique(dynamic_att$event_time))
 
 for (o in outcomes) {
   lim_o <- lims[lims$outcome == o, ]
@@ -313,15 +321,14 @@ for (o in outcomes) {
     n_events_total <- pooled_totals %>%
       filter(timing == t, outcome == o) %>%
       pull(n_events)
-    p <- ggplot(df_plot, aes(x = decade_calendar, y = estimate,
+    p <- ggplot(df_plot, aes(x = event_time, y = estimate,
                              ymin = ci_low, ymax = ci_high)) +
-      geom_vline(aes(xintercept = cohort), linetype = "dotted",
-                 colour = "gray60") +
+      geom_vline(xintercept = 0, linetype = "dotted", colour = "gray60") +
       geom_point(aes(colour = post), size = 1.2) +
       geom_errorbar(aes(colour = post), width = 1.5) +
       geom_hline(yintercept = 0, linetype = "dashed") +
       facet_wrap(~ cohort_label, nrow = 1, scales = "fixed") +
-      scale_x_continuous(breaks = seq(1840, 1950, 20)) +
+      scale_x_continuous(breaks = x_breaks) +
       scale_color_manual(
         drop = FALSE,
         values = c("#e87d72", "#56bcc2"),
@@ -333,11 +340,11 @@ for (o in outcomes) {
         ylim = c(lim_o$ymin, lim_o$ymax)
       ) +
       labs(
-        x = "Birth decade", y = "Effect", color = NULL,
+        x = "Relative Time", y = "Effect", color = NULL,
         title = str_wrap(
           paste0(outcome_labels[[o]],
                  " - Controlled by baseline births (per-cohort CSDID, ",
-                 "calendar axis, ", timing_labels[[t]], ")"),
+                 "relative time, ", timing_labels[[t]], ")"),
           80
         ),
         subtitle = paste0("Events: ", n_events_total,
@@ -348,6 +355,8 @@ for (o in outcomes) {
         plot.title = element_text(color = "darkgray", face = "bold", size = 11),
         plot.subtitle = element_text(color = "darkgray", size = 9),
         axis.title = element_text(color = "darkgray", face = "bold", size = 11),
+        # 13 ticks per facet: shrink the labels so they do not overplot
+        axis.text.x = element_text(size = 8),
         strip.text = element_text(color = "darkgray", face = "bold", size = 9),
         strip.background = element_rect(fill = "white", color = "white"),
         legend.position = "bottom"
@@ -355,7 +364,7 @@ for (o in outcomes) {
     ggsave(
       results_subdir_path(paste0("ES_", o, "_", t, ".png")),
       p,
-      width = 3 * n_cohorts + 2,
+      width = 3.5 * n_cohorts + 2,
       height = 4.5,
       dpi = 300
     )
