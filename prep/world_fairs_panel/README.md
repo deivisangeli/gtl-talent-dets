@@ -58,6 +58,22 @@ old numbered scripts from `03` through `21`, including the LAU/GISCO outcomes
 workflow, are archived in `legacy/numbered_03_21/` for traceability and are not
 part of the main run order.
 
+An optional post-processing script,
+`03b_attach_ukds_1831_socioeconomic_controls.R`, adds the housing, family,
+sex, occupation, and servant variables from UK Data Service study 4961 to a
+separately named copy of the canonical UK panel. It reconstructs the current
+1921 target geometry, links each 1831 record to its 1851 UKDS source geometry,
+and assigns the record's full counts only when at least 60% of that source area
+falls inside one target. Records below the threshold remain in the assignment
+audit and are not imputed. Outputs are written under
+`Data/processed/worlds_fairs/alternative_ukds/`. The canonical panel,
+population series, outcomes, and analysis inputs are not changed. Run it after
+the main UK panel exists:
+
+```powershell
+Rscript prep/world_fairs_panel/03b_attach_ukds_1831_socioeconomic_controls.R
+```
+
 The occupation-share stage writes a unit-level file, a parish-to-target
 crosswalk, and a QC summary under `Data/processed/`. The annual UK panel carries
 `agri_share_1801`, `trade_share_1801`, `other_share_1801`,
