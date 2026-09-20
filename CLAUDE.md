@@ -147,6 +147,61 @@ Run all scripts from `prep/`. Order matters within each group.
 | `geocode_amws_edition.R`, `geocode_amws_1955_us.R` | Geocode birth locations |
 | `dedup_amws_editions.R` | Remove duplicates across editions |
 | `build_amws_county_year.R`, `build_amws_combined_county_year.R` | Aggregate to county-year panel |
+| `build_amws_combined_county_period5.R` | Aggregate the county-year panel to five-year bins under both binning conventions (`period5_bins.R`); outcomes are annual averages within a bin |
+
+### County literacy and schooling pipeline
+
+| Script | Purpose |
+|--------|---------|
+| `download_county_data.r` | Download NHGIS manufacturing, farming, demographics and education domains to `raw/nhgis_*` (needs `IPUMS_API_KEY` or `IPUMS_KEY`) |
+| `build_county_demographics_panel.R` | Build `county_nhgis_demographics_panel.csv` — slavery, literacy 1840-1930, attainment 1940-1950 |
+| `nhgis_education_helpers.R` | Resolve 1930-1950 variable codes from the shipped codebooks |
+| `test_nhgis_education_helpers.R` | Checks for the codebook parser and code resolvers |
+| `mandatory_schooling/build_schooling_enforcement.R` | Read county attendance and literacy against compulsory-schooling law dates |
+| `mandatory_schooling/convert_ipums_1940_fullcount.py` | Convert the 1940 full-count microdata (`EXT1940USCB.dat.gz`) to Hive-partitioned Parquet on `D:` |
+| `mandatory_schooling/verify_ipums_1940_parquet.py` | Verify that Parquet tree (row counts, domains, per-state populations, round-trip) |
+| `mandatory_schooling/test_ext1940_parser.py` | Synthetic-fixture checks for the 1940 fixed-width parser |
+| `mandatory_schooling/build_cls_schooling_laws.R` | Convert the Clay–Lingwall–Stephens detailed compulsory-attendance / child-labour / continuation-school law data to CSV + parquet |
+| `mandatory_schooling/test_cls_schooling_laws.R` | Checks for that conversion (sentinels, repeal gaps, cross-check vs Lingwall) |
+| `mandatory_schooling/profile_ipums_linked_census.py` | Profile the IPUMS MLP linked extract (`usa_00001.csv.gz`, 221 M rows, 5 census years) and write `ipums_linked_1900_1940_dictionary.md` + `.csv` + `_provenance.json`; `--labels-only` re-renders from the saved numbers without re-reading the extract |
+| `mandatory_schooling/ddi_helpers.py` | Read an IPUMS DDI 2.5 codebook (variable labels, value labels, sha256 provenance); `--describe <file.xml>` summarises one |
+| `mandatory_schooling/test_ddi_helpers.py` | Synthetic-fixture checks for the DDI reader, both cross-checks and the `--labels-only` reload |
+
+**CLS detailed schooling laws:** `input/compulsory_schooling_laws.csv` gives one
+adoption *date* per state — the extensive margin only. The Clay–Lingwall–Stephens
+replication package (`Data/raw/mandatory_schooling/replication_CLS.zip`, extracted
+as `ICPSR_145122-V1.1/`) adds the intensive margin: entry/exit ages, the
+work-permit and early-dropout exemptions, and continuation-school requirements,
+1880–1930 for 49 states — plus `ca_years_combined`, years of required attendance
+by `bpl` × `yob` (1875–1912), which joins straight onto the 1940 parquet with **no
+record linkage**. Outputs in `output/mandatory_schooling/cls/`. See
+`prep/mandatory_schooling/README.md`.
+
+**1940 full-count microdata:** `Data/raw/mandatory_schooling/EXT1940USCB.dat.gz`
+is the IPUMS USA v8.0 complete-count 1940 extract — hierarchical fixed-width,
+household (`H`, 159 chars) followed by its persons (`P`, 273 chars), ~132 M
+person records. It ships with **no codebook**; the layout is checked in as
+`prep/mandatory_schooling/ext1940uscb_layout.csv` (53 household + 102 person
+fields) and the converter asserts it against IPUMS' published `.sps` on every
+run. Output defaults to `D:\ipums_1940_fullcount` (`IPUMS_1940_PARQUET_DIR`),
+partitioned by `statefip`, ~6 GB — the one project dataset not kept in Dropbox,
+since it rebuilds from the Dropbox source in under an hour. Read with
+`arrow::open_dataset()`. See `prep/mandatory_schooling/README.md`.
+
+**School attendance coverage note:** county attendance rates exist for 1850,
+1890 and 1920 only, all from extracts already in Dropbox. 1880 is state-level
+only; 1860 and 1900 have no county school table in NHGIS at all. Universes
+differ by year (1850 any institution, 1890 common schools only, 1920 by age
+band), so `attendance_universe` and `attendance_age_span` must be read before
+comparing years. For 1920, `school_attendance_rate` is the broad 7-20 rate for
+cross-year comparability and `attendance_rate_7_13` is the compulsory-age band.
+
+**Literacy coverage note:** the census literacy question ran 1840-1930 and was
+dropped afterwards; 1940 and 1950 asked years of school completed instead, so
+those years carry an attainment proxy (`low_education_share_25plus`) and no
+`literacy_rate`. NHGIS has no county literacy table for 1860, 1880 or 1890.
+`literacy_measure_type` marks which construct each row holds. Set
+`SKIP_NHGIS_EDUCATION=true` to build only 1790-1920 without the education extract.
 
 ### Land grants pipeline
 
@@ -181,6 +236,12 @@ AMWS is an outcome source, not a standalone analysis pipeline. AMWS outcome scri
 | `elite_schools/analysis_elite_school_stem_share.R` | STEM share event study |
 | `elite_schools/analysis_elite_school_radius_stem.R` | Spatial treatment by radius |
 | `mandatory_schooling/analysis_compulsory_schooling.R` | Null: compulsory schooling laws |
+| `mandatory_schooling/analysis_compulsory_schooling_amws_annual_csdid.R` | Annual C&S event studies, `pre20`/`pre40` profiles |
+| `mandatory_schooling/analysis_compulsory_schooling_amws_period5_csdid.R` | Same design on five-year bins, run under the `standard` and `alt` binning conventions |
+| `mandatory_schooling/export_mandatory_schooling_project_artifacts.R` | Copy the C&S figures into `project/figures/` for the standalone figure volume `project/mandatory_schooling.tex`; refuses to export a non-Lingwall vintage |
+| `mandatory_schooling/summarise_attendance_by_law_decade.R` | Descriptive: attendance distribution by law decade (see caveat below) |
+| `mandatory_schooling/describe_cls_policy_environment.R` | Descriptive: five-panel policy-environment table (adoption timing, age limits, within-state changes, person-weighted required years, requirement coding) → `results/mandatory_schooling/cls_policy_descriptives/`, CSV + booktabs `.tex` |
+| `mandatory_schooling/export_cls_policy_table_to_project.R` | Export those descriptives to the paper: a 2-panel `booktabs` float at `project/tables/mandatory_schooling_laws.tex` and a standalone 5-panel volume at `project/mandatory_schooling_laws_stats.tex` (compile directly, run pdflatex twice). Guards on Lingwall attribution and `validation_passed` before writing |
 | `elite_schools/analysis_event_study_yearly_1860_1910.R` | Annual-level event study |
 | `elite_schools/analysis_continuous_treatment_panel.R` | Continuous treatment (school count) |
 | `elite_schools/analysis_synthetic_control_yearly_1860_1910.R` | Synthetic control |
@@ -282,3 +343,27 @@ The frontier-exposure map (counties with historical frontier exposure) shows a s
 - `prep/scientific_facilities/cleaning_county.R`: still requires the manual NHGIS file `nhgis0001_ts_nominal_county.csv`.
 - Population pipeline: `build_county_population.R` (NHGIS+HYDE) and `build_county_hyde_population.R` (HYDE-only) both exist; a decision on which to use as canonical is pending.
 - Schools with `historically_unclear == "yes"` are flagged but included in main spec.
+- Five-year-bin C&S (`analysis_compulsory_schooling_amws_period5_csdid.R`): the `standard` and `alt` samples are NOT nested. Binning moves whole states between cohorts — the raw-1883 adopters bin to 1880 under `standard` and so enter the 1850-1880 target window, but to 1885 under `alt`; WA and WI move the other way. Read `cohort_bin_mapping.csv` before comparing the two.
+- `project/mandatory_schooling.tex` is a standalone figure volume, not part of `main.tex`; compile it from `project/`. Its figures are managed by `export_mandatory_schooling_project_artifacts.R` — never hand-copy into `project/figures/`, which is how the volume silently went stale on the pre-Lingwall vintage. The eight synthetic-DiD figures in it are still unmanaged and of unresolved vintage.
+- Five-year-bin horizons: the not-yet-treated donor pool runs out at calendar bin **1905** (every state had a law by 1920, and a donor must start 15+ years after the comparison bin), so a cohort `g` can be followed only to event time `1905 - g`. The +30 horizon therefore caps targets at binned law year `g <= 1875`; the capped cohort becomes a donor, not an exclusion. Its terminal coefficient rests on 1 control state under `standard` and 4 under `alt`. Horizons beyond +30 collapse the sample to 3 jurisdictions and are not run.
+- Five-year `pre20` runs levels only. Its trend window leaves two unexposed bins, and a two-point line interpolates exactly, so a detrended estimate would be zero at both pre-bins by construction rather than estimated.
+- `did` applies `anticipation` in the units of the time variable, not in period indices. The 14-year allowance is therefore unchanged on the five-year grid; do not rescale it to periods.
+- Attendance by law decade (`summarise_attendance_by_law_decade.R`) is DESCRIPTIVE only: law-adoption decade is nearly collinear with region (all ten 1910s adopters are Southern, the 1870s/1880s cohorts none), and within the non-South the gradient is flat. Do not read it as bite.
+- County school attendance exists for 1850, 1890 and 1920 only; 1880 is state-level; NHGIS has no 1860 or 1900 county school table. Attendance universes differ by year and are not poolable without noting the change.
+- County literacy has no 1860, 1880 or 1890 table in NHGIS, and no 1940/1950 literacy at all — the census stopped asking. 1940-1950 carry an attainment proxy in separate columns; never read them as `literacy_rate`.
+- `prep/build_county_demographics_panel.R` needs the `raw/nhgis_education` extract for 1930-1950. Without `IPUMS_API_KEY`/`IPUMS_KEY` it stops; `SKIP_NHGIS_EDUCATION=true` builds 1790-1920 only.
+- Adding the 1930-1950 rows shifts which census vintage the land-grants control scripts select (they take the latest pre-treatment literacy year). Diff `illiterate_share_control_year` against current results after the education extract lands.
+- `paths.R` still defaults to a coauthor's home directory. Set `TALENT_DETS_DATA_DIR`, or rely on the scripts that fall back to `DET_DIR`.
+- The 1940 full count has **no date of birth and no county of birth** — a property of the census, not the extract. It records `AGE`/`AGEMONTH`, and birthplace only at state/country level (`BPL`/`BPLD`, `MBPL`/`FBPL`). `birthyr_approx` (`1940 - AGE`) is inherently ±1 year: enumeration was 1 April 1940, so anyone with a birthday after 2 April was born the prior year. `county_geoid` is county of **residence** in 1940 and `MIGCOUNTY` county of residence in **1935**; neither is a birth county. Recovering one means linking `HISTID` to the 1910/1920/1930 full counts, which the project does not hold.
+- IPUMS `COUNTY` and `MIGCOUNTY` are FIPS county codes **multiplied by 10**. The 1940 Parquet carries a derived `county_geoid` for this reason; do not join raw `COUNTY` against a 5-digit GEOID.
+- The 1940 Parquet keeps IPUMS codes raw: 9-fills (`999`, `9999`) are not nulled, and implied decimals (`HHWT`/`PERWT`/`SLWT` 2, `CPI99` 3, `PRESGL`/`ERSCOR50`/`EDSCOR50`/`NPBOSS50` 1) are not applied. Both are listed in `_manifest.json`.
+- **Year of birth: CLS use `yob = 1940 - AGE - 1`, not `1940 - AGE`.** Enumeration was 1 April 1940, so most people had not yet had their birthday and the modal birth year is one lower. The 1940 Parquet's `birthyr_approx` takes the minority case, so **joining `ca_years_combined` on `birthyr_approx` is off by one for ~75% of people**, against a treatment that varies by cohort. Compute `yob` explicitly for anything touching the CLS law data.
+- There is no "years of schooling" variable in IPUMS. CLS construct it from `HIGRADED`: divide by 10, then `0` if ≤3, `g-3` if 4–20, `17` if 21–23, dropping `999` (~7% of rows). `EDUC`/`EDUCD` are a different IPUMS recode with different bins — not a substitute.
+- Attainment starts in 1940. `SCHOOL` (attendance) exists 1850–1940, but `HIGRADE`/`EDUC` do not exist before 1940, so in a linked extract those columns are legitimately blank on the pre-1940 rows. `SCHOOL`'s reference period also changes drastically (12 months in 1850–1900, ~4 months in 1920, ~1 month in 1940), so attendance rates are not comparable across census years without addressing it.
+- CLS law data, three encoding traps (all handled by `build_cls_schooling_laws.R`, never read the raw `.dta` without them): (1) `0` means **no law**, not missing; (2) `earlyyrs`/`workyrs`/`contyrs` carry sentinels — `99` = literacy requirement, `99X` = primary-school completion of length X — and the `99 → 4` recode is CLS's **assumption**, flagged in `*_code_type`; (3) **Arizona has no law 1883–1898** and Michigan has a one-year gap, so a monotone "treated from year g" coding is wrong for Arizona by 19 years.
+- The MLP linked extract shipped with **no DDI or codebook**, and lives in OneDrive (`~/OneDrive/Documentos/usa_00001.csv.gz`), not under `DET_DIR` like every other input. Its dictionary is therefore reconstructed: numbers from a full streaming pass, variable labels hand-written in `prep/mandatory_schooling/ipums_variable_labels.csv`, value labels from IPUMS' DDI **once someone fetches it** (My Data Extracts → DDI XML → `Data/raw/mandatory_schooling/usa_00001.xml`; recipe in `prep/mandatory_schooling/README.md`). Until then the run records `"ddi_cross_checked": false` and omits value labels. Nothing in the repo downloads the extract, so it is not yet reproducible.
+- The MLP linked extract `usa_00001.csv.gz` is **not** a two-year 1900–1940 link: it stacks all five census years (1900 13.0M, 1910 24.0M, 1920 40.0M, 1930 70.2M, 1940 73.8M = 220,979,023 rows), one row per person per census, linked cases only. `HIK` is the cross-year person key; **`HISTID` is not** — it identifies a record within a year. See `prep/mandatory_schooling/merge_cls_to_linked_census.md` before joining anything.
+- The CLS join is on **state of birth × birth cohort using the 1940 rows only** — that paper uses no record linkage at all. Childhood county via `HIK` is an extension it never did, and carries match-rate selection the original design does not.
+- CLS vs Lingwall: 15 states are left-censored by the 1880 panel start; of the 34 comparable, 32 match exactly. Arizona (CLS 1880 in force vs Lingwall 1899) and **Washington (Lingwall 1878, CLS 1886 statewide)** disagree.
+- Compulsory-schooling policy shape, which argues against coding adoption dates alone: entry age is near-static (24 of 49 states never changed it, **none ever raised it**) while exit age rose in 38 states — but exemptions gave back about half the tightening (nominal required window 6.31 → 8.90 years, effective 6.31 → 7.59). `effective_leaving_age` is the earliest age any statutory route out opens — the child-labour work permit (`max(workage, entryage + workyrs)`) or the early-dropout exemption (`max(earlyyrs_condition, entryage + earlyyrs)`), whichever comes first, capped at `exitage`; `binding_exemption` records which governs. It assumes continuous attendance from the entry age, matching CLS's own `ca_years2` counter. Use `ca_years_combined`, not `exitage - entryage`.
+- Post-1900 adoption variation is almost entirely Southern: 16 states first adopt in 1900 or later and 11 are the CLS-coded South, clustered 1913–1920. Combined with the region collinearity already noted for attendance, this makes Southern adoption a weak identification base — CLS's own `region!=3` robustness moves the IV estimate only from 0.067–0.077 to 0.064.

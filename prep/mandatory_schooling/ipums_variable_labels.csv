@@ -1,0 +1,59 @@
+varname,label,group,coding_note
+YEAR,Census year,identification,Census year of the record. This extract stacks 1900-1940; one row per person per census in which they appear.
+SERIAL,Household serial number,identification,Unique within YEAR only. Household key is (YEAR SERIAL).
+STATEICP,State (ICPSR code),geography,ICPSR state code. Differs from STATEFIP; Alabama is 41 in ICPSR and 1 in FIPS.
+STATEFIP,State (FIPS code),geography,Standard 2-digit state FIPS. Use this for GEOIDs.
+COUNTYICP,County of residence (ICPSR code),geography,"ICPSR county code = 3-digit FIPS county code times 10. GEOID = STATEFIP*1000 + COUNTYICP/10. Do NOT join raw against a 5-digit GEOID."
+URBAN,Urban/rural status,geography,1 = rural; 2 = urban.
+GQ,Group quarters status,household,"1 = household; 2 = additional household; 3-4 = group quarters; 5 = additional GQ. Values above 2 indicate institutional or collective living."
+FARM,Farm status,household,1 = non-farm; 2 = farm.
+PERNUM,Person number in household,identification,Sequence within (YEAR SERIAL). Person key is (YEAR SERIAL PERNUM).
+MOMLOC,Mother's location in household,family pointer,PERNUM of the person's mother in the same household; 0 = mother not present.
+MOMRULE_HIST,Rule used to link mother,family pointer,Records which matching rule attached MOMLOC. 0 = no link.
+POPLOC,Father's location in household,family pointer,PERNUM of the person's father in the same household; 0 = father not present.
+POPRULE_HIST,Rule used to link father,family pointer,Records which matching rule attached POPLOC. 0 = no link.
+RELATE,Relationship to household head (general),family,"1 = head; 2 = spouse; 3 = child; 4 = child-in-law; 5 = parent; 6 = parent-in-law; 7 = sibling; 8 = sibling-in-law; 9 = grandchild; 10 = other relative; 11 = partner/friend/visitor; 12 = other non-relative; 13 = institutional inmates."
+RELATED,Relationship to household head (detailed),family,4-digit elaboration of RELATE.
+SEX,Sex,demographics,1 = male; 2 = female.
+AGE,Age in years,demographics,"Age at the census date. 1940 was enumerated 1 April, so most respondents had not yet had their birthday that year."
+BIRTHYR,Year of birth,demographics,"Self-reported in 1900, the only census that asked date of birth. Derived in other years. Check against 1940-AGE-1 before using as a cohort key."
+RACE,Race (general),demographics,1 = White; 2 = Black/African American; 3 = American Indian/Alaska Native; 4 = Chinese; 5 = Japanese; 6 = other Asian/Pacific Islander; 7 = other; 8-9 = two or more major races.
+RACED,Race (detailed),demographics,3-digit elaboration of RACE; 100 = White; 200 = Black.
+BPL,Birthplace (general),birthplace,"State or country of birth. US states carry their FIPS state code (1 = Alabama, 6 = California, 36 = New York); codes above 99 are foreign countries. There is NO county of birth in any US census."
+BPLD,Birthplace (detailed),birthplace,"5-digit elaboration, generally BPL*100. Adds territorial-era distinctions (e.g. Indian Territory vs Oklahoma), never sub-state geography."
+SCHOOL,School attendance,education,"1 = did not attend; 2 = attended. Available 1850-1940 but the reference period changes drastically: ~12 months in 1900, ~7.5 in 1910, ~4 in 1920 (enumerated 1 January), ~6 in 1930, ~1 month in 1940. Not comparable across years untreated."
+HIGRADE,Highest grade attended (general),education,1940 onward only. The census recorded highest grade completed; there is no years-of-schooling variable.
+HIGRADED,Highest grade attended (detailed),education,"1940 onward only. Codes are multiples of 10; divide by 10 to get the grade index. 999 = N/A. Years of schooling is CONSTRUCTED: g = HIGRADED %/% 10, then 0 if g<=3, g-3 if 4<=g<=20, 17 if 21<=g<=23."
+EDUC,Educational attainment (general),education,1940 onward only. IPUMS recode of HIGRADE into attainment bins; different bin edges from a raw year count.
+EDUCD,Educational attainment (detailed),education,1940 onward only. Detailed elaboration of EDUC.
+LIT,Literacy,education,"Ability to read and write. The census asked this 1840-1930 and dropped it afterwards, so it is absent in 1940 exactly where HIGRADE begins."
+EMPSTAT,Employment status (general),labour,1 = employed; 2 = unemployed; 3 = not in labour force; 0 = N/A.
+EMPSTATD,Employment status (detailed),labour,2-digit elaboration of EMPSTAT.
+LABFORCE,Labour force status,labour,1 = not in labour force; 2 = in labour force; 0 = N/A.
+CLASSWKR,Class of worker (general),labour,1 = self-employed; 2 = works for wages; 0 = N/A.
+CLASSWKRD,Class of worker (detailed),labour,2-digit elaboration of CLASSWKR.
+OCC1950,Occupation (1950 basis),labour,"Occupation recoded to the 1950 classification for cross-year comparability. Manual non-farm groups: craftsmen 500-595, operatives 600-690, labourers 910-970; service 700-790 and farm 100/123/810-840 are usually kept separate. 999 = N/A."
+IND1950,Industry (1950 basis),labour,Industry recoded to the 1950 classification. 0 = N/A.
+WKSWORK1,Weeks worked last year,labour,1940 onward. Reported weeks; 0 = none or N/A.
+HRSWORK1,Hours worked last week,labour,1940 onward. Reported hours; 0 = none or N/A.
+INCWAGE,Wage and salary income,labour,"1940 onward, for the prior calendar year (1939). Top-coded; 999999 = N/A."
+OCCSCORE,Occupational income score,labour,Constructed score assigned to OCC1950; 0 = N/A.
+SEI,Duncan socioeconomic index,labour,Constructed index assigned to OCC1950; 0 = N/A.
+PRESGL,Siegel occupational prestige score,labour,Constructed score with one implied decimal; 999.9 = N/A.
+ERSCOR50,Occupational earnings score (1950 basis),labour,Constructed score with one implied decimal; 999.9 = N/A.
+EDSCOR50,Occupational education score (1950 basis),labour,Constructed score with one implied decimal; 999.9 = N/A.
+MIGRATE5,Migration status 5 years ago (general),migration,"1940 only. 1 = same house; 2 = same county/different house; 3 = different county same state; 4 = different state; 0 = N/A (under 5); 9 = unknown."
+MIGRATE5D,Migration status 5 years ago (detailed),migration,1940 only. 2-digit elaboration of MIGRATE5.
+MIGPLAC5,State or country of residence 5 years ago,migration,"1940 only. Residence in 1935. 990 = same state; 999 = unknown."
+MIGCOUNTYICP5,County of residence 5 years ago (ICPSR),migration,"1940 only. County of residence in 1935, same FIPS-times-10 coding as COUNTYICP. 9999 = unknown or N/A. This is residence, not birthplace."
+VERSIONHIST,HISTID version,linkage,Version of the HISTID assignment this record carries.
+HISTID,Historical unique identifier,linkage,"36-character UUID identifying a person RECORD within a census year. Stable across IPUMS data versions, NOT shared by the same person across census years."
+QAGE,Data quality flag for AGE,quality,"0 = reported; non-zero = allocated or edited. The EXT1940USCB full-count extract does not carry these flags."
+QSCHOOL,Data quality flag for SCHOOL,quality,0 = reported; non-zero = allocated or edited.
+HIK,Historical Index Key,linkage,"21-character identifier that IS shared by the same person across census years. This is the cross-year person key; HISTID is not. Assigned only to persons the MLP could link."
+LINK1900,Links to the 1900 census,linkage,1 = this person has a linked record in 1900; 0 = not linked.
+LINK1910,Links to the 1910 census,linkage,1 = this person has a linked record in 1910; 0 = not linked.
+LINK1920,Links to the 1920 census,linkage,1 = this person has a linked record in 1920; 0 = not linked.
+LINK1930,Links to the 1930 census,linkage,1 = this person has a linked record in 1930; 0 = not linked.
+LINK1940,Links to the 1940 census,linkage,1 = this person has a linked record in 1940; 0 = not linked.
+VERSIONHIK,HIK version,linkage,"Version of the MLP linking that produced HIK, e.g. ""2.0-2.0""."
