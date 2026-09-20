@@ -1433,8 +1433,9 @@ linked cases included — **220,979,023 rows**, 58 columns.
 |---|---|---|---|---|
 | 12,971,952 | 23,984,383 | 39,982,220 | 70,207,628 | 73,832,840 |
 
-It was downloaded as a bare CSV: **no DDI, codebook or command file came with it**, which
-is why everything below exists. Three documents cover it:
+It was downloaded as a bare CSV — **no DDI, codebook or command file came with it**, which
+is why everything below exists. The DDI has since been fetched separately and now backs the
+value labels; see *The DDI codebook* below. Three documents cover the extract:
 
 | File | What |
 |---|---|
@@ -1465,38 +1466,75 @@ something is wrong. One caveat: the saved dictionary keeps each column's top eig
 so on a long code list the re-render cuts the table to the most common codes rather than to
 every observed one, and says so. A full run is the authoritative render.
 
-#### Fetching the DDI
+#### The DDI codebook
 
-`profile_ipums_linked_census.py` looks for `usa_00001.xml` in
-`Data/raw/mandatory_schooling/` (override with `IPUMS_LINKED_DDI`). **It is not there yet**
-— it has to be fetched by hand, once:
+`Data/raw/mandatory_schooling/usa_00001.xml` (497 KB, fetched by hand from IPUMS USA →
+My Data Extracts on 2026-09-20; override the location with `IPUMS_LINKED_DDI`). It
+describes exactly the extract's **58 variables** — no surplus, no shortfall — and gives
+value labels to **45** of them. The remaining 13 split into two groups:
 
-1. Log in to IPUMS USA → **My Data Extracts**.
-2. Find the extract that produced `usa_00001` and download the **DDI codebook (XML)** and
-   the **extract description (.txt)**.
-3. Put both in `Data/raw/mandatory_schooling/`, beside `EXT1940USCB.dat.gz`.
-4. Re-run with `--labels-only`.
+- genuinely unlabelled, because they are continuous or are identifiers: `BIRTHYR`, `HIK`,
+  `HISTID`, `HRSWORK1`, `INCWAGE`, `MIGCOUNTYICP5`, `MOMLOC`, `PERNUM`, `POPLOC`, `SERIAL`,
+  `WKSWORK1`;
+- **`COUNTYICP` and `OCCSCORE`**, where the codebook enumerates codes (293 and 58) but
+  names none of them. For `COUNTYICP` that is not an omission: ICPSR county codes are
+  state-dependent and mean nothing without `STATEFIP`/`STATEICP`.
 
-If IPUMS has expired the data file, *Revise* still recovers the spec — the sample and
-variable list survive the data. Failing that, submit a fresh extract with the same 58
-variables and the five 1900–1940 MLP-linked samples; its DDI is authoritative for the same
-variable set even if the row counts differ.
+The cross-check fails loudly if the codebook does not describe the extract — the same
+guarantee `convert_ipums_1940_fullcount.py` gets from checking its layout against IPUMS'
+published `.sps`. Without a codebook the run still completes: value labels are omitted, the
+Markdown header says the labels are unverified, and the manifest records
+`"ddi_cross_checked": false`.
 
 Do **not** overwrite `ipums_variable_labels.csv` with the DDI's labels. Its `coding_note`
 column carries analyst knowledge the DDI does not have — the `HIGRADED` years-of-schooling
-construction, the `COUNTYICP` ×10 trap, which variables are 1940-only.
+construction, the `COUNTYICP` ×10 trap, which variables are 1940-only. 36 of the 58 labels
+are deliberately reworded from IPUMS' phrasing and the check reports them without
+complaining.
 
-Without the codebook the run still completes: value labels are omitted, the Markdown says
-in its header that the labels are unverified, and the manifest records
-`"ddi_cross_checked": false`. With it, the run fails loudly if the codebook does not
-describe this extract — the same guarantee `convert_ipums_1940_fullcount.py` gets from
-cross-checking its layout against IPUMS' published `.sps`.
+**What the cross-check caught on its first real run.** Four project labels said less than
+IPUMS' own, and all four are now corrected in `ipums_variable_labels.csv`:
 
-**The extract is not yet reproducible from this repo.** Nothing here requests it (the only
-IPUMS API calls in the project, in `prep/download_county_data.r` and
-`download_matching_covariates.R`, fetch NHGIS *aggregate* data), and it sits in OneDrive
-rather than under `DET_DIR` like every other input. Record the extract number, samples and
-variable list here once the extract description `.txt` is in hand.
+| Variable | Was | IPUMS says |
+|---|---|---|
+| `QSCHOOL` | "flag for SCHOOL"; "0 = reported" | flags **SCHOOL *and* SCHLTYPE**; `0` = original entry **OR inapplicable (not in universe)** — so `0` does not mean "reported" |
+| `QAGE` | "non-zero = allocated or edited" | `4` = allocated, `1`/`8` = failed edit, `2`/`5`/`7` = illegible, `3`/`6` = missing — non-zero is not uniformly allocation |
+| `COUNTYICP` | "County of residence (ICPSR code)" | codes are **state-dependent**; boundaries are as-of-year with no uniform county system, so the same code is not necessarily the same area in 1900 and 1940 |
+| `HIGRADE`/`HIGRADED` | "Highest grade attended" | "Highest grade **of schooling**" |
+
+The `COUNTYICP` one matters for the childhood-county extension in
+`merge_cls_to_linked_census.md`. Note also that IPUMS' "identifiable counties only" caveat
+does **not** bite here: all counties are identified in the 1850–1950 full counts, and the
+column is 100% populated with no `0` codes.
+
+The code-mismatch report caught a fifth, and it is the one most likely to produce silently
+wrong numbers. `PRESGL`, `ERSCOR50` and `EDSCOR50` are flagged because the DDI codes them
+as integers with an implied decimal (`0001` = 0.1) while the extract's values carry the
+decimal already — `40.7`, not `407`. **The 1940 full-count Parquet does the opposite**: its
+manifest records the implied decimal as *unapplied*, so the same three variables are 10×
+larger there. Anything comparing occupational scores across the two datasets has to
+rescale. While checking this, `PRESGL`'s N/A code also turned out to be `0`, not the
+`999.9` the project note claimed — its observed maximum is 81.5, so `999.9` never occurs.
+`ERSCOR50` and `EDSCOR50` do use `999.9`.
+
+#### The extract's specification
+
+The DDI records it, so the extract can be rebuilt without the original request:
+
+| | |
+|---|---|
+| Project | IPUMS USA |
+| Samples | the **1900, 1910, 1920, 1930 and 1940 100% databases** — full counts, not samples |
+| Density | 100% of each; the extract applies no sub-sampling |
+| Restriction | MLP-**linked cases only**, which is why 221 M rows sit below full-count size |
+| Variables | the 58 listed in `ipums_variable_labels.csv` |
+| DDI produced | 2026-09-18, sha256 in `ipums_linked_1900_1940_provenance.json` |
+
+Two gaps remain. Nothing in this repo *downloads* the extract — the only IPUMS API calls in
+the project, in `prep/download_county_data.r` and `download_matching_covariates.R`, fetch
+NHGIS *aggregate* data, so rebuilding means submitting the above by hand through the IPUMS
+USA web interface. And the CSV still sits in OneDrive rather than under `DET_DIR` like
+every other input.
 
 **The headline point of the merge document:** CLS use **no record linkage**. Treatment is
 assigned on state of birth × birth cohort, both recorded in the 1940 cross-section, which is

@@ -198,6 +198,11 @@ def main():
               lambda: any("60 codes in the codebook" in line for line in bpl_table))
         check("a variable with no categories gets no table",
               lambda: profiler.value_table(ddi["HIK"], "HIK", stats, [1940]) == [])
+        # COUNTYICP and OCCSCORE really do this: codes enumerated, none named.
+        blank = {"values": {"0010": "", "0030": " "}, "keys": {}}
+        check("codes the codebook never names get a note, not a blank table",
+              lambda: profiler.value_table(blank, "SEX", stats, [1940])[0].startswith(
+                  "*The codebook enumerates 2 codes"))
         check("top values are decoded",
               lambda: profiler.decode_code(ddi["SEX"], "1") == "`1` Male")
         check("an unlabelled code degrades to the bare code",

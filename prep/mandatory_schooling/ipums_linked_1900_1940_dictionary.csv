@@ -19,11 +19,11 @@ STATEFIP,State (FIPS code),geography,1910,23984383,100.0,49,False,1,56,36=212671
 STATEFIP,State (FIPS code),geography,1920,39982220,100.0,49,False,1,56,36=3783289; 42=3379826; 17=2600011; 39=2428231; 26=1530053; 48=1527504; 25=1527013; 29=1378994
 STATEFIP,State (FIPS code),geography,1930,70207628,100.0,49,False,1,56,36=7032501; 42=5673974; 17=4505257; 39=4047413; 6=3083889; 48=2981270; 26=2976069; 25=2533061
 STATEFIP,State (FIPS code),geography,1940,73832840,100.0,49,False,1,56,36=7398589; 42=5865273; 17=4652106; 39=4202722; 6=3748100; 48=3180862; 26=3088274; 25=2626871
-COUNTYICP,County of residence (ICPSR code),geography,1900,12971952,100.0,278,False,10,"9,270",310=427376; 610=378327; 30=342258; 170=294144; 1010=274717; 10=274121; 470=247938; 50=246561
-COUNTYICP,County of residence (ICPSR code),geography,1910,23984383,100.0,279,False,10,"8,400",310=899206; 610=808858; 30=646401; 170=543859; 470=535182; 1010=526396; 10=516915; 130=481264
-COUNTYICP,County of residence (ICPSR code),geography,1920,39982220,100.0,280,False,10,"8,400",310=1641897; 30=1150379; 610=1104489; 470=966338; 170=924444; 1010=910300; 50=904290; 10=877974
-COUNTYICP,County of residence (ICPSR code),geography,1930,70207628,100.0,282,False,10,"8,400",310=3110440; 30=2063949; 470=1844882; 370=1815137; 50=1736965; 170=1580164; 10=1546457; 610=1524635
-COUNTYICP,County of residence (ICPSR code),geography,1940,73832840,100.0,282,False,10,"8,400",310=3225652; 30=2161453; 370=2128044; 470=1894068; 50=1837264; 10=1727792; 170=1628219; 130=1581461
+COUNTYICP,"County of residence (ICPSR code, identifiable counties only)",geography,1900,12971952,100.0,278,False,10,"9,270",310=427376; 610=378327; 30=342258; 170=294144; 1010=274717; 10=274121; 470=247938; 50=246561
+COUNTYICP,"County of residence (ICPSR code, identifiable counties only)",geography,1910,23984383,100.0,279,False,10,"8,400",310=899206; 610=808858; 30=646401; 170=543859; 470=535182; 1010=526396; 10=516915; 130=481264
+COUNTYICP,"County of residence (ICPSR code, identifiable counties only)",geography,1920,39982220,100.0,280,False,10,"8,400",310=1641897; 30=1150379; 610=1104489; 470=966338; 170=924444; 1010=910300; 50=904290; 10=877974
+COUNTYICP,"County of residence (ICPSR code, identifiable counties only)",geography,1930,70207628,100.0,282,False,10,"8,400",310=3110440; 30=2063949; 470=1844882; 370=1815137; 50=1736965; 170=1580164; 10=1546457; 610=1524635
+COUNTYICP,"County of residence (ICPSR code, identifiable counties only)",geography,1940,73832840,100.0,282,False,10,"8,400",310=3225652; 30=2161453; 370=2128044; 470=1894068; 50=1837264; 10=1727792; 170=1628219; 130=1581461
 URBAN,Urban/rural status,geography,1900,12971952,100.0,2,False,1,2,1=8349258; 2=4622694
 URBAN,Urban/rural status,geography,1910,23984383,100.0,2,False,1,2,1=13642053; 2=10342330
 URBAN,Urban/rural status,geography,1920,39982220,100.0,2,False,1,2,2=20072933; 1=19909287
@@ -39,11 +39,11 @@ FARM,Farm status,household,1910,23984383,100.0,2,False,1,2,1=15493498; 2=8490885
 FARM,Farm status,household,1920,39982220,100.0,2,False,1,2,1=27713521; 2=12268699
 FARM,Farm status,household,1930,70207628,100.0,2,False,1,2,1=52208524; 2=17999104
 FARM,Farm status,household,1940,73832840,100.0,2,False,1,2,1=56278952; 2=17553888
-PERNUM,Person number in household,identification,1900,12971952,100.0,60,False,1,60,3=2681196; 2=2522976; 4=2087831; 1=1832395; 5=1466035; 6=978792; 7=618228; 8=368733
-PERNUM,Person number in household,identification,1910,23984383,100.0,60,False,1,60,2=5658786; 1=4749716; 3=4452221; 4=3311424; 5=2232335; 6=1447379; 7=902498; 8=539110
-PERNUM,Person number in household,identification,1920,39982220,100.0,60,False,1,60,2=10461932; 1=9172291; 3=6910509; 4=5061968; 5=3324338; 6=2104596; 7=1282798; 8=756903
-PERNUM,Person number in household,identification,1930,70207628,100.0,60,False,1,60,2=17829629; 1=16847937; 3=12096510; 4=8848543; 5=5782274; 6=3641438; 7=2232842; 8=1324866
-PERNUM,Person number in household,identification,1940,73832840,100.0,60,False,1,60,1=25335103; 2=19306411; 3=12792522; 4=7902494; 5=4291729; 6=2146654; 7=1013169; 8=466661
+PERNUM,Person number in sample unit,identification,1900,12971952,100.0,60,False,1,60,3=2681196; 2=2522976; 4=2087831; 1=1832395; 5=1466035; 6=978792; 7=618228; 8=368733
+PERNUM,Person number in sample unit,identification,1910,23984383,100.0,60,False,1,60,2=5658786; 1=4749716; 3=4452221; 4=3311424; 5=2232335; 6=1447379; 7=902498; 8=539110
+PERNUM,Person number in sample unit,identification,1920,39982220,100.0,60,False,1,60,2=10461932; 1=9172291; 3=6910509; 4=5061968; 5=3324338; 6=2104596; 7=1282798; 8=756903
+PERNUM,Person number in sample unit,identification,1930,70207628,100.0,60,False,1,60,2=17829629; 1=16847937; 3=12096510; 4=8848543; 5=5782274; 6=3641438; 7=2232842; 8=1324866
+PERNUM,Person number in sample unit,identification,1940,73832840,100.0,60,False,1,60,1=25335103; 2=19306411; 3=12792522; 4=7902494; 5=4291729; 6=2146654; 7=1013169; 8=466661
 MOMLOC,Mother's location in household,family pointer,1900,12971952,100.0,59,False,0,59,2=7301515; 0=4793278; 1=568369; 3=84990; 4=78544; 5=51896; 6=35662; 7=22869
 MOMLOC,Mother's location in household,family pointer,1910,23984383,100.0,59,False,0,58,0=11290899; 2=11082837; 1=912879; 3=169376; 4=167295; 5=121773; 6=85620; 7=55928
 MOMLOC,Mother's location in household,family pointer,1920,39982220,100.0,59,False,0,58,0=20812726; 2=16761807; 1=1379163; 3=269995; 4=266370; 5=190789; 6=124223; 7=74965
@@ -114,16 +114,16 @@ SCHOOL,School attendance,education,1910,23984383,100.0,2,False,1,2,1=17965549; 2
 SCHOOL,School attendance,education,1920,39982220,100.0,2,False,1,2,1=32045285; 2=7936935
 SCHOOL,School attendance,education,1930,70207628,100.0,2,False,1,2,1=53994179; 2=16213449
 SCHOOL,School attendance,education,1940,73832840,100.0,2,False,1,2,1=58937895; 2=14894945
-HIGRADE,Highest grade attended (general),education,1900,0,0.0,0,False,-,-,
-HIGRADE,Highest grade attended (general),education,1910,0,0.0,0,False,-,-,
-HIGRADE,Highest grade attended (general),education,1920,0,0.0,0,False,-,-,
-HIGRADE,Highest grade attended (general),education,1930,0,0.0,0,False,-,-,
-HIGRADE,Highest grade attended (general),education,1940,73832840,100.0,23,False,1,99,11=17509906; 15=10361377; 10=5730608; 9=5447738; 13=5292005; 12=5086608; 8=4270092; 7=3922309
-HIGRADED,Highest grade attended (detailed),education,1900,0,0.0,0,False,-,-,
-HIGRADED,Highest grade attended (detailed),education,1910,0,0.0,0,False,-,-,
-HIGRADED,Highest grade attended (detailed),education,1920,0,0.0,0,False,-,-,
-HIGRADED,Highest grade attended (detailed),education,1930,0,0.0,0,False,-,-,
-HIGRADED,Highest grade attended (detailed),education,1940,73832840,100.0,23,False,10,999,110=17509906; 150=10361377; 100=5730608; 90=5447738; 130=5292005; 120=5086608; 80=4270092; 70=3922309
+HIGRADE,Highest grade of schooling (general),education,1900,0,0.0,0,False,-,-,
+HIGRADE,Highest grade of schooling (general),education,1910,0,0.0,0,False,-,-,
+HIGRADE,Highest grade of schooling (general),education,1920,0,0.0,0,False,-,-,
+HIGRADE,Highest grade of schooling (general),education,1930,0,0.0,0,False,-,-,
+HIGRADE,Highest grade of schooling (general),education,1940,73832840,100.0,23,False,1,99,11=17509906; 15=10361377; 10=5730608; 9=5447738; 13=5292005; 12=5086608; 8=4270092; 7=3922309
+HIGRADED,Highest grade of schooling (detailed),education,1900,0,0.0,0,False,-,-,
+HIGRADED,Highest grade of schooling (detailed),education,1910,0,0.0,0,False,-,-,
+HIGRADED,Highest grade of schooling (detailed),education,1920,0,0.0,0,False,-,-,
+HIGRADED,Highest grade of schooling (detailed),education,1930,0,0.0,0,False,-,-,
+HIGRADED,Highest grade of schooling (detailed),education,1940,73832840,100.0,23,False,10,999,110=17509906; 150=10361377; 100=5730608; 90=5447738; 130=5292005; 120=5086608; 80=4270092; 70=3922309
 EDUC,Educational attainment (general),education,1900,0,0.0,0,False,-,-,
 EDUC,Educational attainment (general),education,1910,0,0.0,0,False,-,-,
 EDUC,Educational attainment (general),education,1920,0,0.0,0,False,-,-,
@@ -249,11 +249,11 @@ QAGE,Data quality flag for AGE,quality,1910,23984383,100.0,2,False,0,4,0=2354593
 QAGE,Data quality flag for AGE,quality,1920,39982220,100.0,2,False,0,4,0=39200867; 4=781353
 QAGE,Data quality flag for AGE,quality,1930,70207628,100.0,2,False,0,4,0=69563350; 4=644278
 QAGE,Data quality flag for AGE,quality,1940,73832840,100.0,2,False,0,4,0=73818237; 4=14603
-QSCHOOL,Data quality flag for SCHOOL,quality,1900,12971952,100.0,1,False,0,0,0=12971952
-QSCHOOL,Data quality flag for SCHOOL,quality,1910,23984383,100.0,2,False,0,4,0=22932194; 4=1052189
-QSCHOOL,Data quality flag for SCHOOL,quality,1920,39982220,100.0,1,False,0,0,0=39982220
-QSCHOOL,Data quality flag for SCHOOL,quality,1930,70207628,100.0,2,False,0,4,0=70060465; 4=147163
-QSCHOOL,Data quality flag for SCHOOL,quality,1940,73832840,100.0,2,False,0,4,0=73672806; 4=160034
+QSCHOOL,Data quality flag for SCHOOL and SCHLTYPE,quality,1900,12971952,100.0,1,False,0,0,0=12971952
+QSCHOOL,Data quality flag for SCHOOL and SCHLTYPE,quality,1910,23984383,100.0,2,False,0,4,0=22932194; 4=1052189
+QSCHOOL,Data quality flag for SCHOOL and SCHLTYPE,quality,1920,39982220,100.0,1,False,0,0,0=39982220
+QSCHOOL,Data quality flag for SCHOOL and SCHLTYPE,quality,1930,70207628,100.0,2,False,0,4,0=70060465; 4=147163
+QSCHOOL,Data quality flag for SCHOOL and SCHLTYPE,quality,1940,73832840,100.0,2,False,0,4,0=73672806; 4=160034
 HIK,Historical Index Key,linkage,1900,12971952,100.0,>4000,True,-,-,
 HIK,Historical Index Key,linkage,1910,23984383,100.0,>4000,True,-,-,
 HIK,Historical Index Key,linkage,1920,39982220,100.0,>4000,True,-,-,

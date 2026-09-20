@@ -149,7 +149,8 @@ def load_ddi():
     ddi = read_ddi(path)
     meta = ddi_provenance(path)
     print(f"  DDI: {path.name} -- {len(ddi)} variables, "
-          f"{sum(1 for v in ddi.values() if v['values'])} with value labels")
+          f"{sum(1 for v in ddi.values() if any(m.strip() for m in v['values'].values()))}"
+          " with value labels")
     return ddi, meta
 
 
@@ -526,8 +527,11 @@ def _provenance_line(ddi_meta, checks):
 def build_provenance(columns, stats, rows_by_year, total, labels, findings,
                      source_info, ddi, ddi_meta, checks, exhaustive=True):
     """The run manifest: what was read, what it was checked against, what is missing."""
-    with_labels = sorted(name for name in columns
-                         if ddi and ddi.get(name.upper(), {}).get("values"))
+    # Codes without meanings do not count as labelled: see value_table().
+    with_labels = sorted(
+        name for name in columns
+        if ddi and any(m.strip()
+                       for m in ddi.get(name.upper(), {}).get("values", {}).values()))
     return {
         "generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "render_mode": "full" if exhaustive else "labels-only",
@@ -741,6 +745,13 @@ def value_table(spec, name, stats, years, exhaustive=True):
     """
     if not spec or not spec["values"]:
         return []
+
+    # A DDI can enumerate codes without naming any of them -- COUNTYICP and
+    # OCCSCORE both do, because an ICPSR county code means nothing without its
+    # state. A column of blank meanings is worse than no table at all.
+    if not any(meaning.strip() for meaning in spec["values"].values()):
+        return [f"*The codebook enumerates {len(spec['values'])} codes for this variable "
+                "but gives none of them a label.*", ""]
 
     observed = set()
     for year in years:
