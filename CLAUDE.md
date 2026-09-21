@@ -177,6 +177,8 @@ by `bpl` × `yob` (1875–1912), which joins straight onto the 1940 parquet with
 record linkage**. Outputs in `output/mandatory_schooling/cls/`. See
 `prep/mandatory_schooling/README.md`.
 
+**County-level bite measure (spec only, not yet built):** `prep/mandatory_schooling/county_bite_from_linked_census.md` specifies how to compare each 1940 student's completed schooling against what the law required of them — nominal (`ca_years1`) and effective (`ca_years_combined`, net of exemptions) — aggregated to the county they lived in at school age, recovered through the MLP linkage. Key points: the CLS cohort table is re-keyed on **residence** state, not `bpl`; the raw gap is absorbed by state × cohort FE so `shortfall_rate` is the headline; and assignment census year is collinear with birth cohort (19 of 28 cohorts have one candidate year), so cohort trends are uninterpretable. Implementation targets are `prep/mandatory_schooling/build_county_bite.R` and `analysis/mandatory_schooling/describe_county_bite.R`, neither written yet.
+
 **1940 full-count microdata:** `Data/raw/mandatory_schooling/EXT1940USCB.dat.gz`
 is the IPUMS USA v8.0 complete-count 1940 extract — hierarchical fixed-width,
 household (`H`, 159 chars) followed by its persons (`P`, 273 chars), ~132 M

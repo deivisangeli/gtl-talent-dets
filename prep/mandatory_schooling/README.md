@@ -1435,13 +1435,14 @@ linked cases included — **220,979,023 rows**, 58 columns.
 
 It was downloaded as a bare CSV — **no DDI, codebook or command file came with it**, which
 is why everything below exists. The DDI has since been fetched separately and now backs the
-value labels; see *The DDI codebook* below. Three documents cover the extract:
+value labels; see *The DDI codebook* below. Four documents cover the extract:
 
 | File | What |
 |---|---|
 | `ipums_linked_1900_1940_dictionary.md` | Every variable: definition, availability by census year, fill rate, distinct count, range, top values, and the code → meaning table wherever the DDI supplies one |
 | `ipums_linked_1900_1940_provenance.json` | Run manifest: source identity, row counts, the DDI's sha256, `ddi_cross_checked`, and which variables still have no value labels |
 | `merge_cls_to_linked_census.md` | How to join the CLS cohort requirements onto it, following what the authors actually did |
+| `county_bite_from_linked_census.md` | Build spec for the county-level bite measure: observed completed schooling against what the law required, nominal and net of exemptions |
 
 ```powershell
 python prep/mandatory_schooling/profile_ipums_linked_census.py                 # ~16 min, full pass
