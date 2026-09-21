@@ -12,13 +12,27 @@ this document assumes you have read.
 
 ## Start here: the county variation is in attainment, not in the law
 
-Required years vary on **state × cohort**. Observed schooling varies on the individual. So
-in `mean(observed - required)`, the county-to-county variation is county mean attainment and
-nothing else — the required term enters only through cohort composition. Any specification
-with state × cohort fixed effects absorbs the whole measure. That is the warning already
-made at `merge_cls_to_linked_census.md:250-255`, and it applies in full force here.
+Required years vary on **state × birth cohort**. Observed schooling varies on the individual.
+So in `mean(observed - required)`, the county-to-county variation is county mean attainment
+and nothing else — the required term enters only through cohort composition. State × cohort
+fixed effects absorb the **required term**, not the measure: the county variation lives in
+attainment and survives. Within-state comparison of counties is therefore entirely available;
+what changes is which measure carries information. Within a state × cohort cell the
+requirement is a constant `r`, so:
 
-Two of the four measures below survive it, because they are **not linear** in attainment:
+| Measure | Within-cell form | Within-state ranking |
+|---|---|---|
+| `gap_mean` | `mean(obs) - r` | identical to ranking by mean attainment |
+| `gap_p10/p25/p50` | `quantile(obs) - r` | identical to ranking by that quantile |
+| `shortfall_rate` | `F_c(r)` — the county CDF at the threshold | **not recoverable from the mean** |
+| `gap_censored` | `-mean(max(r - obs, 0))` | **not recoverable from the mean** |
+
+This sharpens rather than contradicts `merge_cls_to_linked_census.md:250-255`. That warning
+is about a county measure **of the law**, which does collapse to the state measure. This is a
+county measure of **attainment against** the law, which does not.
+
+Two of the four measures below carry information the county mean does not, because they are
+**not linear** in attainment:
 
 - **`shortfall_rate`** — the share of students finishing below the legal minimum. Depends on
   where the county's attainment distribution sits relative to a threshold, which is not
@@ -36,6 +50,38 @@ all**. That route is still the right one for anything causal. This document take
 route — actual completed attainment, compared to the threshold person by person — and pays
 for it in linkage selection. **Build both and correlate them.** If they disagree, the
 linkage is the first suspect.
+
+---
+
+## Definitions used throughout
+
+**Cohort always means birth cohort**, `yob = 1940 - AGE - 1`, which is the CLS key. The
+sample is `yob` **1885–1912, 28 cohorts**, and that bound comes from the `AGE 27–54`
+restriction in 1940 rather than from reachability. The **assignment stratum** — which census
+a student was located in — is a different thing that happens to be nearly determined by birth
+cohort, which is why E1 below matters. `cohort_decade = (yob %/% 10L) * 10L` is a birth
+decade, used only to join county panels indexed the same way. There is no enrolment or grade
+cohort anywhere in this data: 1940 records the highest grade completed as a single number and
+never grade progression.
+
+**Required years is not one number.** Six bases, each a threshold the same four measures are
+computed against:
+
+| | Actual — `0` where no law bound | Counterfactual — state plateau imputed for unexposed cohorts |
+|---|---|---|
+| **Nominal**, `ca_years1`, age limits only | `required_nominal` | `required_nominal_cf` |
+| **Effective**, `ca_years_combined`, net of exemptions | `required_effective` | **`required_effective_cf`** |
+
+plus `required_fixed6` and `required_fixed8`, constants, because `shortfall_rate` is `F_c(r)`
+and county distributions cross — a ranking must be shown to survive a threshold that owes
+nothing to the state's own choice. `required_effective` says what actually bound a student;
+`required_effective_cf` is the basis for anything comparing across cohorts. Part C5 explains
+the counterfactual.
+
+Carried for comparison, never as bases: `required_effective_regular` (`ca_years`,
+continuation school excluded) and `required_effective_bpl` (`ca_years_combined` on `BPL`,
+CLS's birth-state key — its difference from `required_effective` is the migration bias in
+their treatment assignment).
 
 ---
 
@@ -208,6 +254,25 @@ pair differ by 10 years. The rule is therefore close to "nearest age 11.5" in pr
 kept in its state-specific form because it costs nothing and is the defensible framing, not
 because it buys much.
 
+**The realized strata are narrower than the candidate ranges above**, which overlap precisely
+because they are candidates. Running the rule with the 11.5 fallback target puts each cohort
+in exactly one stratum:
+
+| Stratum | Cohorts | n | Observed at ages |
+|---|---|---|---|
+| 1900-assigned | 1885–1893 | 9 | 15 down to 7 |
+| 1910-assigned | 1894–1903 | 10 | 16 down to 7 |
+| 1920-assigned | 1904–1912 | 9 | 16 down to 8 |
+
+**The strata are an output of the rule, not an input.** For the boundary cohorts — 1893/1894
+and 1903/1904 — the choice turns on the state's own window, so a cohort can sit in different
+strata in different states. Any table keyed on stratum must therefore be read as a property
+of the assignment, not of the cohort.
+
+`selection_distance` runs 0.5 to 4.5 *within* each stratum, a sawtooth peaking at the cohort
+observed nearest 11.5. So assignment quality is not collinear with stratum and can be used as
+a within-stratum control or restriction.
+
 **The school-age window recovers cohorts the obvious rule loses.** `merge_cls_to_linked_census.md`
 B3 assigns childhood county at `AGE <= 9` and therefore loses the 1885–1889 cohorts
 completely, because the 1890 census burned. Here they are reachable in 1900 at ages 11–15 —
@@ -285,32 +350,93 @@ becomes X. That is an assumption, not a measurement, and it feeds the exemption 
 Filter on `workyrs_code_type` and `earlyyrs_code_type` in `cls_state_age_limits_1880_1930`
 and report `required_effective` with those state-years dropped. If the measure moves, say so.
 
+### C5. The counterfactual bases, and the cohorts no law bound
+
+`ca_years_combined == 0` means **no law bound that cohort** - 231 of the 1,372 sample cells,
+16.8%. There the measures collapse by construction rather than by finding: `shortfall_rate`
+is `P(observed < 0)` = 0 identically, `gap_censored` is 0 identically, and `gap_mean` is
+plain attainment with the law contributing nothing. Two consequences.
+
+**Partition, do not pool.** Carry `law_bound_cohort = required_nominal > 0L` and report the
+actual bases only on law-bound students. Pooling unexposed students into a county cell drags
+its `shortfall_rate` toward zero in proportion to how many were unexposed - a composition
+artefact indistinguishable from low bite.
+
+**Impute the future standard for the unexposed**, which is what
+`merge_cls_to_linked_census.md:255-259` already committed to: how far the county's
+counterfactual education sat below what the law would later require, *measured
+pre-treatment*. Pre-treatment is the whole point. Bite measured *during* a law regime is
+contaminated - if the law worked, attainment rose and measured bite fell, making it an
+outcome rather than a covariate. Against a future standard on pre-law cohorts it is a usable
+baseline.
+
+```r
+plateau <- cohorts |>
+  group_by(bpl) |>
+  summarise(plateau_nominal   = max(ca_years1),
+            plateau_effective = max(ca_years_combined))
+```
+
+The plateau is the requirement once the law is fully phased in, equivalently the first
+fully-exposed cohort's value. **Build it on each basis separately**, because the two differ:
+across the 17 imputation states the nominal plateau spans **6-10 years** and the effective
+**6-8**, and they diverge in **10 of the 17** by up to 2 years - Delaware, Iowa, Maryland and
+Oklahoma run nominal 10 against effective 8; Alabama 8 against 6. The other seven have
+exemptions that do not bind at the plateau. Keep both counterfactual columns beside the
+actual ones, never overwriting them, under one shared `required_is_imputed` flag - the same
+231 cells are imputed on either basis.
+
+**Imputation is concentrated in the South.** 201 of the 231 imputed cells (**87%**) fall in
+the 11 CLS-coded South states: Virginia 22 unexposed cohorts, Mississippi and South Carolina
+21, Georgia and Florida 19, Texas 18, Alabama/Arkansas/Louisiana/North Carolina 17, Tennessee
+13, against a thin non-South remainder (Arizona 1, Maryland 2, Iowa 3, Missouri 7, Oklahoma
+8, Delaware 9). Report every table with and without imputed cells. **Arizona repealed** (no
+law 1883-1898), so "the first law" is ill-defined there; `max()` handles it mechanically but
+the state should be flagged.
+
+There is also **no never-treated state** in this window: zero of 49 are unexposed across all
+28 cohorts and 32 are exposed throughout. Any exposed-versus-unexposed contrast is therefore
+built inside those 17 states, which is the region collinearity `CLAUDE.md` already documents
+for this pipeline.
+
 ---
 
 ## Part D — the four county measures
 
 ### D1. Definitions
 
-Over students `i` in county `c`, computed twice — once with `required_nominal`, once with
-`required_effective`:
+Over students `i` in county `c`, computed once per basis - all six from *Definitions*
+above. The actual bases run on `law_bound_cohort` students only; the counterfactual and fixed
+bases run on everyone (C5):
 
 | Measure | Definition | Reads as |
 |---|---|---|
 | `shortfall_rate` | `mean(observed < required)` | **headline** — the non-compliance rate |
 | `gap_censored` | `mean(pmin(observed, required) - required)` | mean deficit below the legal minimum |
-| `gap_mean` | `mean(observed - required)` | descriptive only — **absorbed by state × cohort FE** |
+| `gap_mean` | `mean(observed - required)` | descriptive — within a cell this ranks counties exactly as attainment does |
 | `gap_p10`, `gap_p25`, `gap_p50` | percentiles of `observed - required` | counties clearing the law at the median but not the bottom decile |
 
 ```r
 county <- students |>
-  group_by(county_geoid, required_basis) |>
+  group_by(county_geoid, assignment_stratum, required_basis) |>
   summarise(n_students     = n(),
             shortfall_rate = mean(observed_years < required_years),
+            shortfall_se   = sqrt(shortfall_rate * (1 - shortfall_rate) / n_students),
             gap_censored   = mean(pmin(observed_years, required_years) - required_years),
             gap_mean       = mean(observed_years - required_years),
             gap_p10        = quantile(observed_years - required_years, 0.10),
             .groups = "drop")
 ```
+
+**The cohort must stay in the grouping.** Collapsing it makes the fixed-effects panel and any
+per-state cohort plot impossible. Four grains are written:
+
+| Table | Grain | Purpose |
+|---|---|---|
+| `bite_students.parquet` | one row per `HIK` | everything downstream |
+| `bite_county_stratum` | county x stratum x basis | **primary**, ~9,000 cells - what the 25-student minimum is sized for |
+| `bite_county_cohort` | county x `yob` x basis | thin, ~84,000 cells; fixed effects and thinness diagnostics |
+| `bite_state_cohort` | state x `yob` x basis | mean required against mean realized, by state and cohort |
 
 ### D2. Diagnostics that belong on every output row
 
@@ -321,7 +447,34 @@ Without these the measure cannot be read, because Part E's problems vary by coun
 - `mean_selection_distance` and its p90.
 - `share_no_law_at_candidate`.
 - `mean_cand_age`, since B5 shows it moves with cohort.
+- `share_imputed`, so a cell resting mostly on the counterfactual standard is visible.
+- `shortfall_se`, the binomial standard error, so a ranking is read against its own sampling
+  error rather than as a clean order.
+- `coverage` - see D4.
 - The same four measures on `required_effective_bpl`, for the C3 comparison.
+
+### D4. Per-county linkage coverage
+
+The main threat to a within-state ranking is that **linkage is not random across counties**:
+match rates depend on urbanisation, literacy and name commonality. No match-rate table exists
+for this extract - `merge_cls_to_linked_census.md:241-242` prescribes one and it has never
+been built. Cheap guard: divide each county's linked student count by an independent count of
+its children.
+
+```r
+coverage <- county_decade |>
+  left_join(births, by = c("county_geoid" = "GEOID", "cohort_decade" = "decade")) |>
+  mutate(coverage = n_students / county_births_estimate_decade)
+```
+
+`county_births_estimate_decade` is already in `output/us_panel_county_stem_1800.csv` for
+decades 1880-1910, 3,143 counties each. Two traps in that file: the column carries **294
+literal `NA` strings**, so a reader types it as text and a plain numeric cast throws; and
+`GEOID` is typed inconsistently depending on the data — text on the real file, which holds
+leading zeros, but a number wherever every value looks numeric. **Join on integers on both
+sides**, not on a zero-padded string, or the join silently matches nothing in one of the two
+cases. Report per state the within-state dispersion of `coverage` and its rank correlation
+with `shortfall_rate`. **If those correlate, the ranking is measuring linkage, not bite.**
 
 ### D3. Minimum cell size
 
@@ -337,14 +490,22 @@ county with no bite.
 
 This is the sharpest limitation, and it follows from B5 rather than from anything fixable.
 Nineteen of 28 cohorts have a single candidate census year, so the census a student is
-located from is very nearly a deterministic function of their birth cohort: 1885–1895 come
-from 1900, 1896–1905 from 1910, 1906–1912 from 1920.
+located from is very nearly a deterministic function of their birth cohort. The realized
+strata are 1885–1893 from 1900, 1894–1903 from 1910, 1904–1912 from 1920.
 
 The linkage rates differ by a factor of three across those years — **17.57%**, **32.48%**,
 **54.15%**. So cohort, linkage selection and county-boundary vintage move together and
 cannot be separated. A cohort gradient in the measure has at least three candidate
 explanations, and the design cannot tell them apart. **Do not interpret cohort trends.**
-Within-cohort, cross-county comparison is the only comparison this measure supports.
+
+What this bars is cohort *trends*, not within-state work. Stratifying on assignment year
+holds the linkage regime and the boundary vintage fixed, and within a stratum the
+cross-county comparison is clean on both. The cost is that the requirement is then close to a
+state constant: inside the realized strata only 25, 28 and 22 of 49 states vary in
+`ca_years_combined` at all, with a median within-state spread of 1, 1 and 0 years. So the
+variation being used is cross-county attainment against a common legal minimum - which is
+what `shortfall_rate` measures and is a real quantity, but is **not** variation in the law
+and must not be described as such.
 
 Worse, `cand_age` also trends within an assignment year: the 1900-assigned students are
 observed at 15 if born 1885 and at 5 if born 1895. Assignment quality is therefore a
@@ -384,12 +545,19 @@ two-candidate cohorts can support it.
 
 ## Implementation
 
-Two scripts, specified here and not yet written:
+Three scripts. The first two are built; the third is not.
 
 | Script | Covers |
 |---|---|
-| `prep/mandatory_schooling/build_county_bite.R` | Parts A–C; writes the student-level parquet and the county aggregate |
-| `analysis/mandatory_schooling/describe_county_bite.R` | Part D's tables and maps, Part E's diagnostics |
+| `prep/mandatory_schooling/extract_linked_bite_inputs.py` | One streaming pass over the extract, writing `students_1940.parquet` and `candidates_pre1940.parquet` |
+| `prep/mandatory_schooling/build_county_bite.R` | Parts A–D: the selection rule, the six bases, the four grains |
+| `analysis/mandatory_schooling/describe_county_bite.R` | *Not yet written* — the within-state tables and maps, and Part E's diagnostics |
+
+Tested by `test_county_bite.py` (extractor, 25 checks) and `test_county_bite.R` (builder, 42
+checks against a synthetic fixture with hand-computed answers). Both run without the 12 GB
+source. `COUNTY_BITE_IN_DIR` and `COUNTY_BITE_OUT_DIR` let the R test drive the real build
+script over that fixture, including its own law panel, so the year-selection rule can be
+checked on a boundary cohort that flips on the state's window.
 
 Both inherit the patterns already established in
 `analysis/mandatory_schooling/describe_cls_policy_environment.R`: the `repo_root` /
@@ -402,14 +570,84 @@ in the `yob` or `HIGRADED` conventions before the county dimension is added.
 Outputs to `output/mandatory_schooling/county_bite/` and
 `results/mandatory_schooling/county_bite/`.
 
-**On reading the extract.** The linked CSV is the only source for Parts A–B, it is 13 GB
+**On reading the extract.** The linked CSV is the only source for Parts A–B, it is 12.2 GB
 gzipped, and it is **not** under `DET_DIR` — it sits at
-`~/OneDrive/Documentos/usa_00001.csv.gz`, resolved through `IPUMS_LINKED_CSV`. Stream it once
-with `arrow`, selecting only the columns these steps need — `YEAR`, `HIK`, `AGE`, `SEX`,
-`RACE`, `BPL`, `HIGRADED`, `STATEFIP`, `COUNTYICP`, `MOMLOC`, `POPLOC`, `GQ` — and write the
-student-level intermediate so Part D never re-reads it. Read everything as string and cast
-explicitly: the file is ordered by census year, so type inference from the first block makes
-every 1940-only column null. See `profile_ipums_linked_census.py` for the working pattern.
+`~/OneDrive/Documentos/usa_00001.csv.gz`, resolved through `IPUMS_LINKED_CSV`. It is streamed
+once, in Python, selecting only `YEAR`, `HIK`, `AGE`, `SEX`, `RACE`, `BPL`, `HIGRADED`,
+`EDUC`, `STATEFIP`, `COUNTYICP`, `MOMLOC`, `POPLOC`, `GQ`, and the two intermediates mean the
+R build never touches it again.
+
+Two properties of the file drive that design. Everything is read as string and cast
+explicitly, because the rows are ordered by census year and type inference from the first
+block makes every 1940-only column null, failing 200 M rows later on its first real value.
+And **the 1940 rows arrive last**, so a single pass cannot restrict the candidate rows to
+HIKs that survive the student filter — only the cheap age filters are applied there and the
+join drops the rest. `profile_ipums_linked_census.py` is the working precedent for both.
+
+---
+
+## What the build produced
+
+First full run, 2026-09-21. The extraction reads all 220,979,023 rows in 9.6 minutes; the
+build takes about two.
+
+| | |
+|---|---|
+| 1940 rows in `AGE` 27-54 | 33,046,638 |
+| with attainment (`HIGRADED != 999`) | 32,367,477 |
+| **assigned a school-age county** | **15,472,169** (47.8%) |
+| county x stratum x basis rows | 68,854 |
+| state x cohort x basis rows | 7,774 |
+
+Mean `shortfall_rate` across county-stratum cells of at least 25 students, which is the share
+of a county's students finishing below the threshold:
+
+| Basis | Mean | p10 | p90 | `gap_mean` | `gap_censored` |
+|---|---|---|---|---|---|
+| `fixed6` | 0.153 | 0.019 | 0.359 | 2.78 | -0.39 |
+| `effective` (law-bound only) | 0.181 | 0.036 | 0.400 | 2.41 | -0.44 |
+| `effective_cf` | **0.222** | 0.056 | 0.438 | 1.90 | -0.59 |
+| `nominal` (law-bound only) | 0.273 | 0.047 | 0.579 | 1.86 | -0.65 |
+| `fixed8` | 0.305 | 0.079 | 0.598 | 0.78 | -0.91 |
+| `nominal_cf` | 0.321 | 0.084 | 0.623 | 1.33 | -0.83 |
+
+Monotone in the threshold, as it has to be: `fixed6` < `effective_cf` < `fixed8`, and the
+nominal bases sit above their effective counterparts because exemptions lower the bar. On the
+headline basis the law was **slack on average** — students finished about 1.9 years beyond
+what it required — and `shortfall_rate` exceeds 0.5 in only 5.8% of cells.
+
+**Three diagnostics on the within-state ranking**, over the 135 state-strata with at least 10
+qualifying counties, excluding the 1930 stratum:
+
+- **The ranking is not an artefact of linkage.** Median Spearman correlation between
+  `coverage` and `shortfall_rate` is **0.121** (p10 -0.43, p90 0.50) — no systematic
+  relationship. Coverage itself does vary within state (median CV 0.38), so carry it as a
+  control, but it is not producing the ranking.
+- **`shortfall_rate` and `gap_mean` order counties differently.** Median Spearman **-0.874**,
+  and |rho| < 0.9 in **78 of the 135** state-strata. So the threshold does real work in most
+  states, which is the case for preferring `shortfall_rate` over the raw gap.
+- **The ranking is well resolved.** Within-state IQR of `shortfall_rate` is 0.076 against a
+  median within-cell standard error of 0.011 — about 6.6 to 1.
+
+**A fourth stratum exists and should usually be dropped.** 189,062 students (1.22%) are
+assigned from 1930. They are **entirely cohort 1912 observed at age 18**, which is at or past
+every statutory exit age, and every one has `selection_distance >= 5` — the worst-assigned
+group in the file, and a single cohort, so maximally confounded. `selection_distance >= 5`
+isolates it.
+
+Two data facts the build surfaced that were not known before:
+
+- **`COUNTYICP` is not always the FIPS code times ten.** 4,944 of 15,472,169 rows (0.032%)
+  end in 5 — Oregon 605, Virginia 1875, Tennessee 875, South Dakota 1055. Flooring them would
+  silently merge them into a neighbouring county, so they carry a NULL `county_geoid` and a
+  `countyicp_standard` flag, and drop out of the county grains while still counting in the
+  state ones.
+- **The linked records' ages disagree, and +1 is the consistent case.** Comparing
+  `cand_age = YEAR - yob` against the age recorded at that census, the modal difference is
+  **+1 (57.0%)**, then +2 (17.3%), then 0 (15.0%). That is arithmetic, not error:
+  `yob = 1940 - AGE - 1` sits a year below the earlier censuses' own arithmetic. The tails are
+  genuine misreporting, and 3.6% of candidate rows fall outside the school-age window on the
+  cohort-consistent basis and are dropped. `age_consistency` carries the difference per row.
 
 ---
 
@@ -417,8 +655,14 @@ every 1940-only column null. See `profile_ipums_linked_census.py` for the workin
 
 | Trap | Consequence |
 |---|---|
-| Reading `gap_mean` as identifying variation | It is county mean attainment; state × cohort FE absorb it |
+| Reading `gap_mean` as identifying variation | Within a cell it ranks counties exactly as attainment does; use `shortfall_rate` |
 | Interpreting a cohort trend | Cohort, linkage rate and boundary vintage are collinear (E1) |
+| Reading a within-stratum result as variation in the law | Inside a stratum the requirement is near a state constant; only 25/28/22 of 49 states vary (E1) |
+| Pooling unexposed students into a bite cell | `shortfall_rate` is 0 by construction where no law bound; it drags the cell toward zero (C5) |
+| Overwriting `required_effective` with the counterfactual | The actual and imputed standards answer different questions; keep both columns (C5) |
+| Imputing the plateau on one basis only | Nominal and effective plateaus differ in 10 of the 17 states, by up to 2 years (C5) |
+| Joining `county_geoid` to `GEOID` without a zero-padded cast | One is an integer, the other a 5-character string; the join silently returns nothing (D4) |
+| Reading a county ranking without `coverage` | Differential linkage across counties can produce the ranking on its own (D4) |
 | Using `SCHOOL` as observed schooling | Reference period runs ~12 months in 1900 to ~1 month in 1940 |
 | Expecting attainment before 1940 | `HIGRADE`/`EDUC` start in 1940; `LIT` stops in 1930 |
 | Joining the cohort table on `bpl` and calling it the law that applied | That is the birth state; re-key to residence state (C1) |
