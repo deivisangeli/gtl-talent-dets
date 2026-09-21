@@ -560,11 +560,46 @@ sides**, not on a zero-padded string, or the join silently matches nothing in on
 cases. Report per state the within-state dispersion of `coverage` and its rank correlation
 with `shortfall_rate`. **If those correlate, the ranking is measuring linkage, not bite.**
 
-### D3. Minimum cell size
+**Coverage above 1 is impossible, and it happens.** It says a county produced more linked
+school-age students than the number of children estimated ever born there that decade. The
+mechanism is specific: counties **settled after the birth decade** have a births denominator
+near zero while the students assigned to them are school-age in-migrants, so the ratio
+explodes. The West Texas and Panhandle counties reach 2.1, 3.3, 3.4, 14.6 and 17.7.
 
-Require **25 students**. Write smaller counties to the output with a
-`below_min_cell` flag rather than dropping them — a silently missing county looks like a
-county with no bite.
+Counts on the built measure, `effective_cf` basis, county × stratum:
+
+| Subset | Cells | Impossible | Thin | No denominator |
+|---|---|---|---|---|
+| all cells | 11,902 | 208 | 285 | 76 |
+| estimable (≥ 25 students, excluding the 1930 stratum) | 8,770 | **193** | **93** | 49 |
+| usable at the 200-student ranking threshold | 8,155 | — | — | — |
+
+leaving **7,933** cells usable for a ranking. So about 3.3% of estimable cells are compromised
+— and they concentrate at exactly the extremes anyone looks at first, which is why the median
+coverage correlation of 0.121 gave no warning.
+
+### D3. Cell usability
+
+Four separate things can make a cell unreadable, and all four are **flags, not filters** —
+a silently missing county looks like a county with no bite.
+
+| Flag | Condition | Meaning |
+|---|---|---|
+| `below_min_cell` | `n_students < 25` | not estimable at all |
+| `coverage_implausible` | `coverage > 1` | **arithmetically impossible** — see D4 |
+| `coverage_thin` | `coverage < 0.05` | a handful of families, not a county |
+| `coverage_missing` | no births denominator | coverage cannot be judged |
+
+`cell_usable` is the conjunction of their negations, so downstream code does not have to
+rediscover the four conditions. On the county × stratum grain it additionally excludes the
+1930 stratum, which is one cohort observed at 18 and past every exit age; only that grain can
+see the stratum, so the condition cannot live in the aggregation.
+
+**Two thresholds, for two different questions.** `MIN_CELL` = 25 answers "is this cell
+estimable"; `MIN_CELL_FOR_RANKING` = **200** answers "can this cell be *ranked*". They are not
+the same. At `n = 27` the standard error on a shortfall rate near zero is meaningless, and
+every cell in the unguarded bottom ten had `n < 75`. At 200 the median within-cell standard
+error is 0.011 against a within-state IQR of 0.076 — about six to one.
 
 ---
 
@@ -744,6 +779,49 @@ qualifying counties, excluding the 1930 stratum:
 - **The ranking is well resolved.** Within-state IQR of `shortfall_rate` is 0.076 against a
   median within-cell standard error of 0.011 — about 6.6 to 1.
 
+### Ranking the tails, and why the guard is not optional
+
+Ranked **without** the usability flags, the ten lowest-bite cells are almost all newly settled
+West Texas and Panhandle counties — 27 to 71 students, mean attainment 11.0 to 11.9 years, and
+coverage of 2.1, 3.3, 3.4, 14.6 and 17.7. Every one is an artefact of the mechanism in D4.
+Bailey County Texas, coverage 17.7 on 31 students, would head any list of places where the law
+did not bind.
+
+Applying `cell_usable` and the 200-student ranking threshold, both tails become coherent.
+
+Highest bite:
+
+| State | County | Stratum | n | Required | Attained | Shortfall | Deficit |
+|---|---|---|---|---|---|---|---|
+| New Mexico | Rio Arriba | 1920 | 970 | 8.9 | 6.03 | **0.815** | −3.34 |
+| New Mexico | Taos | 1900 | 390 | 7.6 | 4.28 | 0.808 | −3.75 |
+| New Mexico | Valencia | 1900 | 317 | 7.6 | 4.16 | 0.804 | −4.00 |
+| Louisiana | Lafourche | 1900 | 1,004 | 8.0 | 4.75 | 0.770 | −3.89 |
+| Louisiana | St Martin | 1900 | 620 | 8.0 | 4.30 | 0.768 | −4.50 |
+
+The New Mexico Hispano counties and the Louisiana Acadiana parishes — rural, non-Anglophone,
+thinly provisioned. Lowest bite: Texas Panhandle counties with attainment near 11 years
+against requirements near 5, plus California Glenn, Missouri DeKalb and Indiana Carroll.
+
+**Cross-state comparison mixes thresholds.** The high-bite cells face 7.6–8.9 required years
+and the low-bite ones 4.8–6.0; Texas in 1920 required about 4.9 years where New Mexico
+required 8.9. The ranking correlates −0.69 with attainment and only 0.146 with the threshold,
+so attainment dominates, but the threshold's standard deviation of 1.28 years is as large as
+attainment's 1.29. **Within state is the clean comparison.** Ohio, 1910 stratum, every county
+facing the same 7.7-year requirement:
+
+| Highest | Shortfall | | Lowest | Shortfall |
+|---|---|---|---|---|
+| Pike | 0.297 | | Morrow | 0.057 |
+| Lawrence | 0.292 | | Knox | 0.062 |
+| Vinton | 0.254 | | Medina | 0.067 |
+| Jackson | 0.244 | | Seneca | 0.069 |
+| Scioto | 0.242 | | Fulton | 0.072 |
+
+A fivefold spread at a single threshold, with coverage uniform at 0.18–0.27, and the geography
+is the Appalachian unglaciated south against the glaciated farming north. This is the measure's
+best demonstration.
+
 **A fourth stratum exists and should usually be dropped.** 189,062 students (1.22%) are
 assigned from 1930. They are **entirely cohort 1912 observed at age 18**, which is at or past
 every statutory exit age, and every one has `selection_distance >= 5` — the worst-assigned
@@ -793,6 +871,9 @@ Two data facts the build surfaced that were not known before:
 | Using `ca_years_combined` linearly | CLS use bins; the effect is not linear in required years |
 | Ignoring `*_code_type` | The `99 → 4` literacy stand-in is an assumption in 166 + 29 state-years |
 | Dropping small counties silently | A missing county reads as a county with no bite; flag instead (D3) |
+| Ranking cells without `cell_usable` | The unguarded bottom ten are settlement artefacts with coverage up to 17.7 (D3, D4) |
+| Treating `coverage > 1` as merely a large value | It is arithmetically impossible; the county was settled after the birth decade (D4) |
+| Using `MIN_CELL` as the threshold for a ranking | 25 students makes a cell estimable, not rankable; use 200 (D3) |
 | Averaging raw law columns | In `cls_state_age_limits_1880_1930`, `0` means *no law*, not missing |
 
 ## Sources

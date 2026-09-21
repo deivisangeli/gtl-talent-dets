@@ -124,7 +124,9 @@ write_parquet(candidates, file.path(in_dir, "candidates_pre1940.parquet"))
 births <- tibble::tibble(
   GEOID = c("01031", "01031", "01031", "02005", "48001"),
   decade = c(1880L, 1890L, 1900L, 1890L, 1890L),
-  county_births_estimate_decade = c("400", "100", "200", "50", "NA")
+  # 01031/1900's denominator is BELOW its two students, so coverage exceeds 1 --
+  # the impossible case that arises for counties settled after the birth decade.
+  county_births_estimate_decade = c("400", "100", "1", "50", "NA")
 )
 write_csv(births, file.path(in_dir, "us_panel_county_stem_1800.csv"))
 
@@ -251,13 +253,33 @@ cat("\nCoverage\n")
 check("coverage = linked students / county births", function()
   near(coverage$coverage[coverage$county_geoid == 2005 & coverage$cohort_decade == 1890], 3 / 50))
 check("coverage is computed per county-decade", function()
-  near(coverage$coverage[coverage$county_geoid == 1031 & coverage$cohort_decade == 1900], 2 / 200))
+  near(coverage$coverage[coverage$county_geoid == 1031 & coverage$cohort_decade == 1900], 2 / 1))
 check("the floored birth decade reaches the right coverage cell", function()
   near(coverage$coverage[coverage$county_geoid == 1031 & coverage$cohort_decade == 1880], 1 / 400))
 check("an NA births figure yields NULL coverage, not an error or a zero", function()
   is.na(coverage$coverage[coverage$county_geoid == 48001]))
 
 cat("\nThe script's own validation\n")
+u <- function(geoid, stratum_year, field) {
+  stratum[stratum$county_geoid == geoid &
+            stratum$assignment_stratum == stratum_year &
+            stratum$basis == "effective_cf", ][[field]]
+}
+# E and G sit in county 01031, birth decade 1900, whose denominator is 1 -> coverage 2.
+check("coverage above 1 is flagged impossible", function()
+  isTRUE(u(1031, 1920, "coverage_implausible")))
+check("an impossible-coverage cell is not usable", function()
+  !isTRUE(u(1031, 1920, "cell_usable")))
+# B, C and D sit in county 02005, birth decade 1890, denominator 50 -> coverage 0.06.
+check("coverage inside the band is flagged neither impossible nor thin", function()
+  !isTRUE(u(2005, 1900, "coverage_implausible")) && !isTRUE(u(2005, 1900, "coverage_thin")))
+check("a missing denominator is missing, not impossible", function()
+  isTRUE(u(48001, 1900, "coverage_missing")) && !isTRUE(u(48001, 1900, "coverage_implausible")))
+check("a missing denominator makes the cell unusable", function()
+  !isTRUE(u(48001, 1900, "cell_usable")))
+check("no fixture cell clears the 25-student minimum, so none is usable", function()
+  all(!stratum$cell_usable))
+
 check("every validation check the script ran passed", function() all(validation$validation_passed))
 
 if (!nzchar(Sys.getenv("KEEP_FIXTURE"))) unlink(tmp, recursive = TRUE) else cat("fixture kept at:", tmp, "

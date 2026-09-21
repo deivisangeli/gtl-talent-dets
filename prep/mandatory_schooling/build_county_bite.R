@@ -125,6 +125,16 @@ FALLBACK_TARGET_AGE <- 11.5
 
 MIN_CELL <- 25L
 
+# Below this share of the county's estimated children, a cell is a handful of
+# families rather than a county.
+COVERAGE_MIN <- 0.05
+
+# MIN_CELL is the threshold for "estimable at all". Reading a RANKING needs more:
+# at n = 27 the standard error on a shortfall rate near zero is meaningless, and
+# every cell in the unguarded bottom ten had n < 75. At n = 200 the median
+# within-cell standard error is 0.011 against a within-state IQR of 0.076.
+MIN_CELL_FOR_RANKING <- 200L
+
 # The statutory windows span entry 6-10 to exit 12-18, so any age at which a law
 # could have applied. Enforced on cand_age, not on the recorded age.
 CAND_AGE_MIN <- 5L
@@ -380,7 +390,17 @@ aggregate_grain <- function(keys, bases, sample_label, where = "TRUE") {
     pivot_wider(names_from = "statistic", values_from = "value") %>%
     mutate(sample = sample_label,
            shortfall_se = sqrt(shortfall_rate * (1 - shortfall_rate) / n_students),
-           below_min_cell = n_students < MIN_CELL) %>%
+           below_min_cell = n_students < MIN_CELL,
+           # Coverage above 1 is arithmetically impossible: more linked school-age
+           # students than children estimated ever born there that decade. It
+           # arises in counties settled AFTER the birth decade, where the births
+           # denominator is near zero while the students are school-age
+           # in-migrants, and it corrupts the unguarded tails of any ranking.
+           coverage_implausible = !is.na(mean_coverage) & mean_coverage > 1,
+           coverage_thin = !is.na(mean_coverage) & mean_coverage < COVERAGE_MIN,
+           coverage_missing = is.na(mean_coverage),
+           cell_usable = !below_min_cell & !coverage_implausible &
+                         !coverage_thin & !coverage_missing) %>%
     relocate(sample, basis, .after = last_col())
 }
 
@@ -392,7 +412,13 @@ build_table <- function(keys) {
     aggregate_grain(keys, ACTUAL_BASES, "law_bound",
                     paste(gate, "AND law_bound_cohort")),
     aggregate_grain(keys, COUNTERFACTUAL_BASES, "all_students", gate)
-  ) %>% arrange(across(all_of(keys)), basis)
+  ) %>%
+    # The 1930 stratum is a single cohort observed at 18, past every statutory
+    # exit age, so it is not usable either -- but only the stratum grain can see
+    # it, so the condition cannot live in aggregate_grain().
+    mutate(cell_usable = if ("assignment_stratum" %in% keys)
+             cell_usable & assignment_stratum != 1930L else cell_usable) %>%
+    arrange(across(all_of(keys)), basis)
 }
 
 message("Aggregating ...")
@@ -474,6 +500,36 @@ expect("non-standard COUNTYICP codes are a rounding error, not a pattern",
 # every statutory exit age. It is a legitimate assignment -- 18 is inside the
 # candidate window -- but it is the worst-assigned group in the file and is
 # isolated by selection_distance >= 5. Recorded so a change in its shape surfaces.
+usable <- dplyr::filter(county_stratum, basis == "effective_cf")
+# A property of the real data, not of a fixture built to contain one.
+if (!overridden) {
+  expect("impossible coverage stays a rounding error, not a pattern",
+         mean(usable$coverage_implausible) < 0.05,
+         sprintf("%d of %d cells (%.1f%%)", sum(usable$coverage_implausible),
+                 nrow(usable), 100 * mean(usable$coverage_implausible)))
+}
+expect("cell_usable is a subset of the estimable cells",
+       !any(usable$cell_usable & usable$below_min_cell),
+       sum(usable$cell_usable & usable$below_min_cell))
+# paste0: R does not concatenate adjacent string literals.
+estimable <- dplyr::filter(usable, !below_min_cell, assignment_stratum != 1930L)
+message(sprintf(paste0("  county x stratum, effective_cf: %d cells of which %d usable.",
+                       "
+    All cells: %d below the %d-student minimum, %d impossible ",
+                       "coverage, %d thin, %d no denominator.",
+                       "
+    Of the %d estimable (>= minimum, excluding the 1930 ",
+                       "stratum): %d impossible, %d thin.",
+                       "
+    Usable at the %d-student ranking threshold: %d."),
+                nrow(usable), sum(usable$cell_usable), sum(usable$below_min_cell),
+                MIN_CELL, sum(usable$coverage_implausible), sum(usable$coverage_thin),
+                sum(usable$coverage_missing),
+                nrow(estimable), sum(estimable$coverage_implausible),
+                sum(estimable$coverage_thin),
+                MIN_CELL_FOR_RANKING,
+                sum(usable$cell_usable & usable$n_students >= MIN_CELL_FOR_RANKING)))
+
 late <- dbGetQuery(con, "
 SELECT count(*) n, count(DISTINCT yob) cohorts, min(cand_age) age_lo,
        min(selection_distance) dist_lo
