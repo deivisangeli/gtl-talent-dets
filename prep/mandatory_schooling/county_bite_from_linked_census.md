@@ -10,6 +10,26 @@ this document assumes you have read.
 
 ---
 
+## Which measure to use
+
+**This is the secondary measure.** A compulsory-*attendance* law obliges a child to be in
+school between two ages; it says nothing about years completed. Completed attainment is a
+downstream proxy, and it is blind where the law actually operates: if enforcement pulls
+marginal children into school who still leave at the exit age, attainment barely moves and
+the shortfall below reads that as no bite. If the children drawn in are those who would have
+finished fewest years, composition can make measured attainment *fall*, so a working law
+looks like a failing one.
+
+[`county_attendance_from_linked_census.md`](county_attendance_from_linked_census.md) measures
+attendance instead, contemporaneously on the childhood census row, over 42.4 M observations
+rather than 15.5 M, with no 1940 linkage needed for the outcome. Prefer it.
+
+What this document still measures correctly: how far a cohort's *completed* schooling fell
+short of the standard their state set. That is a real quantity and the right one for questions
+about attainment. It is not a measure of whether the law was obeyed.
+
+---
+
 ## Start here: the county variation is in attainment, not in the law
 
 Required years vary on **state × birth cohort**. Observed schooling varies on the individual.
@@ -92,10 +112,12 @@ their treatment assignment).
 Attainment exists in one census year. `HIGRADE`, `HIGRADED`, `EDUC` and `EDUCD` sit in the
 dictionary's "1940 only" group and read `0.0%` fill in 1900, 1910, 1920 and 1930.
 
-**Do not substitute `SCHOOL`.** It is present in all five years at 100.0% fill, and it is
-not comparable across them: the reference period runs ~12 months in 1900, ~7.5 in 1910, ~4
-in 1920, ~6 in 1930 and ~1 month in 1940. It measures enrolment on a shifting window, not
-completed years.
+**Do not substitute `SCHOOL` for attainment.** It measures enrolment on a window that
+shifts between censuses -- ~12 months in 1900, ~7.5 in 1910, ~4 in 1920, ~6 in 1930 and ~1
+month in 1940 -- so it is not a count of completed years and the series is not comparable
+across years. That is a statement about using it *here*, not a dismissal: `SCHOOL` is the
+right measure of the thing the statute actually names, which is what
+[`county_attendance_from_linked_census.md`](county_attendance_from_linked_census.md) builds.
 
 `LIT` runs 1900–1930 at 100.0% and is `0.0%` in 1940 — literacy stops exactly where
 attainment begins, so there is no year in which both are observed.

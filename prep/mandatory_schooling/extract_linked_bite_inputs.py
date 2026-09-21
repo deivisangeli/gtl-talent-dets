@@ -6,7 +6,9 @@ two Parquet files:
   students_1940.parquet     the 1940 rows for birth cohorts 1885-1912 (AGE 27-54),
                             carrying attainment
   candidates_pre1940.parquet  the pre-1940 rows at school age (5-18), carrying the
-                            county and state the child lived in
+                            county and state the child lived in, and SCHOOL --
+                            contemporaneous attendance, which is the margin a
+                            compulsory-attendance law actually operates on
 
 The file is ordered by census year, 1900 first and 1940 last. That ordering forces
 two decisions:
@@ -116,6 +118,15 @@ CANDIDATE_SCHEMA = pa.schema([
     ("HIK", pa.string()),
     ("YEAR", pa.int16()),
     ("AGE", pa.int16()),
+    ("SEX", pa.int8()),
+    ("RACE", pa.int8()),
+    # SCHOOL is the attendance question, present in all five census years at 100%
+    # fill. It is the margin a compulsory-ATTENDANCE law actually operates on,
+    # observed contemporaneously on the childhood row rather than inferred from
+    # attainment forty years later. Its reference period changes across censuses
+    # (~12 months in 1900, ~4 in 1920, ~1 month in 1940), so it is comparable
+    # WITHIN a census year and not across them.
+    ("SCHOOL", pa.int8()),
     ("STATEFIP", pa.int16()),
     ("COUNTYICP", pa.int32()),
     ("MOMLOC", pa.int16()),

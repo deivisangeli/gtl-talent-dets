@@ -28,7 +28,7 @@ HERE = Path(__file__).resolve().parent
 EXTRACTOR = HERE / "extract_linked_bite_inputs.py"
 
 COLUMNS = ["YEAR", "HIK", "AGE", "SEX", "RACE", "BPL", "HIGRADED", "EDUC",
-           "STATEFIP", "COUNTYICP", "MOMLOC", "POPLOC", "GQ", "LIT"]
+           "SCHOOL", "STATEFIP", "COUNTYICP", "MOMLOC", "POPLOC", "GQ", "LIT"]
 
 FAILURES = 0
 
@@ -66,6 +66,7 @@ def row(year, hik, age, **over):
         "YEAR": year, "HIK": hik, "AGE": age, "SEX": 1, "RACE": 1, "BPL": 1,
         "HIGRADED": "" if year < 1940 else 110,
         "EDUC": "" if year < 1940 else 6,
+        "SCHOOL": 2,   # attended; 1 = did not attend
         "STATEFIP": 1, "COUNTYICP": 310, "MOMLOC": 1, "POPLOC": 2, "GQ": 1,
         "LIT": 4,
     }
@@ -169,6 +170,8 @@ def main():
         check("the parent pointers and GQ are carried, not filtered",
               lambda: all(r["MOMLOC"] == 1 and r["POPLOC"] == 2 and r["GQ"] == 1
                           for r in candidates))
+        check("SCHOOL is carried on the childhood rows -- the attendance margin",
+              lambda: all(r["SCHOOL"] == 2 for r in candidates))
 
         print("\nManifest")
         check("row counts are recorded", lambda: manifest["rows_read"] == len(FIXTURE_ROWS))
@@ -182,9 +185,10 @@ def main():
               lambda: manifest["student_filter"]["yob"] == [1885, 1912])
 
         print("\nGuards")
+        drop = COLUMNS.index("COUNTYICP")
         bad = write_fixture(tmp / "missing.csv.gz",
                             columns=[c for c in COLUMNS if c != "COUNTYICP"],
-                            rows=[",".join(r.split(",")[:9] + r.split(",")[10:])
+                            rows=[",".join(r.split(",")[:drop] + r.split(",")[drop + 1:])
                                   for r in FIXTURE_ROWS])
         check_raises("a source missing a needed column is rejected",
                      lambda: run_extractor(bad, data_root), "COUNTYICP")

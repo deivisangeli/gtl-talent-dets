@@ -1433,7 +1433,7 @@ linked cases included — **220,979,023 rows**, 58 columns.
 |---|---|---|---|---|
 | 12,971,952 | 23,984,383 | 39,982,220 | 70,207,628 | 73,832,840 |
 
-It was downloaded as a bare CSV — **no DDI, codebook or command file came with it**, which
+It carries `SCHOOL`, `SEX` and `RACE` on the childhood rows as of 2026-09-21, for the attendance measure. It was downloaded as a bare CSV — **no DDI, codebook or command file came with it**, which
 is why everything below exists. The DDI has since been fetched separately and now backs the
 value labels; see *The DDI codebook* below. Four documents cover the extract:
 
@@ -1443,6 +1443,7 @@ value labels; see *The DDI codebook* below. Four documents cover the extract:
 | `ipums_linked_1900_1940_provenance.json` | Run manifest: source identity, row counts, the DDI's sha256, `ddi_cross_checked`, and which variables still have no value labels |
 | `merge_cls_to_linked_census.md` | How to join the CLS cohort requirements onto it, following what the authors actually did |
 | `county_bite_from_linked_census.md` | Build spec **and results** for the county-level bite measure: observed completed schooling against what the law required, nominal and net of exemptions |
+| `county_attendance_from_linked_census.md` | Build spec **and results** for the county-level ATTENDANCE measure -- the share of legally-required children not in school, measured contemporaneously. Supersedes the bite measure, since the statute names attendance |
 
 ```powershell
 python prep/mandatory_schooling/profile_ipums_linked_census.py                 # ~16 min, full pass
