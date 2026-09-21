@@ -399,6 +399,90 @@ There is also **no never-treated state** in this window: zero of 49 are unexpose
 built inside those 17 states, which is the region collinearity `CLAUDE.md` already documents
 for this pipeline.
 
+### C6. `ca_years > 0` is not exposure
+
+The first cohort with a positive requirement is **not** the first cohort the law applied to,
+and treating it as such is the single easiest way to produce a spurious result from this
+data. Across all 17 states the first cohort with `ca_years1 > 0` faces a mean effective
+requirement of **0.94 years** against a mean plateau of **7.24**, and in **17 of 17** that
+figure is 0 or 1 year.
+
+Alabama is the worked example. Its law is in force from 1917, entry age 8, exit age 16:
+
+| Birth cohort | Age in 1917 | Required | Attained | Shortfall vs its own requirement |
+|---|---|---|---|---|
+| 1901 | 16 - at the exit age | 0 | - | - |
+| 1902 | 15 | **1** | 7.64 | **0.029** |
+| 1905 | 12 | 4 | 7.99 | 0.107 |
+| 1908 | 9 | 5 | 8.47 | 0.139 |
+| **1909** | **8 - the entry age** | **6** | 8.15 | **0.248** |
+| 1912 | 5 | 6 | 8.24 | 0.224 |
+
+Cohort 1902 was fifteen when the statute passed and had already completed 7.64 years of
+schooling. It faced a one-year requirement, which bound on 2.9% of them. Behaviourally it is
+a **pre-law cohort** that happens to carry a non-zero `ca_years`.
+
+Two defensible definitions of "exposed", and they are not the same thing:
+
+- **`T - entryage`** - the first cohort covered from the entry age onward, so exposed for its
+  whole statutory window under the law as it then stood. Alabama: 1917 - 8 = **1909**.
+- **The plateau cohort** - the first cohort reaching the state's maximum required years over
+  1885-1912.
+
+They coincide in **9 of the 17** states and diverge in the rest, because a state that
+*tightened* its law later reaches its maximum only after the amendment: Maryland +15 years,
+Missouri +8, Delaware and Tennessee +6. Three go the other way (Arkansas and Mississippi -2,
+Florida -1) where the early law was stricter than what followed. **Arizona is unusable for
+either rule** - its recorded onset of 1880 belongs to a spell repealed in 1882, with the
+durable law starting 1899.
+
+So there is no boundary that makes a clean before-and-after. Use the ramp as a **dose**:
+`required_effective` runs 0, 0, 1, 2, 3, 4, 4, 4, 5, 6, 6, 6, 6 across Alabama's cohorts
+1900-1912 while attainment goes 7.64 to 8.24. That is what CLS do, and it is also why they
+enter required years in bins rather than linearly.
+
+### C7. A counterfactual basis is not comparable across the law's introduction
+
+`required_effective_cf` is the actual requirement where a law bound and the plateau where
+none did. Those are two different definitions, and stepping across the transition swaps
+between them - so a before/after contrast on a counterfactual basis measures the yardstick
+changing, not the children.
+
+Alabama's transition pair, from `bite_state_cohort`:
+
+| Cohort | Basis | Threshold | Attained | Shortfall |
+|---|---|---|---|---|
+| 1901 | `effective_cf` | **6** - plateau, unexposed | 7.56 | **0.282** |
+| 1902 | `effective_cf` | **1** - actual, first positive | 7.64 | **0.029** |
+| 1901 | `fixed6` | 6 | 7.56 | 0.282 |
+| 1902 | `fixed6` | 6 | 7.64 | 0.271 |
+
+Attainment moved by 0.08 years. On `effective_cf` the shortfall rate falls 25 points, all of
+it the threshold shrinking from six years to one. Held at a fixed six, the same two cohorts
+differ by one point.
+
+Across the 17 states the mean threshold on this comparison collapses from **6.89 to 0.90**
+while mean attainment rises **0.047 years**. Missouri is the reductio: at its first positive
+cohort the effective requirement is **zero**, because the exemptions bind from the first year.
+
+The counterfactual bases are comparable **within** a cohort - which is what they were built
+for, and the right basis for ranking counties against each other. For anything crossing the
+transition, hold the threshold fixed with `fixed6`/`fixed8`, or compare `mean_observed_years`
+directly.
+
+Empirically the county-level before/after contrast has no signal in any case. Over the 609
+county pairs with at least 100 students on each side of the adjacent-cohort boundary and
+plausible coverage, the standard deviation of the change in `shortfall_rate` is **0.0484**
+against a pure binomial noise floor of **0.0454** - a ratio of **1.07**, which is to say the
+dispersion is what nothing happening would produce. Cells of 100-170 give a standard error
+near 0.045 on each rate, so 0.064 on the difference, while CLS's own IV estimate of
+0.067-0.077 years per required year moves a shortfall rate at a six-year threshold by about
+0.01. The design is underpowered by roughly an order of magnitude at this grain. Comparing
+the last zero-requirement cohort to the first fully exposed one instead (8.1 years apart on
+average) does give a mean effect - attainment +0.518 years, bite -4.6 points - but the
+cross-county dispersion is only 1.21 times the noise floor, and eight years of secular
+attainment growth are bundled into it.
+
 ---
 
 ## Part D — the four county measures
@@ -689,6 +773,10 @@ Two data facts the build surfaced that were not known before:
 | Reading `gap_mean` as identifying variation | Within a cell it ranks counties exactly as attainment does; use `shortfall_rate` |
 | Interpreting a cohort trend | Cohort, linkage rate and boundary vintage are collinear (E1) |
 | Reading a within-stratum result as variation in the law | Inside a stratum the requirement is near a state constant; only 25/28/22 of 49 states vary (E1) |
+| Treating `ca_years > 0` as the first exposed cohort | It faces ~1 year in 17 of 17 states and is behaviourally pre-law; full exposure starts at `T - entryage` (C6) |
+| Looking for a sharp cohort cutoff at adoption | There is none - the ramp runs 8-13 cohorts; use the dose, not a boundary (C6) |
+| Comparing a counterfactual basis across the law's introduction | The threshold swaps from plateau to actual, manufacturing a 25-point improvement from a 0.08-year change in attainment (C7) |
+| Equating the plateau cohort with `T - entryage` | They coincide in only 9 of 17 states; later tightening moves the plateau, and Arizona's repeal breaks both (C6) |
 | Pooling unexposed students into a bite cell | `shortfall_rate` is 0 by construction where no law bound; it drags the cell toward zero (C5) |
 | Overwriting `required_effective` with the counterfactual | The actual and imputed standards answer different questions; keep both columns (C5) |
 | Imputing the plateau on one basis only | Nominal and effective plateaus differ in 10 of the 17 states, by up to 2 years (C5) |
