@@ -596,6 +596,37 @@ build takes about two.
 | 1940 rows in `AGE` 27-54 | 33,046,638 |
 | with attainment (`HIGRADED != 999`) | 32,367,477 |
 | **assigned a school-age county** | **15,472,169** (47.8%) |
+
+Where the other 52% goes, and why it is not random:
+
+| Stage | Students | Lost |
+|---|---|---|
+| 1940 rows, `AGE` 27-54 | 33,046,638 | |
+| with attainment (`HIGRADED != 999`) | 32,367,477 | 679,161 (2.1%) |
+| with any pre-1940 row at school age | 16,041,856 | **16,325,621 (50.4%)** |
+| inside the window on the cohort-consistent age | 15,472,169 | 569,687 (3.6% of those) |
+
+**The binding constraint is that each cohort gets one shot.** A student has to appear in the
+one census where they happened to be of school age. The extract links **95.1%** of 1940 rows
+to 1930, but for these cohorts 1930 finds them aged 18-45 and so past school age, which makes
+that link almost useless here. The links that matter reach 1900, 1910 and 1920 — **17.6%**,
+**32.5%** and **54.2%** of 1940 rows — and the further back the reach, the worse it gets:
+more intervening name changes, more age misreporting, and fewer survivors to link at all.
+
+That produces a steep gradient in the realized assignment rate:
+
+| Cohorts | Served by | Students | Assigned | Rate |
+|---|---|---|---|---|
+| 1885-1893 | 1900 | 9,793,000 | 3,314,484 | **33.8%** |
+| 1894-1903 | 1910 | 12,285,656 | 5,353,097 | **43.6%** |
+| 1904-1912 | 1920 | 10,288,821 | 6,804,588 | **66.1%** |
+
+These sit above the raw link rates because the nine two-candidate cohorts get a second chance
+and because 27-54-year-olds link better than the population as a whole. **This is E1 made
+quantitative**: the oldest cohorts are about half as likely to be observed as the youngest, so
+the 47.8% is a selected half, and the selection differs across the cohorts being compared
+rather than merely in level. It is the reason cohort trends are uninterpretable and the reason
+`coverage` has to travel with every county ranking.
 | county x stratum x basis rows | 68,854 |
 | state x cohort x basis rows | 7,774 |
 
