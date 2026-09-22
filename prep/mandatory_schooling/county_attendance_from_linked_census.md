@@ -85,6 +85,14 @@ consistency between two censuses, and no 47.8% assignment loss.
 11,927** cells, against 76 with no denominator at all and 99 below the 25-child minimum,
 leaving **11,746 usable**.
 
+Coverage also puts a number on the selection, and it is not small. Median coverage runs
+**0.069 (1900), 0.087 (1910), 0.107 (1920), 0.170 (1930)** against a true school-age share
+near 0.26 — so the linkage holds roughly a quarter of a county's children in 1900 rising to
+two thirds in 1930. The share missing therefore **varies by a factor of 2.4 across the census
+years**, compounding B1. **This measure needs no linkage at all**, so the fix is to rebuild it
+on the unlinked full counts:
+[`county_attendance_from_fullcount.md`](county_attendance_from_fullcount.md).
+
 ---
 
 ## Part B — the two things attendance costs

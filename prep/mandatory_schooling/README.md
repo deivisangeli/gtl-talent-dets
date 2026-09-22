@@ -1444,6 +1444,7 @@ value labels; see *The DDI codebook* below. Four documents cover the extract:
 | `merge_cls_to_linked_census.md` | How to join the CLS cohort requirements onto it, following what the authors actually did |
 | `county_bite_from_linked_census.md` | Build spec **and results** for the county-level bite measure: observed completed schooling against what the law required, nominal and net of exemptions |
 | `county_attendance_from_linked_census.md` | Build spec **and results** for the county-level ATTENDANCE measure -- the share of legally-required children not in school, measured contemporaneously. Supersedes the bite measure, since the statute names attendance |
+| `county_attendance_from_fullcount.md` | Steps to rebuild the attendance measure on the **unlinked** 1900-1930 full counts, which the project does not yet hold. Removes the linkage selection entirely, since attendance needs no link |
 
 ```powershell
 python prep/mandatory_schooling/profile_ipums_linked_census.py                 # ~16 min, full pass
