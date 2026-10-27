@@ -1,8 +1,9 @@
 ###############################################################################
 # USA-only AMWS world's-fairs event studies estimated separately by cohort.
 #
-# Reuses the validated treated and balanced never-treated samples from:
-#   WORLD_FAIRS_PROFILE=robust_m30_pop_m10_balanced_oldest
+# Reuses validated treated and balanced never-treated samples from the selected
+# WORLD_FAIRS_PROFILE. Set WORLD_FAIRS_PER_COHORT_SCOPE=figure5 to estimate only
+# the hosted-county AMWS-per-1,000-births decomposition used in the appendix.
 #
 # Run from the repository root or analysis/:
 #   Rscript analysis/world_fairs/worlds_fairs_us_amws_event_studies_per_cohort.R
@@ -64,9 +65,31 @@ if (!dir.exists(TALENT_DETS_DATA_DIR)) {
 
 profile_name <- Sys.getenv(
   "WORLD_FAIRS_PROFILE",
-  unset = "robust_m30_pop_m10_balanced_oldest"
+  unset = "robust_m30_pop_m10_balanced_oldest_treatment_m20_single_fair"
 )
 profile <- world_fairs_us_amws_profile(profile_name)
+analysis_scope <- tolower(Sys.getenv(
+  "WORLD_FAIRS_PER_COHORT_SCOPE",
+  unset = "all"
+))
+if (!analysis_scope %in% c("all", "figure5")) {
+  stop("Unsupported WORLD_FAIRS_PER_COHORT_SCOPE: ", analysis_scope)
+}
+if (analysis_scope == "figure5") {
+  figure5_profiles <- c(
+    "robust_m30_pop_m10_balanced_oldest_treatment_m20_single_fair",
+    paste0(
+      "robust_m30_pop_m10_balanced_oldest_treatment_m20_",
+      "single_fair_g_shift"
+    )
+  )
+  if (!profile$name %in% figure5_profiles) {
+    stop(
+      "The figure5 scope requires one of the validated Figure 5 profiles; received: ",
+      profile$name
+    )
+  }
+}
 balance_controls_calendar <- isTRUE(value_or(
   profile$balance_controls_calendar,
   value_or(profile$balance_controls_oldest, FALSE)
@@ -104,7 +127,10 @@ results_dir <- file.path(
   "worlds_fair",
   profile$results_subdir
 )
-per_cohort_dir <- file.path(results_dir, "per_cohort")
+per_cohort_dir <- file.path(
+  results_dir,
+  if (analysis_scope == "figure5") "per_cohort_figure5" else "per_cohort"
+)
 dir.create(per_cohort_dir, recursive = TRUE, showWarnings = FALSE)
 
 required_files <- c(
@@ -136,6 +162,9 @@ outcomes <- c(
   "population",
   "county_births_estimate"
 )
+if (analysis_scope == "figure5") {
+  outcomes <- "amws_per_1000_births"
+}
 outcome_labels <- c(
   n_amws = "AMWS scientists born",
   log1p_n_amws = "log(1 + AMWS scientists born)",
@@ -215,6 +244,10 @@ sample_keys <- read_csv(
     expected_treated = as.integer(n_treated_eligible),
     expected_controls = as.integer(n_never_treated_controls)
   )
+if (analysis_scope == "figure5") {
+  sample_keys <- sample_keys %>%
+    filter(treatment_spec == "hosted", is.na(distance_bin_km))
+}
 
 expected_treated_by_cohort <- read_csv(
   file.path(results_dir, "all_treated_counts_by_cohort.csv"),
@@ -227,6 +260,10 @@ expected_treated_by_cohort <- read_csv(
     expected_treated_cohort = as.integer(n_treated_eligible)
   ) %>%
   filter(expected_treated_cohort > 0L)
+if (analysis_scope == "figure5") {
+  expected_treated_by_cohort <- expected_treated_by_cohort %>%
+    filter(treatment_spec == "hosted", is.na(distance_bin_km))
+}
 
 run_one_cohort <- function(data, outcome, spec_label, bin_label, cohort,
                            cohort_event_times, cores) {
@@ -446,9 +483,9 @@ warning_summary <- model_status %>%
 write_csv(warning_summary, file.path(per_cohort_dir, "warning_summary.csv"))
 
 rendered_files <- character()
-calendar_axis_min <- min(expected_treated_by_cohort$cohort) + event_time_min
-calendar_axis_max <- panel_decade_max
-calendar_axis_breaks <- seq(calendar_axis_min, calendar_axis_max, 20L)
+relative_axis_min <- event_time_min
+relative_axis_max <- max(panel_decade_max - expected_treated_by_cohort$cohort)
+relative_axis_breaks <- seq(relative_axis_min, relative_axis_max, 10L)
 
 for (key_index in seq_len(nrow(sample_keys))) {
   spec_label <- sample_keys$treatment_spec[[key_index]]
@@ -474,7 +511,6 @@ for (key_index in seq_len(nrow(sample_keys))) {
       mutate(cohort_event_time_max = max(event_time)) %>%
       ungroup() %>%
       mutate(
-        decade_calendar = cohort + event_time,
         period = factor(
           if_else(event_time < 0, "Pre", "Post"),
           levels = c("Pre", "Post")
@@ -505,8 +541,6 @@ for (key_index in seq_len(nrow(sample_keys))) {
       pull(cohort_label)
     plot_data <- plot_data %>%
       mutate(cohort_label = factor(cohort_label, levels = cohort_label_levels))
-    cohort_lines <- plot_data %>%
-      distinct(cohort_label, cohort)
     plot_y_limits <- plot_data %>%
       summarise(
         ymin = min(ci_low, na.rm = TRUE),
@@ -516,11 +550,10 @@ for (key_index in seq_len(nrow(sample_keys))) {
 
     plot <- ggplot(
       plot_data,
-      aes(x = decade_calendar, y = estimate, ymin = ci_low, ymax = ci_high)
+      aes(x = event_time, y = estimate, ymin = ci_low, ymax = ci_high)
     ) +
       geom_vline(
-        data = cohort_lines,
-        aes(xintercept = cohort),
+        xintercept = 0,
         linetype = "dotted",
         colour = "gray60"
       ) +
@@ -529,7 +562,7 @@ for (key_index in seq_len(nrow(sample_keys))) {
       geom_hline(yintercept = 0, linetype = "dashed") +
       facet_wrap(~ cohort_label, nrow = 1, scales = "fixed") +
       scale_x_continuous(
-        breaks = calendar_axis_breaks
+        breaks = relative_axis_breaks
       ) +
       scale_color_manual(
         drop = FALSE,
@@ -538,18 +571,18 @@ for (key_index in seq_len(nrow(sample_keys))) {
         labels = c("Pre", "Post")
       ) +
       coord_cartesian(
-        xlim = c(calendar_axis_min, calendar_axis_max),
+        xlim = c(relative_axis_min, relative_axis_max),
         ylim = c(plot_y_limits$ymin, plot_y_limits$ymax)
       ) +
       labs(
-        x = "Birth decade",
+        x = "Relative Time",
         y = "Effect",
         colour = NULL,
         title = str_wrap(
           paste0(
             outcome_labels[[outcome]],
             " — World's fairs, ", treatment_label,
-            " (per-cohort ", plot_estimator_label, ", calendar axis)"
+            " (per-cohort ", plot_estimator_label, ", relative time)"
           ),
           90
         )
@@ -685,6 +718,7 @@ elapsed <- difftime(Sys.time(), initial_time, units = "mins")
 notes <- c(
   "USA-only AMWS world's-fairs event studies estimated separately by cohort.",
   paste0("Source profile: ", profile$name),
+  paste0("Analysis scope: ", analysis_scope, "."),
   paste0(
     "Event-time window by cohort: [", event_time_min,
     ", 1960-g], ending at the last available panel decade."
@@ -702,10 +736,10 @@ notes <- c(
   "Covariate: log county population, evaluated at g-10 by the universal base.",
   "Estimator: did::att_gt outcome regression; analytical pointwise 95% CIs.",
   paste0(
-    "Figures use a common calendar axis [", calendar_axis_min, ", ",
-    calendar_axis_max, "] and fixed y scales across cohorts within each figure."
+    "Figures use a common relative-time axis [", relative_axis_min, ", ",
+    relative_axis_max, "] and fixed y scales across cohorts within each figure."
   ),
-  "Dotted vertical lines mark each treatment cohort; facet headers report e_max.",
+  "Dotted vertical lines mark e=0; facet headers report e_max.",
   paste0("Models successful: ", sum(model_status$ok), " / ", nrow(model_status), "."),
   paste0("Figures rendered: ", length(rendered_files), "."),
   paste0("Elapsed minutes: ", round(as.numeric(elapsed), 2), ".")

@@ -29,6 +29,8 @@ annual_repo_root <- function() {
 
 repo_root <- annual_repo_root()
 source(file.path(repo_root, "analysis", "mandatory_schooling", "annual_csdid_helpers.R"))
+source(file.path(repo_root, "analysis", "mandatory_schooling", "csdid_figure_helpers.R"))
+source(file.path(repo_root, "analysis", "mandatory_schooling", "annual_csdid_population_controls.R"))
 
 annual_data_root <- function() {
   config <- new.env()
@@ -38,46 +40,6 @@ annual_data_root <- function() {
     root <- file.path("C:/Users", Sys.info()[["user"]], "Globtalent Dropbox", "gtl_talent_dets")
   }
   normalizePath(root, winslash = "/", mustWork = TRUE)
-}
-
-plot_annual_results <- function(coefficients, output_dir, pre, per_cohort = FALSE) {
-  for (outcome in names(annual_outcomes)) {
-    d <- coefficients[outcome_name == outcome]
-    d[, specification_label := factor(specification_label,
-      levels = c("Levels", "Cohort-linear detrended"))]
-    p <- ggplot(d, aes(event_time, att)) +
-      annotate("rect", xmin = -14.5, xmax = -0.5, ymin = -Inf, ymax = Inf,
-               fill = "#f0c674", alpha = 0.22) +
-      geom_hline(yintercept = 0, color = "grey45", linetype = "dashed") +
-      geom_vline(xintercept = c(-15, 0), color = "grey50", linetype = "dotted") +
-      geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.35,
-                    color = "#315a7d", linewidth = 0.35, na.rm = TRUE) +
-      geom_point(size = 1.15, color = "#173e60", na.rm = TRUE) +
-      scale_x_continuous(breaks = sort(unique(c(seq(-pre, 20, 10), -15))),
-                         limits = c(-pre - 0.7, 20.7)) +
-      labs(title = "Compulsory schooling and AMWS scientist births",
-           subtitle = paste0(annual_outcomes[[outcome]], " | Annual C&S | ",
-                             pre, " pre-law years | Reference: -15"),
-           x = "Birth year relative to law passage", y = "Estimated effect",
-           caption = paste0("Shaded: potentially exposed birth cohorts (-14 to -1). ",
-                            "95% pointwise intervals; state-clustered multiplier bootstrap.\n",
-                            "Targets: laws adopted in 1850-1880. Trends use only unexposed years; ",
-                            "detrended inference is conditional on fitted trends.")) +
-      theme_minimal(base_size = 11) +
-      theme(panel.grid.minor = element_blank(), plot.caption = element_text(hjust = 0),
-            strip.text = element_text(face = "bold"))
-    if (per_cohort) {
-      p <- p + facet_grid(cohort_label ~ specification_label, scales = "free_y")
-      height <- 2.05 * uniqueN(d$g) + 2
-    } else {
-      p <- p + facet_wrap(~specification_label, ncol = 2)
-      height <- 6
-    }
-    stem <- file.path(output_dir, paste0(if (per_cohort) "cohort_" else "pooled_", outcome))
-    ggsave(paste0(stem, ".png"), p, width = 13, height = height, dpi = 160,
-           limitsize = FALSE, bg = "white")
-    ggsave(paste0(stem, ".pdf"), p, width = 13, height = height, limitsize = FALSE)
-  }
 }
 
 run_annual_profile <- function(inputs, profile_name, results_root) {
@@ -189,18 +151,20 @@ run_annual_profile <- function(inputs, profile_name, results_root) {
   }
   pooled <- rbindlist(pooled_all)
   cells <- merge(rbindlist(cells_all), cohort_labels, by = "g")
-  stopifnot(nrow(pooled) == 8L * length(sample$grid),
-            nrow(cells) == 8L * length(sample$grid) * nrow(sample$weights))
+  stopifnot(nrow(pooled) == annual_specification_count() * length(sample$grid),
+            nrow(cells) == annual_specification_count() * length(sample$grid) * nrow(sample$weights))
   fwrite(cells, file.path(output_dir, "per_cohort", "cohort_coefficients.csv"))
-  plot_annual_results(pooled, output_dir, profile$pre)
-  plot_annual_results(cells, file.path(output_dir, "per_cohort"), profile$pre, TRUE)
+  figure_counts <- annual_figure_counts(sample$targets, sample$audit, sample$weights)
+  plot_annual_results(pooled, output_dir, profile$pre, figure_counts)
+  plot_annual_results(cells, file.path(output_dir, "per_cohort"), profile$pre, figure_counts, TRUE)
   writeLines(c(
     paste("Profile:", profile_name),
-    "Annual AMWS birth cohorts; target laws adopted in 1850-1880, inclusive.",
-    "Exact law dates are provisional inputs, not independently verified historical facts.",
+    "Annual outcomes; target laws took statewide effect in 1850-1880, inclusive.",
+    "Treatment dates are from Lingwall (2014), dissertation Table 6.2.",
+    "Treatment is the first year a compulsory-attendance law was in effect in every county.",
     "Missing dates are excluded, never converted to never-treated status.",
     "14-year exposure allowance is an explicit assumption; reference is e=-15.",
-    "Birth cohorts e=-14,...,-1 may already be exposed and are not placebo leads.",
+    "Event years e=-14,...,-1 are inside the anticipation window and are not placebo leads.",
     "Treated counties have every requested event year; controls may have calendar gaps.",
     "All eligible counties' other available years are retained in estimation.",
     "C&S not-yet-treated comparisons use anticipation=14 and universal base periods.",
@@ -209,7 +173,7 @@ run_annual_profile <- function(inputs, profile_name, results_root) {
     "State-clustered multiplier bootstrap: 1000 draws; 95% pointwise intervals.",
     "Base seed 20260905; deterministic profile/model offsets are in coefficient exports.",
     "Detrending uses only e=-pre,...,-15; inference is conditional on estimated trends.",
-    "Annual county population is interpolated; annual county births use estimated denominators.",
+    "Population is interpolated annually; county births are annual estimates.",
     paste("Generated:", Sys.time())
   ), file.path(output_dir, "notes.txt"))
   writeLines(capture.output(sessionInfo()), file.path(output_dir, "session_info.txt"))
@@ -227,12 +191,13 @@ verify_annual_outputs <- function(results_root, profiles) {
     cells <- fread(file.path(d, "per_cohort", "cohort_coefficients.csv"))
     support <- fread(file.path(d, "comparison_support.csv"))
     targets <- fread(file.path(d, "treated_counties.csv"))
+    audit <- fread(file.path(d, "sample_inclusion_audit.csv"))
     weights <- fread(file.path(d, "cohort_weights.csv"))
     direct <- fread(file.path(d, "direct_did_validation.csv"))
     trends <- fread(file.path(d, "detrending_fits.csv"))
     stopifnot(nrow(targets) == profile$counties,
       uniqueN(targets$state_id) == profile$jurisdictions,
-      nrow(pooled) == 8L * (profile$pre + 21L),
+      nrow(pooled) == annual_specification_count() * (profile$pre + 21L),
       nrow(cells) == nrow(pooled) * nrow(weights),
       !anyDuplicated(pooled[, .(outcome_name, specification, event_time)]),
       !anyDuplicated(cells[, .(outcome_name, specification, g, event_time)]),
@@ -243,7 +208,7 @@ verify_annual_outputs <- function(results_root, profiles) {
       all(trends$fitting_max_event <= -15L),
       max(direct$absolute_error) < 1e-7)
     models <- list.files(file.path(d, "models"), pattern = "[.]rds$", full.names = TRUE)
-    stopifnot(length(models) == 8L)
+    stopifnot(length(models) == annual_specification_count())
     metadata <- rbindlist(lapply(models, function(path) {
       m <- readRDS(path)
       ids <- as.integer(rownames(m$fit$inffunc))
@@ -267,10 +232,15 @@ verify_annual_outputs <- function(results_root, profiles) {
     # the distinction between supplied rows and did's internal time truncation.
     if ("estimation_rows" %in% names(summary)) setnames(summary, "estimation_rows", "estimation_input_rows")
     fwrite(summary, file.path(d, "sample_summary.csv"))
-    plot_annual_results(pooled, d, profile$pre)
-    plot_annual_results(cells, file.path(d, "per_cohort"), profile$pre, TRUE)
-    figures <- list.files(d, pattern = "[.](png|pdf)$", recursive = TRUE, full.names = TRUE)
-    stopifnot(length(figures) == 16L, all(file.info(figures)$size > 0))
+    figure_counts <- annual_figure_counts(targets, audit, weights)
+    stopifnot(figure_counts$treated_counties == summary$target_counties,
+              figure_counts$treated_states == summary$target_jurisdictions,
+              figure_counts$control_counties == summary$donor_counties)
+    plot_annual_results(pooled, d, profile$pre, figure_counts)
+    plot_annual_results(cells, file.path(d, "per_cohort"), profile$pre, figure_counts, TRUE)
+    figures <- c(list.files(d, pattern = "[.](png|pdf)$", full.names = TRUE),
+                 list.files(file.path(d, "per_cohort"), pattern = "[.](png|pdf)$", full.names = TRUE))
+    stopifnot(length(figures) == annual_figure_file_count(), all(file.info(figures)$size > 0))
     reports[[nm]] <- data.table(profile = nm, models = nrow(metadata),
       pooled_rows = nrow(pooled), cohort_rows = nrow(cells),
       target_counties = nrow(targets), target_jurisdictions = uniqueN(targets$state_id),
@@ -302,6 +272,21 @@ main <- function() {
   profiles <- if (requested == "both") names(annual_profiles) else requested
   results_root <- file.path(data_root, "results", "mandatory_schooling",
                             "compulsory_schooling_amws_annual_csdid")
+  control <- tolower(trimws(Sys.getenv("COMPULSORY_AMWS_ANNUAL_CONTROL", unset = "none")))
+  if (!control %in% c("none", "both", names(annual_population_controls))) {
+    stop("Control must be none, both, baseline_log_population, or preperiod_population_cagr.")
+  }
+  if (control != "none") {
+    controls <- if (control == "both") names(annual_population_controls) else control
+    for (nm in profiles) for (cv in controls) {
+      if (!"--verify-outputs" %in% commandArgs(TRUE)) {
+        run_annual_population_control(inputs, nm, cv, results_root)
+      }
+      verify_annual_population_control(inputs, nm, cv, results_root)
+    }
+    message("Controlled results: ", results_root)
+    return(invisible(NULL))
+  }
   if ("--verify-outputs" %in% commandArgs(TRUE)) {
     verify_annual_outputs(results_root, profiles)
     return(invisible(NULL))

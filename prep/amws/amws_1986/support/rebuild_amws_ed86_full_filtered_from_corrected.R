@@ -225,6 +225,12 @@ rebuilt_final_keyed <- rebuilt_final_country_eligible[!us_not_geocoded, ]
 rebuilt_final <- rebuilt_final_keyed |>
   mutate(entry_id = row_number(), .before = lineid) |>
   select(-doc_id, -source_file, -lineid, -entry_instance, -field)
+preserve_entry_ids <- env_flag("AMWS_ED86_PRESERVE_ENTRY_IDS", file.exists(final_csv))
+if (preserve_entry_ids) {
+  source(file.path(repo_root, "prep/amws/amws_1986/ocr_supplement_helpers.R"))
+  previous_final <- read_csv_text(final_csv)
+  rebuilt_final <- amws_preserve_final_ids(rebuilt_final, previous_final)
+}
 
 if (anyDuplicated(row_key(rebuilt_filtered))) {
   stop("Rebuilt filtered row count or key uniqueness does not match expectations.")
@@ -234,7 +240,8 @@ if (anyDuplicated(row_key(rebuilt_final_keyed)) ||
     any(c("doc_id", "source_file", "lineid", "entry_instance", "field") %in%
         names(rebuilt_final)) ||
     !identical(names(rebuilt_final)[[1]], "entry_id") ||
-    !identical(rebuilt_final$entry_id, seq_len(nrow(rebuilt_final))) ||
+    (!preserve_entry_ids && !identical(as.integer(rebuilt_final$entry_id), seq_len(nrow(rebuilt_final)))) ||
+    anyNA(as.integer(rebuilt_final$entry_id)) || any(as.integer(rebuilt_final$entry_id) < 1L) ||
     anyDuplicated(rebuilt_final$entry_id)) {
   stop("Final row count, key uniqueness, or columns do not match expectations.")
 }
@@ -461,10 +468,10 @@ summary <- bind_rows(
                                                names(rebuilt_final)),
     "lineid_removed", as.character(!"lineid" %in% names(rebuilt_final)),
     "entry_id_created", as.character("entry_id" %in% names(rebuilt_final)),
-    "entry_id_min", as.character(min(rebuilt_final$entry_id)),
-    "entry_id_max", as.character(max(rebuilt_final$entry_id)),
+    "entry_id_min", as.character(min(as.integer(rebuilt_final$entry_id))),
+    "entry_id_max", as.character(max(as.integer(rebuilt_final$entry_id))),
     "entry_id_sequential", as.character(identical(
-      rebuilt_final$entry_id, seq_len(nrow(rebuilt_final))
+      as.integer(rebuilt_final$entry_id), seq_len(nrow(rebuilt_final))
     )),
     "entry_instance_removed", as.character(!"entry_instance" %in%
                                                names(rebuilt_final)),

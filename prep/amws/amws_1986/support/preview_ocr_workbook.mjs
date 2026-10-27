@@ -1,0 +1,12 @@
+import fs from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {pathToFileURL} from 'node:url';
+import path from 'node:path';
+const [input,output]=process.argv.slice(2);
+const require=createRequire(path.join(process.env.AMWS_ARTIFACT_RUNTIME,'package.json'));
+const {FileBlob,SpreadsheetFile}=await import(pathToFileURL(require.resolve('@oai/artifact-tool')).href);
+const wb=await SpreadsheetFile.importXlsx(await FileBlob.load(input));
+const sheetName=wb.worksheets.getItemAt(0).name;
+const preview=await wb.render({sheetName,range:'A1:H5',scale:1,format:'png'});
+await fs.writeFile(output,new Uint8Array(await preview.arrayBuffer()));
+console.log(output);

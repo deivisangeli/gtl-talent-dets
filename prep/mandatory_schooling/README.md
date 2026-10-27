@@ -1,6 +1,37 @@
 # Mandatory Schooling Prep Pipeline
 
-There is no dedicated prep script for mandatory schooling yet.
+The separate [monthly AMWS panel](monthly_amws_panel.md) builds county-month
+outcomes for 1915-1950 using recorded scientist birth months and NHGIS annual
+occurrence births divided by twelve. Its downloader, builder and tests preserve
+the existing annual panels.
+Use `--births-source=gapminder` for a separate variant that divides the existing
+Gapminder county annual birth estimates by twelve; the NHGIS default remains available.
+Add `--years=all` to the Gapminder build to cover the full 1800-1960 annual AMWS
+range, producing a separate panel and audits while preserving the shorter versions.
+
+The [quarterly Gapminder panel](monthly_amws_panel.md#quarterly-gapminder-panel-1800-1960)
+uses the validated full-period monthly counts and annual county birth estimates.
+Run `Rscript prep/mandatory_schooling/build_amws_county_quarter.R` from the repo
+root (or use an absolute script path from any directory), followed by
+`Rscript prep/mandatory_schooling/test_quarterly_gapminder_amws.R --integration`.
+It writes `county_amws_quarterly_gapminder_1800_1960.csv` and separate quarterly
+audits in Dropbox `output/mandatory_schooling/`: 1,991,248 rows for 3,092 counties,
+with four calendar quarters per year, summed scientist counts and annual birth
+estimates divided by four. Positive denominators with zero counts yield zero
+rates; missing/nonpositive denominators yield missing rates. Existing panels
+remain unchanged.
+
+All four period panels and their annual support tables now include male, female
+and unclassified scientist counts, rates and annual birth-month completeness
+using saved `male_80`/`female_80` flags. Existing total-birth and population
+denominators are retained. Rebuild with the commands above after the AMWS gender
+and threshold-flag steps, then run
+`Rscript prep/mandatory_schooling/test_amws_panel_gender.R --integration`.
+For SQL validation of existing outputs, run
+`Rscript prep/mandatory_schooling/validate_amws_panel_gender_duckdb.R`;
+add `--rerun-quarterly` to check a cached quarterly rebuild with DuckDB.
+See [the gender-specific definitions and audits](monthly_amws_panel.md#gender-specific-outcomes-at-the-08-threshold),
+including the 1,694 records outside the saved inference sample.
 
 The current pipeline is manual. The canonical treatment dates are from
 [Lingwall (2014), dissertation Table 6.2](https://www.cmu.edu/sites/default/files/cmu-tepper-site-files/2025-06/2014-joint-phd-program-economics-and-public-policy-lingwall-dissertation.pdf),
@@ -1433,7 +1464,7 @@ linked cases included — **220,979,023 rows**, 58 columns.
 |---|---|---|---|---|
 | 12,971,952 | 23,984,383 | 39,982,220 | 70,207,628 | 73,832,840 |
 
-It carries `SCHOOL`, `SEX` and `RACE` on the childhood rows as of 2026-09-21, for the attendance measure. It was downloaded as a bare CSV — **no DDI, codebook or command file came with it**, which
+It carries `SCHOOL`, `SEX` and `RACE` on the childhood rows as of 2026-09-21, for the attendance measure. **The extract is built from 1940 outward:** a 1940 person is included only if linked to at least one of 1900–1930, so everyone in it appears in 2–5 censuses and 1940 people found in no other census are absent (73.8 M of ~132 M). Among white men aged 17–49 in 1940, 30.0% appear in 2 censuses, 36.2% in 3, 22.4% in 4 and 11.4% in all 5; 9.7% have a gap (e.g. 1920 and 1940 but not 1930). It was downloaded as a bare CSV — **no DDI, codebook or command file came with it**, which
 is why everything below exists. The DDI has since been fetched separately and now backs the
 value labels; see *The DDI codebook* below. Four documents cover the extract:
 
@@ -1445,6 +1476,7 @@ value labels; see *The DDI codebook* below. Four documents cover the extract:
 | `county_bite_from_linked_census.md` | Build spec **and results** for the county-level bite measure: observed completed schooling against what the law required, nominal and net of exemptions |
 | `county_attendance_from_linked_census.md` | Build spec **and results** for the county-level ATTENDANCE measure -- the share of legally-required children not in school, measured contemporaneously. Supersedes the bite measure, since the statute names attendance |
 | `county_attendance_from_fullcount.md` | Steps to rebuild the attendance measure on the **unlinked** 1900-1930 full counts, which the project does not yet hold. Removes the linkage selection entirely, since attendance needs no link |
+| `county_attendance_cohort.md` | Build spec **and results** for county × birth-cohort schooling (ever attended, meeting the law's minimum years, gap to it) around the 13 first laws of 1907–1920, white non-migrant men born 1890–1920, placed at their earliest linked record at age ≤ 18. County levels carry signal; county before/after contrasts do not (split-half r 0.04–0.20) |
 
 ```powershell
 python prep/mandatory_schooling/profile_ipums_linked_census.py                 # ~16 min, full pass
@@ -1545,3 +1577,296 @@ why they get a ~19 M sample with no crosswalk and no match-rate selection. Repro
 join first (1940 rows only, `yob = 1940 - AGE - 1`); the childhood-county extension the
 linked file enables is something the paper never did, and it carries selection their design
 does not.
+
+### Linked 1900–1950 extract: birthplace-partitioned Parquet
+
+The standalone [dataset guide](ipums_linked_1900_1950.md) describes its
+contents, linkage and partition rules, scientist flag, and provenance.
+
+`D:/usa_00003.csv.gz` is the six-census IPUMS extract (1900–1950). Its companion
+`D:/usa_00003_ddi.xml` supplies the 60 variable names, classes, descriptions, and
+category labels. Convert both with DuckDB through R:
+
+```powershell
+Rscript prep/mandatory_schooling/convert_ipums_linked_1950.R
+Rscript prep/mandatory_schooling/test_convert_ipums_linked_1950.R
+```
+
+The converter uses 12 DuckDB threads and a 20 GB memory limit. Override its default
+paths with `IPUMS_LINKED_1950_SOURCE`, `IPUMS_LINKED_1950_DDI`, and
+`IPUMS_LINKED_1950_PARQUET_DIR`. The final output path must not exist when it starts.
+The default is `D:/ipums_linked_1900_1950/`, outside Dropbox. It contains
+`birth_bpl=<code>/*.parquet`, `dictionary.md`, `variable_dictionary.csv`,
+`value_labels.csv`, `validation_year_bpl.csv`, and `_manifest.json`.
+
+`birth_bpl` is a **1950-anchored birthplace code**, not the row's residence
+`STATEFIP`. Every 1950 row uses its own `BPL`, even when `HIK` is blank. An earlier
+row uses the `BPL` on its unique 1950 `HIK` match. If no unique 1950 match exists,
+it goes in `birth_bpl=unknown`; its original `BPL` remains in the data. The
+partition includes every birthplace code, including territories and foreign
+countries. `unknown` means missing 1950 linkage, distinct from any IPUMS `BPL`
+code for unknown birthplace. The raw `BPL` can disagree across a person's census
+rows, so this rule gives linked rows a consistent 1950 birthplace assignment.
+
+The added Boolean `scientist_occ1950` marks the occupation on **that census
+row**. It is true only for `OCC1950` codes `007` (chemists), `061`
+(agricultural scientists), `062` (biological scientists), `063` (geologists and
+geophysicists), `067` (mathematicians), `068` (physicists), and `069` (miscellaneous
+natural scientists). Other recorded codes are false; blank `OCC1950` is null.
+The DDI calls `069` “Misc. natural scientists.” This flag does not mean a person
+ever held one of these occupations across linked years.
+
+The 2026-09-25 build passed source-to-Parquet counts by year and original `BPL`
+and checked every partition assignment. It contains **463,770,248 rows** in
+**146 Parquet files** (19.69 GiB), with **203,835 scientist-position rows**.
+There are **77,229,397 unique 1950 HIK anchors**. Among pre-1950 rows,
+**171,024,163** (49.6%) have no unique 1950 match and therefore occupy the
+`unknown` partition. This partition describes linkage availability, not a
+missing birthplace on the original census row.
+
+The source fields remain available through Hive partitioning. For example:
+
+```r
+con <- DBI::dbConnect(duckdb::duckdb())
+DBI::dbGetQuery(con, paste0(
+  "SELECT YEAR, birth_bpl, count(*) AS n FROM read_parquet(",
+  "'D:/ipums_linked_1900_1950/birth_bpl=*/*.parquet', ",
+  "hive_partitioning=true) GROUP BY ALL"))
+DBI::dbDisconnect(con, shutdown = TRUE)
+```
+
+### 1950 sample-line linked dataset
+
+The separate [1950 sample-line linked dataset](ipums_linked_1950_sample_line.md)
+retains every 1950 sample-line respondent and adds a reciprocal 1940 linked row
+when available. It enriches the existing census Parquet with row-specific
+`SLWT`, `SLREC`, `VETWWI`, and `VETWWII`, and writes to
+`D:/ipums_linked_1950_sample_line/`. Run
+`prep/mandatory_schooling/test_build_linked_1950_sample_line.R` followed by
+`prep/mandatory_schooling/build_linked_1950_sample_line.R` from the repo root.
+
+### 1950 scientist occupations by birth state
+
+Run `Rscript analysis/mandatory_schooling/describe_linked_1950_scientists_by_state.R`
+from any working directory. It reads the Parquet above with R/DuckDB (12 threads,
+20 GB memory limit) and writes `state_summary.csv`, `state_occupation.csv`, and
+`notes.txt` under the Dropbox
+`results/mandatory_schooling/linked_1950_scientists/` directory. Use
+`IPUMS_LINKED_1950_PARQUET_DIR` and `TALENT_DETS_DATA_DIR` to override the
+default source and Dropbox locations. Run
+`Rscript analysis/mandatory_schooling/test_describe_linked_1950_scientists_by_state.R`
+for the small synthetic-data test.
+
+The denominator is every 1950 white male age 18 or older with a state/DC `BPL`
+equal to his 1950 `STATEFIP`, regardless of whether an occupation was recorded.
+The numerator is the count with `scientist_occ1950 == TRUE`. The state table
+reports that count, each of the seven `OCC1950` component counts, scientists per
+100,000 eligible men, and the percentage of all eligible U.S. scientists in
+each state. The long table gives each occupation's within-state percentage;
+that percentage is blank when the state has zero scientists. State and
+occupation labels come from the DDI-derived `value_labels.csv`.
+
+This is a **birth-state residence** comparison, not a confirmed never-migrant
+sample. A man who left his birth state and returned by 1950 qualifies. The
+1950 records have no populated `MIGRATE5` field to tighten that definition.
+
+### Schooling IV for 1950 scientist occupation
+
+This analysis adapts the first-wave compulsory-schooling-law design of Clay,
+Lingwall, and Stephens (2021) to ask whether schooling changes the probability
+of holding a scientist occupation in the 1950 census. It combines schooling
+reported in 1940 with the occupation on the same person's linked 1950 record.
+The [linked-census dataset guide](ipums_linked_1900_1950.md) documents the
+Parquet conversion and scientist flag; the
+[CLS law guide](merge_cls_to_linked_census.md) explains the state-by-cohort
+requirements. The executable specification is
+[`estimate_linked_1940_schooling_1950_scientist_iv.R`](../../analysis/mandatory_schooling/estimate_linked_1940_schooling_1950_scientist_iv.R).
+
+#### Inputs and run order
+
+Start with the converted six-census extract at
+`D:/ipums_linked_1900_1950/birth_bpl=*/*.parquet` and the CLS cohort file at
+`<Dropbox project>/output/mandatory_schooling/cls/cls_cohort_requirements_1875_1912.parquet`.
+If the Parquet extract is absent, follow the dataset guide to run
+`convert_ipums_linked_1950.R` on `D:/usa_00003.csv.gz` and its DDI; that
+conversion preserves the source variables and adds `scientist_occ1950`.
+Set `IPUMS_LINKED_1950_PARQUET_DIR` for another Parquet location and
+`TALENT_DETS_DATA_DIR` for another Dropbox root. The estimator uses DuckDB
+with eight threads and a 20 GB memory limit.
+
+Run these commands **from the repository root** (or pass absolute script paths):
+
+```powershell
+Rscript analysis/mandatory_schooling/test_linked_1940_schooling_1950_scientist_iv.R
+Rscript analysis/mandatory_schooling/estimate_linked_1940_schooling_1950_scientist_iv.R
+```
+
+#### Cleaning, law assignment, and linkage
+
+1. Restrict the CLS file to birth years 1885--1912. The script requires one
+   row per `bpl` × `yob` and checks for 49 states × 28 birth years = 1,372 law
+   cells. Its treatment is `ca_years_combined`, the combined compulsory
+   attendance, child-labor, and continuation-school requirement.
+2. Select `YEAR == 1940`, male (`SEX == 1`), white (`RACE == 1`) census rows
+   aged 27--54. Define `yob = 1940 - AGE - 1` and join laws on the **1940
+   row's `BPL`** and `yob`. This state of birth determines exposure even if
+   the 1950 `BPL` disagrees. Neither current residence `STATEFIP` nor the
+   Parquet partition key `birth_bpl` substitutes for this join key.
+3. Convert 1940 `HIGRADED` to completed years: discard blank, `000`, and
+   `999`; let `g = floor(HIGRADED / 10)`; map `g <= 3` to zero, `4 <= g <= 20`
+   to `g - 3`, and higher valid grades to 17. This follows the CLS schooling
+   recode and yields the endogenous regressor `school_years`.
+4. Retain rows with `LINK1950 == 1` and a nonblank `HIK`, the cross-census
+   person key. Require unique eligible 1940 `HIK`s. Join to `YEAR == 1950`
+   on `HIK` while requiring the reciprocal `LINK1940 == 1`, and assert a
+   one-to-one match. Audit 1950 birthplace, sex, race, and age changes;
+   disagreements remain in the main sample.
+5. Read the **1950 row's** `scientist_occ1950` flag, derived from `OCC1950`
+   codes `007`, `061`, `062`, `063`, `067`, `068`, and `069`. Drop rows whose
+   occupation flag is null. All other recorded occupation codes, including
+   nonoccupational codes, are zero. Check that the flag agrees with `OCC1950`.
+
+The saved 2026-09-25 run has this auditable flow (`sample_flow.csv`):
+
+| Restriction | Men |
+|:--|--:|
+| CLS-eligible 1940 men | 16,219,098 |
+| Valid 1940 schooling | 15,880,601 |
+| Valid grade and flagged 1950 link | 12,285,411 |
+| Unique 1940--1950 pairs | 12,285,411 |
+| Pairs with observed 1950 occupation | 12,285,411 |
+| Scientist occupations in 1950 | 22,743 |
+
+#### IV specification and inference
+
+Bin `ca_years_combined` as 1--5, 6, 7, 8, or 9+ required years; zero is
+the omitted category. For man $i$, birth state $s$, and birth year $c$, the
+first stage and second stage are:
+
+$$
+S_{isc}=\alpha^S_s+\lambda^S_{r(s)c}
+       +\sum_{b\in\{1\text{--}5,6,7,8,9+\}}\pi_b Z^b_{sc}+u_{isc},
+$$
+
+$$
+Y_{isc}=\alpha^Y_s+\lambda^Y_{r(s)c}
+       +\beta\widehat{S}_{isc}+\varepsilon_{isc}.
+$$
+
+Here $S$ is completed schooling in 1940, $Y$ is the binary 1950 scientist
+occupation, $Z^b$ indicates a law-requirement bin, $\alpha_s$ denotes
+birth-state fixed effects, and $\lambda_{r(s)c}$ denotes CLS-region ×
+birth-year fixed effects. The reduced form replaces $S$ in the first equation
+with $Y$. An OLS regression of $Y$ on observed $S$ with the same fixed effects
+is reported for comparison. Since $Y$ is binary, the second stage is a linear
+probability model; multiply $\beta$ by 100,000 to report additional scientist
+occupations per 100,000 men per completed school year.
+
+The script groups identical `bpl`/`yob`/region/law-bin/schooling/outcome
+records and weights each cell by its person count, preserving the individual
+regression cross-products. It reports state × birth-year and birth-state
+clustered standard errors and joint first-stage $F$ tests. `K.adj = FALSE`
+removes the finite-observation correction so clustering is invariant to the
+cell collapse. The Anderson--Rubin $p$-value for zero effect is the joint
+reduced-form Wald test of the five instruments with birth-state clustering.
+The 95% Anderson--Rubin confidence set inverts state-clustered tests over a
+grid of $\beta$ values from -0.05 to 0.05 probability units; a blank endpoint
+means the accepted set reached the grid boundary, not that it is bounded.
+
+#### Sensitivities, outputs, and interpretation
+
+The stricter-link sensitivity requires matching 1940 and 1950 birth state,
+male and white codes in 1950, and an age increase of 9--11 years. A separate
+1950 same-record sensitivity uses 1950 `HIGRADED` and occupation for eligible
+men asked the sample-line grade question. It is unweighted because this
+extract does not contain `SLWT`.
+
+Results are written to
+`<Dropbox project>/results/mandatory_schooling/linked_1940_schooling_1950_scientist_iv/`.
+`sample_flow.csv`, `linkage_audit.csv`, and `law_bin_counts.csv` audit
+selection and treatment; `main_cells.csv`, `quality_link_cells.csv`, and
+`sensitivity_1950_grade_cells.csv` hold grouped regression inputs.
+`first_stage.csv`, `reduced_form.csv`, `estimates.csv`, and `diagnostics.csv`
+report model results. `anderson_rubin_grid.csv` and
+`anderson_rubin_intervals.csv` record weak-instrument-robust inference;
+`models.rds` and `notes.txt` retain fitted models and run provenance.
+
+The outcome is an occupation observed in 1950, not the date a man first
+became a scientist. Linking 1940 to 1950 selects people non-randomly, so the
+main estimate does not represent all 1950 men. A causal schooling
+interpretation requires relevant law-induced schooling changes and, beyond
+the included fixed effects, valid exclusion, monotonicity, and comparable
+state-cohort law timing. The state-clustered first stage and Anderson--Rubin
+results should be read alongside conventional 2SLS estimates.
+
+## CLS IV for BA-equivalent completion
+
+The separate runner
+`analysis/mandatory_schooling/estimate_linked_1940_ba_1950_scientist_iv.R`
+uses `1(school_years >= 16)` as the endogenous treatment, including
+postgraduate schooling. It keeps everyone with valid schooling and retains
+the original five CLS requirement bins, fixed effects, scientist outcome,
+cell-count weights, clustering conventions, and three sensitivity samples.
+The measure is BA-equivalent completed schooling, not an observed degree award.
+
+Run from the repo root (or any directory using the script's absolute path):
+
+```powershell
+Rscript analysis/mandatory_schooling/estimate_linked_1940_ba_1950_scientist_iv.R
+Rscript analysis/mandatory_schooling/test_linked_1940_ba_1950_scientist_iv.R
+Rscript analysis/mandatory_schooling/test_linked_1940_schooling_1950_scientist_iv.R
+```
+
+The runner reads the existing schooling IV's three saved cell CSVs and sample
+audits, without rescanning census microdata. It validates the state-cohort
+mapping and sample totals and re-estimates the schooling-years baseline to
+check the saved coefficients, clustered inference, and diagnostics. The BA
+reduced form and AR test at zero must match the saved baseline.
+
+Results go to Dropbox
+`results/mandatory_schooling/linked_1940_ba_1950_scientist_iv/`.
+Override the saved-cell input, result, and note directories with
+`MS_BA_IV_SOURCE_DIR`, `MS_BA_IV_RESULTS_DIR`, and `MS_BA_IV_PROJECT_DIR`.
+The input and result directories must differ. Standard data-root configuration
+still uses `TALENT_DETS_DATA_DIR` and `paths.R`.
+
+First-stage CSVs contain probability-unit and percentage-point coefficients.
+The BA effect column is `effect_per_100k_per_ba_completed`: scientist
+occupations per 100,000 men for a change from noncompletion to completion.
+`completion_shares.csv` reports the denominator and completion count for each
+sample. `input_provenance.csv`, `baseline_validation.csv`, `session_info.txt`,
+sample audits, fitted models, and run notes retain reproducibility information.
+
+The main sample's state-clustered 95% Anderson--Rubin set is inverted over
+2,001 probability-unit values in `[-1, 1]`, refining crossings to `1e-8`.
+All detected accepted intervals are retained. Explicit boundary flags mark
+search truncation rather than proven infinite endpoints; a finite grid may
+miss accepted regions narrower than its 0.001 spacing.
+
+The runner also renders the self-contained note
+`project/mandatory_schooling_ba_scientist_iv.tex` with inline tables and a
+comparison to the existing schooling-years specification. Open and compile
+the note using the built-in Codex LaTeX editor. The original results and note
+are preserved. The two coefficients have different units and estimands.
+Re-render the note without re-estimating by running
+`analysis/mandatory_schooling/export_linked_1940_ba_1950_scientist_iv_to_project.R`;
+`note_provenance.csv` records the note, renderer, and result-input checksums.
+
+A BA-specific causal interpretation additionally requires law-induced
+changes at other schooling margins to have no separate effect on scientist
+occupation. The outcome remains occupation observed in 1950, and selected
+census links do not represent all men.
+
+## WWII veteran status and scientist occupation
+
+`build_linked_1950_veteran_scientist.R` creates one row per eligible 1950
+sample-line man with reciprocal 1940 records, linked father characteristics,
+and full-count household homeownership. The separate output is
+`D:/ipums_linked_1950_veteran_scientist`.
+`analysis/mandatory_schooling/estimate_linked_1950_veteran_scientist.R` estimates
+weighted linear probability models for WWII veteran status and scientist work,
+covering the paper's two cohorts and the earlier overlapping comparison cohorts.
+Results and sample audits go to Dropbox
+`results/mandatory_schooling/linked_1950_sample_line_veteran_scientist/`.
+See [the dataset and analysis documentation](linked_1950_veteran_scientist.md)
+for joins, definitions, tests, controls, and environment overrides.

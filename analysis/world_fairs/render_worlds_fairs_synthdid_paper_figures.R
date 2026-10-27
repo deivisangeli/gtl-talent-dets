@@ -36,12 +36,14 @@ if (!dir.exists(TALENT_DETS_DATA_DIR)) {
 
 results_dir <- file.path(
   TALENT_DETS_DATA_DIR, "results", "worlds_fair", "synthdid",
-  "ukds_1911_lgd_wikipedia_donor_pools", "match_v3_balanced", "pooled_dz"
+  "ukds_1911_lgd_wikipedia_donor_pools", "match_v4_balanced_e0", "pooled_dz"
 )
 file_names <- c(
+  att = "dz_pooled_att.csv",
   dynamic = "dz_pooled_dynamic_effects.csv",
   dynamic_trim = "dz_pooled_dynamic_by_trim.csv",
-  trimming = "dz_progressive_trimming.csv"
+  trimming = "dz_progressive_trimming.csv",
+  qc = "dz_qc.csv"
 )
 files <- setNames(file.path(results_dir, unname(file_names)), names(file_names))
 if (!all(file.exists(files))) {
@@ -71,10 +73,10 @@ paper_theme <- theme_minimal(base_size = 11) +
 # Figure 7: the effect panels contain inverted confidence intervals for the
 # reference-normalized effect. The rank panels retain randomization-null
 # envelopes because a rank has no effect-scale confidence interval. Event time
-# zero is fixed by construction and is omitted from both forms of inference.
+# -10 is fixed by construction and is omitted from both forms of inference.
 dynamic <- fread(files[["dynamic"]])[model_id %chin% names(model_map)]
-if (nrow(dynamic) != 14L || any(dynamic$n_events != 5L) ||
-    any(dynamic$reference_event_time != 0)) {
+if (nrow(dynamic) != 14L || any(dynamic$n_events != 4L) ||
+    any(dynamic$reference_event_time != -10L)) {
   stop("Unexpected preferred lead-20 dynamic sample or reference period.")
 }
 dynamic[, decade_definition := factor(
@@ -113,7 +115,8 @@ plot_dynamic[, significant := fifelse(
   is.finite(p_value), p_value < 0.05, FALSE
 )]
 plot_dynamic[, interval_segment := fifelse(
-  event_time < 0, "pre", fifelse(event_time > 0, "post", "reference")
+  event_time == -10L, "reference",
+  fifelse(event_time < 0L, "pre", "post")
 )]
 
 pooled_plot <- ggplot(
@@ -128,8 +131,9 @@ pooled_plot <- ggplot(
     alpha = 0.72, colour = NA
   ) +
   geom_hline(aes(yintercept = reference), colour = "grey45", linewidth = 0.35) +
-  geom_vline(xintercept = 0, linetype = "dotted", colour = "grey50") +
-  geom_vline(xintercept = 10, linetype = "dashed", colour = "grey40") +
+  geom_vline(xintercept = -10, linetype = "longdash", colour = "grey45") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "#b2182b") +
+  geom_vline(xintercept = 20, linetype = "dotted", colour = "#2166ac") +
   geom_line(linewidth = 0.55, na.rm = TRUE) +
   geom_point(aes(colour = significant), size = 2.1, na.rm = TRUE) +
   facet_grid(panel ~ decade_definition, scales = "free_y") +
@@ -149,8 +153,8 @@ pooled_plot <- ggplot(
   labs(
     title = "Pooled synthetic-DiD event study: 20-year cohort lead",
     subtitle = paste0(
-      "Event time 0 is the omitted final pre-period (dotted); treatment ",
-      "starts at +10 (dashed)"
+      "Reference e=-10 (grey long-dash); treatment e=0 (red dash); ",
+      "fair e=+20 (blue dot)"
     ),
     x = "Event time (years relative to the shifted fair decade)",
     y = NULL
@@ -166,11 +170,11 @@ ggsave(
 # Figures 8 and 9: event-study paths after each of the first three pre-fit
 # trimming steps. These are deliberately not scalar ATT trimming plots.
 dynamic_trim <- fread(files[["dynamic_trim"]])[
-  model_id %chin% names(model_map) & worst_fitting_events_dropped <= 3L
+  model_id %chin% names(model_map) & n_events >= 2L
 ]
-if (nrow(dynamic_trim) != 56L ||
-    any(dynamic_trim$reference_event_time != 0) ||
-    any(dynamic_trim[worst_fitting_events_dropped == 0L]$n_events != 5L)) {
+if (nrow(dynamic_trim) != 42L ||
+    any(dynamic_trim$reference_event_time != -10L) ||
+    any(dynamic_trim[worst_fitting_events_dropped == 0L]$n_events != 4L)) {
   stop("Unexpected preferred lead-20 trimming event-study sample.")
 }
 
@@ -191,7 +195,8 @@ render_trim_event_study <- function(target_model_id, output_name, decade_label) 
     is.finite(randomization_p), randomization_p < 0.05, FALSE
   )]
   d[, interval_segment := fifelse(
-    event_time < 0, "pre", fifelse(event_time > 0, "post", "reference")
+    event_time == -10L, "reference",
+    fifelse(event_time < 0L, "pre", "post")
   )]
 
   p <- ggplot(d, aes(event_time, pooled_effect, group = panel)) +
@@ -202,8 +207,9 @@ render_trim_event_study <- function(target_model_id, output_name, decade_label) 
       fill = "grey76", alpha = 0.72, colour = NA
     ) +
     geom_hline(yintercept = 0, colour = "grey45", linewidth = 0.35) +
-    geom_vline(xintercept = 0, linetype = "dotted", colour = "grey50") +
-    geom_vline(xintercept = 10, linetype = "dashed", colour = "grey40") +
+    geom_vline(xintercept = -10, linetype = "longdash", colour = "grey45") +
+    geom_vline(xintercept = 0, linetype = "dashed", colour = "#b2182b") +
+    geom_vline(xintercept = 20, linetype = "dotted", colour = "#2166ac") +
     geom_line(linewidth = 0.55) +
     geom_point(aes(colour = significant), size = 2) +
     facet_wrap(~panel, ncol = 2, scales = "free_y") +
@@ -218,8 +224,8 @@ render_trim_event_study <- function(target_model_id, output_name, decade_label) 
         "Pooled event studies by pre-fit trimming stage: ", decade_label
       ),
       subtitle = paste0(
-        "Grey ribbons are pointwise 95% inverted confidence intervals; ",
-        "e = 0 is omitted and treatment starts at +10"
+        "Grey ribbons: 95% inverted CIs; reference e=-10, treatment e=0, ",
+        "fair e=+20"
       ),
       x = "Event time (years relative to the shifted fair decade)",
       y = "Reference-normalized pooled effect"
@@ -245,7 +251,7 @@ render_trim_event_study(
 # Retain the earlier scalar trimming summary as a supplementary output. The
 # manuscript's trimming figures are the event-study composites rendered above.
 trimming <- fread(files[["trimming"]])[
-  model_id %chin% names(model_map) & worst_fitting_events_dropped <= 3L
+  model_id %chin% names(model_map) & n_events >= 2L
 ]
 trimming[, decade_definition := factor(
   unname(model_map[model_id]), levels = definition_levels
@@ -268,7 +274,7 @@ trimming_plot <- ggplot(
     values = c(`FALSE` = "black", `TRUE` = "#b22222"),
     labels = c(`FALSE` = "p >= 0.05", `TRUE` = "p < 0.05")
   ) +
-  scale_x_continuous(breaks = 0:3, limits = c(-0.28, 3.28)) +
+  scale_x_continuous(breaks = 0:2, limits = c(-0.28, 2.28)) +
   scale_y_continuous(expand = expansion(mult = c(0.12, 0.22))) +
   labs(
     title = "Progressive pre-fit trimming: 20-year cohort lead",
@@ -283,4 +289,174 @@ ggsave(
   bg = "white"
 )
 
+###############################################################################
+# Manuscript tables: generated from the same validated CSVs as the figures.
+###############################################################################
+
+table_dir <- file.path(repo_root, "project", "tables")
+dir.create(table_dir, recursive = TRUE, showWarnings = FALSE)
+
+fmt3 <- function(x) sprintf("%.3f", as.numeric(x))
+effect_tex <- function(x) paste0("$", fmt3(x), "$")
+definition_label <- function(x) fifelse(
+  x == "standard", "Standard", "Alternative"
+)
+
+preferred_att <- fread(files[["att"]])[model_id %chin% names(model_map)]
+if (nrow(preferred_att) != 2L || any(preferred_att$n_events != 4L)) {
+  stop("Unexpected preferred pooled-ATT table input.")
+}
+preferred_att[, decade_order := match(decade_definition,
+                                      c("standard", "alternative"))]
+setorder(preferred_att, decade_order)
+preferred_rows <- preferred_att[, paste(
+  definition_label(decade_definition), n_events, effect_tex(pooled_att),
+  fmt3(mean_percentile_rank), fmt3(randomization_p_two_sided),
+  fmt3(randomization_p_any_post_horizon),
+  fmt3(randomization_p_any_post_horizon_rank), sep = " & "
+)]
+preferred_rows <- paste0(preferred_rows, " \\\\")
+
+trim_table <- fread(files[["trimming"]])[
+  model_id %chin% names(model_map) & n_events >= 2L
+]
+trim_table[, decade_definition := fifelse(
+  model_id == "lead20_standard", "standard", "alternative"
+)]
+trim_table[, decade_order := match(decade_definition,
+                                    c("standard", "alternative"))]
+setorder(trim_table, decade_order, worst_fitting_events_dropped)
+trim_table[, removed_display := fifelse(
+  worst_fitting_events_dropped == 0L, "None",
+  gsub("; ", ", ", dropped_event_names, fixed = TRUE)
+)]
+trim_table[, removed_display := gsub(
+  "BRISTOL", "Bristol", removed_display, fixed = TRUE
+)]
+trim_rows <- trim_table[, paste(
+  definition_label(decade_definition), worst_fitting_events_dropped,
+  removed_display, n_events, effect_tex(pooled_att),
+  fmt3(mean_percentile_rank), fmt3(randomization_p_rank), sep = " & "
+)]
+trim_rows <- paste0(trim_rows, " \\\\")
+trim_break <- sum(trim_table$decade_definition == "standard")
+trim_rows <- append(trim_rows, "\\addlinespace", after = trim_break)
+
+lead20_table <- c(
+  "\\begin{table}[H]",
+  "\\centering",
+  "\\caption{Pooled synthetic-DiD estimates: preferred 20-year cohort-lead specification}",
+  "\\label{tab:wf_synthdid_lead20}",
+  "\\small",
+  "\\setlength{\\tabcolsep}{4pt}",
+  "\\begin{tabular}{lrrrrrr}",
+  "\\toprule",
+  paste0(
+    "Decade definition & Events & Pooled effect & Mean rank & Rank $p$ & ",
+    "Any-post $p$ & Any-post rank $p$ ", "\\\\"
+  ),
+  "\\midrule",
+  preferred_rows,
+  "\\bottomrule",
+  "\\end{tabular}",
+  paste0(
+    "\\caption*{\\footnotesize Notes: Corrected balanced-window, rebuilt-donor-pool specification with exposure shifted twenty years before the fair. ",
+    "Each event path subtracts the final untreated gap at $e=-10$; the pooled effect is the equal-weighted mean over $e=0,+10,+20,+30$. ",
+    "Mean rank is the average event-specific percentile rank of the RMSPE-standardized effect in its in-space placebo distribution. ",
+    "Rank $p$ is the two-sided joint-randomization $p$-value for the mean rank. The two any-post columns jointly test the four treated horizons. ",
+    "All $p$-values use 1{,}000 joint randomization draws. Wembley is excluded because its corrected pre-panel is identically zero.}"
+  ),
+  "\\end{table}",
+  "",
+  "\\begin{table}[H]",
+  "\\centering",
+  "\\caption{Progressive pre-treatment-fit trimming: preferred 20-year cohort-lead specification}",
+  "\\label{tab:wf_synthdid_lead20_trimming}",
+  "\\small",
+  "\\setlength{\\tabcolsep}{3.8pt}",
+  "\\begin{tabular}{ll>{\\raggedright\\arraybackslash}p{4.4cm}rrrr}",
+  "\\toprule",
+  paste0(
+    "Decades & Worst dropped & Events removed & Events & Pooled effect & ",
+    "Mean rank & Rank $p$ ", "\\\\"
+  ),
+  "\\midrule",
+  trim_rows,
+  "\\bottomrule",
+  "\\end{tabular}",
+  "\\caption*{\\footnotesize Notes: Events are ranked from worst to best normalized pre-treatment RMSPE and removed progressively. The ordering uses no post-treatment outcomes and is reproduced inside every randomization draw. The manuscript stops before a one-event estimate; the full audit output retains that final stage.}",
+  "\\end{table}"
+)
+writeLines(
+  lead20_table,
+  file.path(table_dir, "wf_synthdid_lead20_results.tex")
+)
+
+base_results <- file.path(
+  TALENT_DETS_DATA_DIR, "results", "worlds_fair", "synthdid",
+  "ukds_1911_lgd_wikipedia_donor_pools"
+)
+robustness_sources <- list(
+  "Full window" = file.path(
+    base_results, "match_v2_lagged", "pooled_dz", "dz_pooled_att.csv"
+  ),
+  "Balanced, original pools" = file.path(
+    base_results, "match_v2_lagged", "pooled_dz_balanced_3p4",
+    "dz_pooled_att.csv"
+  ),
+  "Balanced, rebuilt pools" = files[["att"]]
+)
+if (!all(file.exists(unlist(robustness_sources)))) {
+  stop("A design-robustness pooled-ATT input is missing.")
+}
+robustness <- rbindlist(lapply(names(robustness_sources), function(label) {
+  x <- fread(robustness_sources[[label]])
+  x[, design := label]
+  x
+}), fill = TRUE, use.names = TRUE)
+robustness[, design := factor(
+  design, levels = names(robustness_sources)
+)]
+robustness[, decade_order := match(decade_definition,
+                                    c("standard", "alternative"))]
+setorder(robustness, design, cohort_lead_years, decade_order)
+robustness_rows <- robustness[, paste(
+  as.character(design), cohort_lead_years,
+  definition_label(decade_definition), n_events, effect_tex(pooled_att),
+  fmt3(mean_percentile_rank), fmt3(randomization_p_two_sided), sep = " & "
+)]
+robustness_rows <- paste0(robustness_rows, " \\\\")
+robustness_rows <- append(robustness_rows, "\\addlinespace", after = 4L)
+robustness_rows <- append(robustness_rows, "\\addlinespace", after = 9L)
+
+robustness_table <- c(
+  "\\begin{table}[H]",
+  "\\centering",
+  "\\caption{Pooled synthetic-DiD estimates across donor-pool and event-window designs}",
+  "\\label{tab:wf_synthdid_design_robustness}",
+  "\\small",
+  "\\setlength{\\tabcolsep}{5pt}",
+  "\\begin{tabular}{lllrrrr}",
+  "\\toprule",
+  paste0(
+    "Design & Cohort lead & Decades & Events & Pooled effect & Mean rank & ",
+    "Rank $p$ ", "\\\\"
+  ),
+  "\\midrule",
+  robustness_rows,
+  "\\bottomrule",
+  "\\end{tabular}",
+  paste0(
+    "\\caption*{\\footnotesize Notes: The full-window design uses every available 1850--1960 bin and already begins treatment at $e=0$. ",
+    "The balanced designs use the corrected three-pre/four-post window. The middle design retains the original lagged-outcome pools; the preferred design rebuilds pools from the fixed five-variable match. ",
+    "Every path subtracts its final untreated gap, $e=-10$ in the corrected balanced designs. Rank $p$ is the two-sided joint-randomization $p$-value for the mean placebo percentile rank.}"
+  ),
+  "\\end{table}"
+)
+writeLines(
+  robustness_table,
+  file.path(table_dir, "wf_synthdid_design_robustness.tex")
+)
+
 message("Wrote paper figures to: ", output_dir)
+message("Wrote paper tables to: ", table_dir)

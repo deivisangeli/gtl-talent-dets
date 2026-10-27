@@ -61,18 +61,18 @@
 # ESTIMAND. Event-time paths use the final pre-treatment period as the omitted
 # reference. If g_et is the treated-minus-synthetic gap and t0 is the final pre
 # period, the reported path is g_et - g_e,t0 and the event effect is its mean
-# over the post-treatment periods. Under the preferred balanced window t0 is
-# event time zero, so the plotted effect is exactly zero there and treatment
-# begins at +10. The synthdid package ATT and its lambda-weighted pre-period
+# over the post-treatment periods. Under the corrected preferred window t0 is
+# event time -10, so the plotted effect is exactly zero there and treatment
+# begins at 0. The synthdid package ATT and its lambda-weighted pre-period
 # offset are retained as diagnostics, but they are not the reported estimand.
 #
 # Run from the repository root, after the donor pools and the per-event models:
 #   Rscript analysis/world_fairs/synthdid/estimate_ukds_1911_lgd_wikipedia_pooled_dube_zipperer.R
 #
-# Under the balanced_4pre_3post event window each event contributes exactly
-# four pre and three post decade bins, with the fair decade as the last pre
-# period and treatment starting at T+10. tau_e is then the mean
-# reference-normalized gap over the same three horizons for every event, and
+# Under the corrected balanced_3pre_4post event window each event contributes
+# exactly three pre and four post decade bins, with e=-10 as the reference and
+# treatment starting at T. tau_e is then the mean reference-normalized gap over
+# the same four horizons for every event, and
 # the dynamic effect path has a constant
 # event count at all seven event times, which the full-window run does not.
 #
@@ -329,9 +329,9 @@ fit_gap_path <- function(Y, N0, T0) {
 
 # Build the synthdid panel exactly as the per-event stage does, so the solver
 # sees the same row order and reproduces the same numbers to machine precision.
-# treatment_decade is the fair decade T. Under the balanced window the sample is
-# the seven bins from T-30 to T+30 and treatment turns on at T+10, so the fair
-# decade is the last pre-treatment period. Pass `decades` to override the
+# treatment_decade is the effective cohort decade T. Under a balanced window
+# the sample is the seven bins from T-30 to T+30; the active window determines
+# whether treatment turns on at T or T+10. Pass `decades` to override the
 # window explicitly, as the placebo-in-time test does.
 build_setup <- function(panel, donor_ids, treated_id, treatment_decade,
                         decades = NULL, treatment_start = NULL,
@@ -895,8 +895,8 @@ pooled_dynamic <- event_horizon_effects[, .(
 ), by = .(model_id, event_time)]
 pooled_dynamic[, `:=`(
   event_time_decades = event_time / 10L,
-  # Treatment starts at the window offset, which is +10 decades under the
-  # balanced window because the fair decade is the last pre-treatment period.
+  # Treatment starts at the active window offset: zero in the corrected
+  # balanced design and +10 only in the legacy balanced design.
   period = fifelse(event_time < event_window$treatment_offset, "pre", "post")
 )]
 setorder(pooled_dynamic, model_id, event_time)
@@ -1675,10 +1675,13 @@ offsets_text <- function(offsets) paste(
   collapse = ", "
 )
 treatment_start_text <- if (event_window$balanced) paste0(
-  "Decade bin containing first_fair_year minus the cohort lead sets the fair ",
-  "decade T; leads of 0 and 20 years are both reported. Under this window the ",
-  "fair decade is the LAST PRE-TREATMENT period, so the treatment indicator ",
-  "turns on at T+", event_window$treatment_offset, "."
+  "Decade bin containing first_fair_year minus the cohort lead sets the ",
+  "effective cohort decade T; leads of 0 and 20 years are both reported. ",
+  "The treatment indicator turns on at T",
+  if (event_window$treatment_offset > 0L) {
+    paste0("+", event_window$treatment_offset)
+  } else "",
+  "."
 ) else paste0(
   "Decade bin containing first_fair_year minus the cohort lead; leads of 0 ",
   "and 20 years are both reported. The treatment indicator turns on at that ",
@@ -1686,15 +1689,16 @@ treatment_start_text <- if (event_window$balanced) paste0(
 )
 pre_window_text <- if (event_window$balanced) paste0(
   event_window$n_pre_periods, " decade bins at offsets ",
-  offsets_text(event_window$pre_offsets), " decades from the fair decade, the ",
-  "last of which is the fair decade itself"
+  offsets_text(event_window$pre_offsets), " from the effective cohort decade; ",
+  "the final pre-treatment reference is e=",
+  max(event_window$pre_offsets)
 ) else paste0(
   "All decade bins strictly before the treatment decade (",
   describe_range(pre_range), " bins across events)"
 )
 post_window_text <- if (event_window$balanced) paste0(
   event_window$n_post_periods, " decade bins at offsets ",
-  offsets_text(event_window$post_offsets), " decades from the fair decade"
+  offsets_text(event_window$post_offsets), " from the effective cohort decade"
 ) else paste0(
   "All decade bins from the treatment decade onward (",
   describe_range(post_range), " bins across events)"
@@ -1709,6 +1713,11 @@ event_window_text <- if (event_window$balanced) paste0(
   event_window$id, ": every decade bin in the panel, so the number of pre and ",
   "post periods varies across events and the pooled event-time grid is ragged"
 )
+reference_period_text <- if (event_window$balanced) {
+  paste0("event time ", max(event_window$pre_offsets))
+} else {
+  "the last decade before treatment"
+}
 
 decisions <- data.table(
   decision = c(
@@ -1751,9 +1760,9 @@ decisions <- data.table(
     paste0("Baseline retains every estimated event; progressive trimming on ",
            "NRMSPE reported as robustness rather than used as a screen"),
     paste0("Mean post-treatment treated-minus-synthetic gap less the final ",
-           "pre-treatment gap. Under the balanced window that reference is ",
-           "event time 0; under the full window it is the last decade before ",
-           "treatment. The package synthdid ATT and lambda-weighted pre-gap ",
+           "pre-treatment gap. In this run that reference is ",
+           reference_period_text,
+           ". The package synthdid ATT and lambda-weighted pre-gap ",
            "are retained as diagnostics."),
     paste0("S_e = tau_e / RMSPE_pre_e. A standardized effect, not an ",
            "elasticity: the denominator is the pre-treatment root mean squared ",

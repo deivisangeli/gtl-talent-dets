@@ -767,6 +767,21 @@ warning_summary <- tibble(warning = run_warnings) %>%
 write_csv(warning_summary, file.path(results_dir, "warning_summary.csv"))
 
 expected_models <- nrow(combined_samples) * length(outcomes)
+expected_estimable_models <- combined_samples %>%
+  filter(n_treated_eligible > 0L) %>%
+  nrow()
+expected_estimable_models <- expected_estimable_models * length(outcomes)
+expected_empty_models <- combined_status %>%
+  filter(
+    !ok,
+    n_treated_units == 0L,
+    error == "No eligible treated units."
+  )
+unexpected_failed_models <- combined_status %>%
+  filter(
+    !ok,
+    !(n_treated_units == 0L & error == "No eligible treated units.")
+  )
 core_status <- combined_status %>%
   filter(
     treatment_spec %in% c("hosted", "hosted_visits_100k") |
@@ -862,7 +877,7 @@ run_validation <- tibble(
     "core_assigned_counts_match",
     "core_eligible_counts_match",
     "core_models_successful",
-    "all_models_successful",
+    "all_estimable_models_successful",
     "balanced_control_counts_match",
     "fixed_control_pool_available",
     "baseline_population_complete",
@@ -875,9 +890,9 @@ run_validation <- tibble(
     nrow(combined_status) == expected_models,
     sum(panel_year$n_amws_1986) > 0,
     all(combined_dynamic$event_time %in% event_times),
-    nrow(dynamic_grid) == expected_models &&
+    nrow(dynamic_grid) == expected_estimable_models &&
       all(dynamic_grid$n_event_times == length(event_times)),
-    nrow(reference_rows) == expected_models &&
+    nrow(reference_rows) == expected_estimable_models &&
       all(reference_rows$estimate == 0) && all(is.na(reference_rows$se)),
     length(treated_cohorts) > 0L &&
       all(treated_cohorts >= profile$treated_cohort_min) &&
@@ -885,7 +900,9 @@ run_validation <- tibble(
     all(core_count_validation$assigned_ok),
     all(core_count_validation$eligible_ok),
     nrow(core_status) == expected_core_models && all(core_status$ok),
-    nrow(combined_status) == expected_models && all(combined_status$ok),
+    sum(combined_status$ok) == expected_estimable_models &&
+      nrow(unexpected_failed_models) == 0L &&
+      nrow(expected_empty_models) == expected_models - expected_estimable_models,
     nrow(core_control_validation) == 0L || all(core_control_validation$controls_ok),
     !balance_controls_calendar ||
       (nrow(control_support_validation) > 0L &&
@@ -905,10 +922,15 @@ run_validation <- tibble(
         sum(combined_samples$n_treated_assigned),
     !balance_controls_calendar ||
       all(
-        is.finite(combined_samples$control_calendar_min) &
-          is.finite(combined_samples$control_calendar_max) &
-          combined_samples$control_calendar_min <=
-            combined_samples$control_calendar_max
+        if_else(
+          combined_samples$n_treated_eligible == 0L,
+          is.na(combined_samples$control_calendar_min) &
+            is.na(combined_samples$control_calendar_max),
+          is.finite(combined_samples$control_calendar_min) &
+            is.finite(combined_samples$control_calendar_max) &
+            combined_samples$control_calendar_min <=
+              combined_samples$control_calendar_max
+        )
       ),
     !reuse_control_sample ||
       (nrow(combined_control_sample_identity) ==
@@ -919,13 +941,16 @@ run_validation <- tibble(
     paste(nrow(combined_status), "of", expected_models),
     as.character(sum(panel_year$n_amws_1986)),
     paste(sort(unique(combined_dynamic$event_time)), collapse = ","),
-    paste(nrow(dynamic_grid), "models with", length(event_times), "event times"),
+    paste(nrow(dynamic_grid), "estimable models with", length(event_times), "event times"),
     paste(nrow(reference_rows), "normalized rows"),
     paste(sort(treated_cohorts), collapse = ","),
     paste(core_count_validation$n_treated_assigned, collapse = ","),
     paste(core_count_validation$n_treated_eligible, collapse = ","),
     paste(sum(core_status$ok), "of", nrow(core_status)),
-    paste(sum(combined_status$ok), "of", nrow(combined_status)),
+    paste(
+      sum(combined_status$ok), "estimable models successful;",
+      nrow(expected_empty_models), "expected empty models skipped"
+    ),
     if (nrow(core_control_validation) == 0L) "not configured" else
       paste(core_control_validation$n_never_treated_controls, collapse = ","),
     paste(
@@ -946,10 +971,14 @@ run_validation <- tibble(
       "assigned treated rows"
     ),
     if (!balance_controls_calendar) "not configured" else paste(
-      paste(
-        combined_samples$control_calendar_min,
-        combined_samples$control_calendar_max,
-        sep = "-"
+      if_else(
+        combined_samples$n_treated_eligible == 0L,
+        "not applicable (no eligible treated units)",
+        paste(
+          combined_samples$control_calendar_min,
+          combined_samples$control_calendar_max,
+          sep = "-"
+        )
       ),
       collapse = ","
     ),

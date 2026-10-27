@@ -263,3 +263,149 @@ download_nhgis_domain(
  extract_description = "GTL demographic NHGIS datasets",
  requested_tables = demographics_tables
 )
+
+### Literacy and educational attainment: 1930, 1940, 1950
+###
+### 1930 is the last census with a true literacy question ("able to read and
+### write"). From 1940 the census asked years of school completed instead, so
+### 1940 and 1950 can only support an attainment-based proxy. Table numbers in
+### these datasets are not stable enough to hard-code the way the earlier
+### demographics tables are, so resolve them from the NHGIS metadata and fail
+### loudly if the expected topic is missing.
+###
+### This is a separate domain rather than extra years on "demographics":
+### download_nhgis_domain() reuses any existing nhgis*_csv.zip in the domain
+### directory, so adding years there would silently skip the download and
+### leave the new years missing.
+
+### 1930-1950 for literacy and attainment. 1840, 1870, 1880 and 1910 are here
+### for school attendance: only one to three tables were ever requested from
+### those datasets, so whether they carry an attendance table is unknown and
+### the candidate-tables audit below will settle it.
+###
+### 1850, 1890 and 1900 are deliberately absent. 1850 came complete with the
+### mandatory-schooling matching extract and 1890 and 1900 with the
+### manufacturing extract, so their attendance tables are already on disk;
+### 1900 has none, and 1860 has no school table in NHGIS at all.
+education_years <- c(1840, 1870, 1880, 1910, 1930, 1940, 1950)
+education_dir <- file.path(raw_dir, "nhgis_education")
+dir.create(education_dir, recursive = TRUE, showWarnings = FALSE)
+
+### Historical NHGIS tables describe this topic inconsistently: 1920 says
+### "Illiterate Persons", 1850 says "Adults Who Cannot Read and Write". Cover
+### both wordings so a renamed 1930 table is not missed.
+education_topic_pattern <- regex(
+ "illiter|literac|cannot read|cannot write|school|educat|attain",
+ ignore_case = TRUE
+)
+
+education_candidates <- nhgis_datasets$name[
+ str_detect(nhgis_datasets$name,
+            paste0("^(", paste(education_years, collapse = "|"), ")_"))
+]
+
+if (length(education_candidates) == 0) {
+ stop("No NHGIS datasets found for years: ",
+      paste(education_years, collapse = ", "))
+}
+
+### Metadata is one API call per dataset, so cache it. Re-runs resolve tables
+### from the cache and never re-query.
+education_metadata_path <- file.path(education_dir, "education_metadata.rds")
+
+if (!file.exists(education_metadata_path)) {
+ education_metadata <- set_names(
+  map(education_candidates, \(x) {
+   message("Fetching NHGIS metadata for ", x, "...")
+   get_metadata(collection = "nhgis", dataset = x)
+  }),
+  education_candidates
+ )
+ saveRDS(education_metadata, education_metadata_path)
+}
+
+education_metadata <- readRDS(education_metadata_path)
+
+### One row per candidate table, so the resolution is auditable rather than
+### implicit in a regex.
+education_table_audit <- imap_dfr(education_metadata, \(meta, dataset_name) {
+ if (nrow(meta$data_tables) == 0) {
+  return(tibble())
+ }
+
+ meta$data_tables %>%
+  transmute(
+   dataset = dataset_name,
+   year = as.integer(str_extract(dataset_name, "^[0-9]{4}")),
+   has_county = "county" %in% meta$geog_levels$name,
+   table = name,
+   description,
+   universe = coalesce(universe, NA_character_),
+   n_variables,
+   topic_match = str_detect(description, education_topic_pattern) |
+    str_detect(coalesce(universe, ""), education_topic_pattern)
+  )
+})
+
+write_csv(
+ education_table_audit,
+ file.path(education_dir, "nhgis_education_candidate_tables.csv")
+)
+
+education_selected <- education_table_audit %>%
+ filter(has_county, topic_match)
+
+education_tables <- education_selected %>%
+ split(education_selected$dataset) %>%
+ map(\(rows) unique(c("NT1", rows$table)))
+
+### Guard rails. A silently empty 1930-1950 would produce a panel that looks
+### complete but has no literacy or attainment in it, so those years must
+### resolve. The earlier years are exploratory - whether they carry a school
+### table is exactly what this run is finding out - so a miss there is
+### reported, not fatal, and must not block the 1930-1950 download.
+education_required_years <- c(1930, 1940, 1950)
+
+education_years_resolved <- education_selected %>%
+ distinct(year) %>%
+ pull(year)
+
+education_required_missing <- setdiff(education_required_years,
+                                      education_years_resolved)
+
+if (length(education_required_missing) > 0) {
+ stop(
+  "No county-level education/literacy table resolved for: ",
+  paste(education_required_missing, collapse = ", "),
+  ". Inspect ",
+  file.path(education_dir, "nhgis_education_candidate_tables.csv"),
+  " and widen education_topic_pattern if the topic is described differently."
+ )
+}
+
+education_exploratory_missing <- setdiff(
+ setdiff(education_years, education_required_years), education_years_resolved
+)
+
+if (length(education_exploratory_missing) > 0) {
+ message("No county school table found for: ",
+         paste(education_exploratory_missing, collapse = ", "),
+         " (expected for some years; see the candidate-tables audit).")
+}
+
+message(
+ "Resolved education tables: ",
+ paste(
+  map_chr(names(education_tables),
+          \(x) paste0(x, " [", paste(education_tables[[x]], collapse = ","), "]")),
+  collapse = "; "
+ )
+)
+
+download_nhgis_domain(
+ domain_label = "education",
+ output_subdir = "nhgis_education",
+ requested_datasets = names(education_tables),
+ extract_description = "GTL literacy and educational attainment NHGIS datasets",
+ requested_tables = education_tables
+)
