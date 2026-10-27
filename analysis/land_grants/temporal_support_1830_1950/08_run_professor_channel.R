@@ -85,11 +85,17 @@ PAPER <- tibble(
 # the same three measures by each county's own factor instead of the national
 # one (faculty headcount / coded professors where the headcount is larger, else
 # 1; prep/occupational_fertility/build_professor_county_coverage.R).
+# "regional_raw", "regional_faculty" and "regional_county" predict with births
+# per professor by Census region x urban/rural county and census, from
+# professors' own co-resident children
+# (build_professor_regional_fertility_schedule.R): unscaled, national-scaled
+# and county-scaled.
 PAIRS <- tibble(
   channel = rep(c("faculty", "raw", "ams_faculty", "ams_raw", "chsurv_faculty", "chsurv_raw",
-                  "county_faculty", "ams_county", "chsurv_county"), each = 2),
-  measure = rep(c("count", "per_1000_births"), 9),
-  amws = rep(c("n_amws", "amws_per_1000_births"), 9),
+                  "county_faculty", "ams_county", "chsurv_county",
+                  "regional_faculty", "regional_raw", "regional_county"), each = 2),
+  measure = rep(c("count", "per_1000_births"), 12),
+  amws = rep(c("n_amws", "amws_per_1000_births"), 12),
   prof = c("faculty_births", "faculty_births_per_1000_births",
            "prof_births_plus_deans", "prof_births_plus_deans_per_1000_births",
            "ams_faculty_births", "ams_faculty_births_per_1000_births",
@@ -98,9 +104,13 @@ PAIRS <- tibble(
            "chsurv_births", "chsurv_births_per_1000_births",
            "county_faculty_births", "county_faculty_births_per_1000_births",
            "ams_county_faculty_births", "ams_county_faculty_births_per_1000_births",
-           "chsurv_county_faculty_births", "chsurv_county_faculty_births_per_1000_births"),
+           "chsurv_county_faculty_births", "chsurv_county_faculty_births_per_1000_births",
+           "regional_faculty_births", "regional_faculty_births_per_1000_births",
+           "regional_births", "regional_births_per_1000_births",
+           "regional_county_faculty_births", "regional_county_faculty_births_per_1000_births"),
   sample = rep(c("common", "common", "common_ams", "common_ams", "common_chsurv", "common_chsurv",
-                 "common", "common_ams", "common_chsurv"), each = 2)
+                 "common", "common_ams", "common_chsurv",
+                 "common_regional", "common_regional", "common_regional"), each = 2)
 )
 CENSUS_CHANNELS <- c("faculty", "raw")
 CHANNEL_COL <- c(faculty = "faculty_births", raw = "prof_births_plus_deans")
@@ -125,7 +135,7 @@ read_predicted <- function(prefix, alternative) {
     mutate(GEOID = pad_geoid(GEOID), decade = as.integer(decade)) %>%
     select(GEOID, decade, all_of(paste0(prefix, c("_births", "_faculty_births", "_county_faculty_births"))))
 }
-PREDICTED <- c("ams", "chsurv")
+PREDICTED <- c("ams", "chsurv", "regional")
 add_channel <- function(panel, channel, alternative) {
   out <- panel %>% left_join(channel, by = c("GEOID", "decade"))
   for (prefix in PREDICTED) {
@@ -229,7 +239,12 @@ for (spec_name in names(SPECS)) {
         filter(!is.na(n_amws), !is.na(amws_per_1000_births), !is.na(chsurv_births),
                !is.na(chsurv_births_per_1000_births), !is.na(chsurv_faculty_births),
                !is.na(chsurv_faculty_births_per_1000_births), !is.na(chsurv_county_faculty_births),
-               !is.na(chsurv_county_faculty_births_per_1000_births)))
+               !is.na(chsurv_county_faculty_births_per_1000_births)),
+      common_regional = stack %>%
+        filter(!is.na(n_amws), !is.na(amws_per_1000_births), !is.na(regional_births),
+               !is.na(regional_births_per_1000_births), !is.na(regional_faculty_births),
+               !is.na(regional_faculty_births_per_1000_births), !is.na(regional_county_faculty_births),
+               !is.na(regional_county_faculty_births_per_1000_births)))
     for (k in seq_len(nrow(PAIRS))) {
       pr <- PAIRS[k, ]
       common <- commons[[pr$sample]]
@@ -239,7 +254,7 @@ for (spec_name in names(SPECS)) {
       stopifnot(identical(fa$egt, fp$egt), fa$n == fp$n)
       fits_keep[[paste(spec_name, timing, pr$channel, pr$measure, sep = "__")]] <- list(a = fa, p = fp)
       # The AMWS event study is the same within a sample group; record it once.
-      keep <- if (pr$channel %in% c("faculty", "ams_faculty", "chsurv_faculty")) list(list(fa, pr$amws), list(fp, pr$prof)) else
+      keep <- if (pr$channel %in% c("faculty", "ams_faculty", "chsurv_faculty", "regional_faculty")) list(list(fa, pr$amws), list(fp, pr$prof)) else
         list(list(fp, pr$prof))
       for (f in keep) {
         es_rows[[length(es_rows) + 1L]] <- f[[1]]$es %>%
@@ -497,6 +512,8 @@ event_counts <- map_dfr(names(stacks), function(timing) {
                 rename(events_common_ams = events), by = "event_time") %>%
     full_join(count_events(filter(st, !is.na(chsurv_faculty_births_per_1000_births))) %>%
                 rename(events_common_chsurv = events), by = "event_time") %>%
+    full_join(count_events(filter(st, !is.na(regional_faculty_births_per_1000_births))) %>%
+                rename(events_common_regional = events), by = "event_time") %>%
     mutate(timing = timing, .before = 1)
 })
 
@@ -555,6 +572,9 @@ county_note <- paste0("Scaled by county: faculty headcount (Education by the Num
 chsurv_note <- paste0("Faculty children predicted: census faculty (010-029 men) by age x births per professor from ",
                       "wives' CHSURV\n(1900-1910 censuses, for faculty to 1920) and CHBORN (1940 sample line, ",
                       "for faculty 1930-1950).")
+regional_note <- paste0("Faculty children predicted: census faculty (010-029 men) by age x births per professor by Census region x
+",
+                        "urban/rural county and census, from professors' own co-resident children under 10 (levels on an era age shape).")
 CHANNELS <- list(
   faculty = list(suffix = "", note = factor_note, sample = "common",
                  per1000 = "faculty_births_per_1000_births", count = "faculty_births",
@@ -599,7 +619,23 @@ CHANNELS <- list(
                        note = paste0(chsurv_note, "\n", county_note),
                        per1000 = "chsurv_county_faculty_births_per_1000_births", count = "chsurv_county_faculty_births",
                        panel_b_per1000 = "B. Faculty children per 1,000 births (census fertility x census faculty, county-scaled)",
-                       panel_b_count = "B. Faculty children in the county (census fertility x census faculty, county-scaled)"))
+                       panel_b_count = "B. Faculty children in the county (census fertility x census faculty, county-scaled)"),
+  regional_faculty = list(suffix = "_regional_scaled", sample = "common_regional",
+                          note = paste(regional_note, "Scaled by the census coverage factor."),
+                          per1000 = "regional_faculty_births_per_1000_births", count = "regional_faculty_births",
+                          panel_b_per1000 = "B. Faculty children per 1,000 births (regional fertility x census faculty, scaled)",
+                          panel_b_count = "B. Faculty children in the county (regional fertility x census faculty, scaled)"),
+  regional_raw = list(suffix = "_regional_unscaled", sample = "common_regional",
+                      note = paste(regional_note, "No coverage rescaling."),
+                      per1000 = "regional_births_per_1000_births", count = "regional_births",
+                      panel_b_per1000 = "B. Faculty children per 1,000 births (regional fertility x census faculty, unscaled)",
+                      panel_b_count = "B. Faculty children in the county (regional fertility x census faculty, unscaled)"),
+  regional_county = list(suffix = "_regional_county_scaled", sample = "common_regional",
+                         note = paste0(regional_note, "
+", county_note),
+                         per1000 = "regional_county_faculty_births_per_1000_births", count = "regional_county_faculty_births",
+                         panel_b_per1000 = "B. Faculty children per 1,000 births (regional fertility x census faculty, county-scaled)",
+                         panel_b_count = "B. Faculty children in the county (regional fertility x census faculty, county-scaled)"))
 MEASURES <- list(
   per1000 = list(amws = "amws_per_1000_births", measure = "per_1000_births", unit = "per 1,000 births",
                  panel_a = "A. AMWS scientists born per 1,000 births (main.tex Figure 2)"),

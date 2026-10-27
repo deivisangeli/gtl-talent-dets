@@ -1,13 +1,15 @@
 """Build faculty_offspring_channel.pdf, the report companion for the
 faculty-offspring channel of the college-allocation result.
 
-Three figures in two versions: Figures 1-3 with faculty children scaled to
+Three figures in three versions: Figures 1-3 with faculty children scaled to
 total college faculty (the census coverage factor), Figures 4-6 with the same
-OCC1950 010-029 count unscaled. Each version has two standard-decade figures
+OCC1950 010-029 count unscaled, Figures 7-9 scaled by each county's faculty
+headcount (build_professor_county_coverage.R). Each version has two standard-decade figures
 and the break-even p* figure (both timings), with descriptive notes, a section
 title and a subsection title per version, nothing else. Every number in the
 notes is read from the saved outputs of 08_run_professor_channel.R,
-build_professor_coverage.R and the children panel's build manifest; this
+build_professor_coverage.R, build_professor_county_coverage.R and the
+children panel's build manifest; this
 script estimates nothing. The layout follows project/report_companion.tex.
 
 Run from <repo>:
@@ -27,6 +29,7 @@ DATA_ROOT = Path(os.environ.get('TALENT_DETS_DATA_DIR')
                  or 'C:/Users/megaj/Globtalent Dropbox/gtl_talent_dets')
 RESULTS = DATA_ROOT / 'results/land_grants/professor_channel'
 COVERAGE = DATA_ROOT / 'output/occupational_fertility/professor_coverage_factors.csv'
+COUNTY_COVERAGE = DATA_ROOT / 'output/occupational_fertility/professor_county_coverage_factors_summary.csv'
 CHANNEL_MANIFEST = DATA_ROOT / 'output/occupational_fertility/college_channel/build_manifest.json'
 OUT_DIR = RESULTS / 'companion'
 NAME = 'faculty_offspring_channel'
@@ -37,6 +40,9 @@ VERSIONS = {
                 'title': 'Scaled to total college faculty'},
     'raw': {'suffix': '_unscaled', 'label': 'unscaled', 'outcome': 'prof_births_plus_deans_per_1000_births',
             'title': 'Unscaled census counts'},
+    'county_faculty': {'suffix': '_county_scaled', 'label': 'county-scaled',
+                       'outcome': 'county_faculty_births_per_1000_births',
+                       'title': 'Scaled by county faculty headcounts'},
 }
 HORIZONS = (40, 50, 60, 70)
 TIMING_NAMES = {'standard_decade': 'standard', 'alternative_decade': 'alternative'}
@@ -102,6 +108,9 @@ p_zero = read(RESULTS / 'p_where_e50_ci_reaches_zero.csv')
 counts = read(RESULTS / 'event_counts_by_horizon.csv')
 factors = read(COVERAGE)
 fvals = [float(r['faculty_factor']) for r in factors]
+county_summary = read(COUNTY_COVERAGE)
+county_medians = [float(r['median_factor_scaled']) for r in county_summary if r['median_factor_scaled']]
+county_max = max(float(r['max_factor']) for r in county_summary if r['max_factor'])
 
 amws50 = one(es, spec=SPEC, timing=TIMING, outcome='amws_per_1000_births', sample='original',
              event_time=50)
@@ -154,9 +163,17 @@ def notes_for(channel):
              event_time=50)
     pz = one(p_zero, spec=SPEC, timing=TIMING, channel=channel, measure='per_1000_births')
 
-    scaling = ('rescaled in each census by its coverage of NCES male professional staff '
-               f'(factors {min(fvals):.2f}--{max(fvals):.2f})' if channel == 'faculty' else
-               'counted as enumerated, without coverage rescaling')
+    scaling = {
+        'faculty': 'rescaled in each census by its coverage of NCES male professional staff '
+                   f'(factors {min(fvals):.2f}--{max(fvals):.2f})',
+        'raw': 'counted as enumerated, without coverage rescaling',
+        'county_faculty': 'rescaled in each county and census by the faculty headcount in the Education by '
+                          'the Numbers panel over the coded professors (both sexes) where the headcount is '
+                          'larger, and not scaled otherwise; among scaled event counties the median factor '
+                          f'runs {min(county_medians):.1f}--{max(county_medians):.1f} by census, up to '
+                          f'{county_max:.0f}. The largest factors fall on college counties the census coded '
+                          'with only a handful of professors, so a few families weigh heavily and the '
+                          'intervals are wide'}[channel]
     fewer_sentence = fewer_explained()
     channel_note = (
         'Notes: Panel A is the main-text Figure 2 series: AMWS scientists born per 1,000 estimated '
@@ -232,6 +249,10 @@ def notes_for(channel):
                        f'{"; ".join(fewer_parts)}. Both effects in the ratio are estimated on those '
                        'events only, so these points describe a different set of colleges from the '
                        'earlier horizons.' if fewer_parts else '')
+    # 08 caps the axis at 60% when an interval is very wide; say which bars it cuts.
+    cut = [k for k, r in sorted(plotted.items()) if float(r['p_star_fieller_hi']) > 0.6]
+    cut_sentence = (' The axis stops at 60\\%, which cuts the upper end of the interval at ' +
+                    ' and '.join(f'{TIMING_NAMES[t]} $+{e}$' for t, e in cut) + '.' if cut else '')
     multiple = float(be['p_star']) / float(be['base_rate'])
     breakeven_note = (
         'Notes: Break-even transmission rate $p^* = \\text{ATT(AMWS per 1,000 births)} / '
@@ -240,7 +261,7 @@ def notes_for(channel):
         'Both effects are estimated on the sample with faculty-birth data; bars are Fieller 95\\% '
         'intervals from the joint influence functions. Shown from $e = +40$, where faculty children '
         f'rise clearly. Standard decades: {be_series("standard_decade")}. Alternative decades: '
-        f'{be_series("alternative_decade")}.' + omitted_sentence + fewer_breakeven +
+        f'{be_series("alternative_decade")}.' + cut_sentence + omitted_sentence + fewer_breakeven +
         f' At standard $e = +50$, $p^*$ is about {multiple:.0f} times the AMWS base rate per birth in '
         f'the runner-up counties, birth decades 1880--1930 ({pct(be["base_rate"], 2)}).')
     return channel_note, adjusted_note, breakeven_note

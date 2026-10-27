@@ -495,3 +495,53 @@ factor is not scaled.
 **Caution.** College counties the census coded with 1–5 professors get
 factors of 30–68. These dominate the noise; see
 `results/land_grants/professor_channel/memo_county_scale.md`.
+
+## Regional fertility from co-resident children (`build_professor_regional_fertility_schedule.R`)
+
+A middle ground between one national schedule and each county's own realised
+children: births per professor by **Census region × urban/rural county** and
+census, from professors' own children under 10 linked by `POPLOC`.
+
+**Schedule.**
+- **Professors.** Men aged 20–69 coded 010–029, in every census 1850–1950.
+- **Age shape.** A child aged k of a father aged a is a birth at a − k. The
+  shape is pooled nationally within three eras (1850–1880, 1900–1920,
+  1930–1950) and smoothed with a 5-year moving average.
+- **Levels.** Observed / expected children 0–9 per census × group, shrunk
+  toward the census's national level with a weight of 30 expected children.
+  A `national` group carries that national level for stock with no county
+  code.
+- **Groups.** Region from the state (`census_regions.R`, DC in the South).
+  A county is urban in a census if at least half its persons have
+  `URBAN` = 2 (`county_urban_class.csv`).
+- **Results.** Rural levels are about 1.2 times urban. The Northeast is
+  lowest. Lifetime births on the national shape are 3.29, 2.09 and 2.08 by
+  era.
+- **Output.** In `college_channel/`:
+  - `professor_birth_schedule_regional.csv`, keyed census × group × age;
+  - `professor_fertility_group_levels.csv`;
+  - `professor_fertility_era_shape.csv`;
+  - `county_urban_class.csv`;
+  - a manifest.
+
+**Channel builder.** A schedule with a `group` column gives each county ×
+census its group's rates, read from `OCC_COUNTY_GROUPS` (default
+`county_urban_class.csv`). Stock outside any group takes `national`. A group
+missing from the schedule stops the build. Schedules without `group` are
+unaffected: the AMS and CHSURV outputs are byte-identical. Build it with:
+
+    OCC_BIRTH_SCHEDULE=<college_channel>/professor_birth_schedule_regional.csv OCC_CHANNEL_PREFIX=regional
+
+Predicted counts are 63–102% of the census-observed count in the event
+counties, the closest of the three schedules.
+
+**Tests.** `test_professor_predicted_channel.R` (9 checks) runs the builder on
+a fixture with group-keyed rates:
+- the same stock in two groups gives births in the ratio of the group rates;
+- stock without a county code takes the national rate;
+- national and county scaling apply as expected;
+- a missing group is an error.
+
+**Results.** See `results/land_grants/professor_channel/memo_regional.md`.
+They match the national census-fertility schedule to within a few tenths of
+a point: at +50, p\* is 11.3% national-scaled and 9.1% county-scaled.

@@ -6,6 +6,9 @@
 #   census     build_professor_census_fertility_schedule.R: wives' CHSURV
 #              1900-1910 and CHBORN 1940 (OCC_BIRTH_SCHEDULE=..._census.csv,
 #              OCC_CHANNEL_PREFIX=chsurv)
+#   regional   build_professor_regional_fertility_schedule.R: own co-resident
+#              children by region x urban/rural and census
+#              (OCC_BIRTH_SCHEDULE=..._regional.csv, OCC_CHANNEL_PREFIX=regional)
 #
 #   forward(county, D)  = sum_a stock(county, D, a)      x births at ages a .. a+9
 #   backward(county, D) = sum_a stock(county, D + 10, a) x births at ages a-10 .. a-1
@@ -15,7 +18,10 @@
 # births per professor by age are the schedule's single-year rates
 # (births_at_age_<rule> columns; the first is the headline, others are stored
 # with a _<rule> suffix). A schedule with a `census` column gives each census
-# its own rates; one without applies the same rates to every census. The
+# its own rates; one without applies the same rates to every census. A schedule
+# with a `group` column as well gives each county x census its group's rates,
+# the group read from OCC_COUNTY_GROUPS (county_urban_class.csv); stock outside
+# any group takes the schedule's "national" group. The
 # forward view counts fathers present when the decade opens and misses faculty
 # who arrive during it; the backward view counts fathers present when it closes
 # (as the census-observed channel does). Their mean approximates the faculty
@@ -34,6 +40,7 @@
 #   IPUMS_1850_1950_FERTILITY_PARQUET_DIR (default D:/ipums_1850_1950_fullcount_fertility)
 #   OCC_BIRTH_SCHEDULE (default <OCC_CHANNEL_OUT_DIR>/professor_birth_schedule.csv)
 #   OCC_CHANNEL_PREFIX (default ams)
+#   OCC_COUNTY_GROUPS (default <OCC_CHANNEL_OUT_DIR>/county_urban_class.csv; group-keyed schedules only)
 #   OCC_CHANNEL_EVENT_UNITS, OCC_COVERAGE_FACTORS, OCC_CHANNEL_OUT_DIR (as the children panel)
 # Output (in OCC_CHANNEL_OUT_DIR):
 #   <prefix>_children_county_decade.csv, <prefix>_children_county_decade_alt.csv,
@@ -90,6 +97,7 @@ PREFIX <- env_or("OCC_CHANNEL_PREFIX", function() "ams")
 # County factors (build_professor_county_coverage.R); optional, see main().
 COUNTY_COVERAGE <- env_or("OCC_COUNTY_COVERAGE_FACTORS", function()
   file.path(data_root(), "output/occupational_fertility/professor_county_coverage_factors.csv"))
+COUNTY_GROUPS <- env_or("OCC_COUNTY_GROUPS", function() file.path(OUT_DIR, "county_urban_class.csv"))
 DECADES <- seq(1830L, 1950L, 10L)
 WINDOWS <- list(std_fwd = c(0L, 9L), std_back = c(-10L, -1L), alt_fwd = c(-3L, 6L), alt_back = c(-13L, -4L))
 
@@ -103,7 +111,9 @@ main <- function() {
   rules <- sub("^births_at_age_", "", grep("^births_at_age_", names(schedule), value = TRUE))
   stop_if(!length(rules), "The schedule has no births_at_age_* column: ", SCHEDULE)
   by_census <- "census" %in% names(schedule)
-  say("Schedule ", basename(SCHEDULE), " (", if (by_census) "by census" else "every census",
+  by_group <- "group" %in% names(schedule)
+  stop_if(by_group && !by_census, "A group-keyed schedule needs a census column")
+  say("Schedule ", basename(SCHEDULE), " (", if (by_group) "by census and group" else if (by_census) "by census" else "every census",
       "), rules: ", paste(rules, collapse = ", "), "; prefix ", PREFIX)
   factors <- fread(COVERAGE)[, .(census, faculty_factor)]
   units <- fread(EVENT_UNITS, colClasses = list(character = "GEOID"))
@@ -145,7 +155,18 @@ main <- function() {
     }
     out
   }
-  if (by_census) {
+  if (by_group) {
+    # Group-keyed rates: each county x census takes its group's rates
+    # (county_urban_class.csv); stock without a group takes "national".
+    groups <- fread(COUNTY_GROUPS)[, .(county_geoid, census, group)]
+    stock <- merge(stock, groups, by = c("county_geoid", "census"), all.x = TRUE)
+    stock[is.na(group), group := "national"]
+    stop_if(!all(unique(stock$group) %in% schedule$group), "The schedule has no rates for group ",
+            paste(setdiff(unique(stock$group), schedule$group), collapse = ", "))
+    wtab <- rbindlist(lapply(split(schedule, by = c("census", "group")), function(s)
+      window_table(s)[, `:=`(census = s$census[1], group = s$group[1])]))
+    stock <- merge(stock, wtab, by = c("census", "group", "age"))
+  } else if (by_census) {
     wtab <- rbindlist(lapply(split(schedule, by = "census"), function(s)
       window_table(s)[, census := s$census[1]]))
     stock <- merge(stock, wtab, by = c("census", "age"))
@@ -153,7 +174,7 @@ main <- function() {
     wtab <- window_table(schedule)
     stock <- merge(stock, wtab, by = "age")
   }
-  wcols <- setdiff(names(wtab), c("age", "census"))
+  wcols <- setdiff(names(wtab), c("age", "census", "group"))
   sum_by <- function(s) s[, c(lapply(.SD, function(w) sum(n * w)), list(stock = sum(n))),
                           by = .(county_geoid, census), .SDcols = wcols]
   county_census <- sum_by(stock[!is.na(county_geoid)])
@@ -252,7 +273,7 @@ main <- function() {
   jsonlite::write_json(list(
     completed_utc = format(Sys.time(), tz = "UTC", usetz = TRUE), prefix = PREFIX, censuses = years,
     decades = DECADES, event_counties = length(event_geoids), schedule = SCHEDULE,
-    schedule_by_census = by_census, rules = rules,
+    schedule_by_census = by_census, schedule_by_group = by_group, rules = rules,
     pooled_correlation_with_observed = cmp[, cor(get(births), observed_births)],
     decade_rule = paste("mean of the forward view from the opening census and the backward view from the",
                         "closing census; one end only for the 1880s, 1890s and 1950s; 1830s repeat the 1840s")),
