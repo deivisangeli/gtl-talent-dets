@@ -5,12 +5,12 @@
 #
 # Adds a "Specification" column marking whether each event enters the main-text
 # fully-balanced specification (Main) or only the less-restrictive Appendix
-# specifications (Appendix). "Main" reproduces the pipeline's balanced-event-time
-# filter (standard-decade timing): treated county with non-missing population at
-# every e in {-20,-10,...,70} and at least one runner-up surviving the same filter.
+# specifications (Appendix). Membership comes from the saved per-cohort audit
+# of the manuscript's actual balanced sample, including baseline-birth support
+# and timing-specific outcome binning. The row label uses standard timing.
 #
-# Input  (Dropbox output/): andrews_event_county_units_1850_1920.csv,
-#                           amws_temporal_support_county_decade_1830_1950.csv
+# Input (Dropbox): event county units, saved per-cohort membership audit and
+#                 pooled baseline-population model status.
 # Output (Overleaf repo):   project/tables/andrews_selected_events.tex
 ###############################################################################
 
@@ -29,8 +29,6 @@ script_path <- normalizePath(sub("^--file=", "", file_arg[[1]]), winslash = "/",
 repo_root <- normalizePath(file.path(dirname(script_path), "..", ".."), winslash = "/", mustWork = TRUE)
 source(file.path(repo_root, "prep", "raw_paths.R"))
 
-balance_event_times <- seq(-20L, 70L, 10L)
-
 state_abbr <- setNames(c(state.abb, "DC"), c(state.name, "District of Columbia"))
 
 latex_escape <- function(x) {
@@ -44,7 +42,7 @@ latex_escape <- function(x) {
 }
 
 ###############################################################################
-# Load units and population panel
+# Load the original experiment metadata
 ###############################################################################
 
 units <- read_csv(
@@ -53,41 +51,26 @@ units <- read_csv(
 ) %>%
   mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0"))
 
-panel <- read_csv(
-  output_file_path("land_grants", "amws_temporal_support_county_decade_1830_1950.csv"),
-  show_col_types = FALSE
-) %>%
-  mutate(GEOID = str_pad(as.character(as.integer(GEOID)), 5, pad = "0")) %>%
-  select(GEOID, decade, population)
-
 ###############################################################################
-# Balanced-sample membership (per timing): a unit survives if it has non-missing
-# population at every required decade g + e; an event is in the balanced sample
-# if its treated unit survives and >= 1 runner-up survives.
+# Read the estimator's audited balanced-sample membership for each timing.
 ###############################################################################
 
-survives_unit <- function(geoid, g, timing_var) {
-  need <- g + balance_event_times
-  have <- panel$decade[panel$GEOID == geoid & !is.na(panel$population)]
-  all(need %in% have)
+cohort_audit <- read_csv(results_file_path("land_grants", "event_studies",
+  "amws_county_pairs_temporal_support_1830_1950_baseline_pop_per_cohort_max_e",
+  "events_by_cohort.csv"), show_col_types = FALSE)
+model_status <- read_csv(results_file_path("land_grants", "event_studies",
+  "amws_county_pairs_temporal_support_1830_1950_baseline_pop_balanced_event_time_max70",
+  "baseline_pop_model_status.csv"), show_col_types = FALSE)
+saved_events <- function(timing_name) {
+  audit <- cohort_audit %>% filter(timing == timing_name, outcome == "amws_per_1000_births")
+  ids <- sort(unique(as.integer(unlist(strsplit(audit$event_ids, "|", fixed = TRUE)))))
+  status <- model_status %>% filter(timing == timing_name, outcome == "amws_per_1000_births", spec == "births_level")
+  stopifnot(nrow(status) == 1L, status$ok, length(ids) == status$n_events,
+            sum(audit$n_treated) == length(ids), all(ids %in% units$event_id))
+  ids
 }
-
-balanced_events <- function(timing_col) {
-  u <- units %>% mutate(g = .data[[timing_col]])
-  u$surv <- mapply(function(geoid, g) survives_unit(geoid, g), u$GEOID, u$g)
-  u %>%
-    group_by(event_id) %>%
-    summarise(
-      treated_ok = any(surv[sample_role == "treated"]),
-      ctrl_ok = any(surv[sample_role == "runner_up"]),
-      .groups = "drop"
-    ) %>%
-    filter(treated_ok & ctrl_ok) %>%
-    pull(event_id)
-}
-
-main_std <- balanced_events("g_std")
-main_alt <- balanced_events("g_shift")
+main_std <- saved_events("standard_decade")
+main_alt <- saved_events("alternative_decade")
 
 message("Balanced (Main) events -- standard: ", length(main_std),
         " | alternative: ", length(main_alt))
@@ -162,11 +145,12 @@ header <- c(
          "studies (experiment years 1850--1920). Winner (college) county and state, the runner-up ",
          "counties (with state abbreviations) that serve as never-treated controls, the experiment ",
          "year, and the college type follow Andrews (2023) Appendix Table A1. ``Spec.'' indicates ",
-         "whether the event enters the main-text fully-balanced specification (``Main'': ",
-         "non-missing county population throughout $e \\in [-20,+70]$; ", length(main_std),
-         " events under the standard-decade timing, ", length(main_alt),
-         " under the alternative-decade timing) or only the less-restrictive Appendix ",
-         "specifications (``Appendix''). Main-specification events are a subset of the Appendix ",
+         "membership in the saved standard-decade fully-balanced specification (``Main'': ",
+         length(main_std), " treated events) or the less-restrictive Appendix ",
+         "specifications (``Appendix''). Alternative timing uses its own outcome and denominator ",
+         "bins and retains ", length(main_alt), " treated events; the row labels refer to standard timing only. ",
+         "Membership is read from the saved per-cohort sample audit, which includes the baseline-birth ",
+         "covariate and balanced $e \\in [-20,+70]$ support. Main-specification events are a subset of the Appendix ",
          "sample and therefore also appear in the Appendix figures. Because the fully-balanced ",
          "specification requires complete NHGIS county population across the entire window ",
          "$e \\in [-20,+70]$ for the winner and at least one runner-up control, the Main sample is ",

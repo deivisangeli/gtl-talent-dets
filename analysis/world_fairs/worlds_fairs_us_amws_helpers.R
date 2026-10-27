@@ -160,6 +160,202 @@ world_fairs_us_amws_profile <- function(
       plot_estimator_label = paste0(
         "CSDID + log population, g = fair decade - 20, ref e=-10"
       )
+    ),
+    robust_m30_pop_m10_balanced_oldest_treatment_m20_g_shift = list(
+      name = "robust_m30_pop_m10_balanced_oldest_treatment_m20_g_shift",
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "g_shift_treatment_m20_e_m30_p50_balanced_oldest_logpop_m10"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1820L,
+      # Fairs in 1907--1909 map to fair cohort 1910, then treatment g=1890.
+      treated_cohort_max = 1890L,
+      treatment_timing = "alternative_decade",
+      treatment_cohort_shift = -20L,
+      event_time_min = -30L,
+      event_time_max = 50L,
+      expected_assigned = c(15L, 15L, 42L, 46L),
+      expected_eligible = c(8L, 8L, 23L, 27L),
+      expected_core_controls = c(687L, 373L, 669L, 365L),
+      balance_controls_calendar = TRUE,
+      population_control = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, alternative-decade timing, ",
+        "g = fair decade - 20, ref e=-10"
+      )
+    ),
+    robust_m30_pop_m10_balanced_oldest_treatment_m20_single_fair = list(
+      name = "robust_m30_pop_m10_balanced_oldest_treatment_m20_single_fair",
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "fair_cohorts_1840_1900_treatment_m20_e_m30_p50_",
+        "balanced_oldest_logpop_m10_single_fair"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1820L,
+      treated_cohort_max = 1880L,
+      treatment_cohort_shift = -20L,
+      event_time_min = -30L,
+      event_time_max = 50L,
+      expected_assigned = c(11L, 11L, 30L, 31L),
+      expected_eligible = c(6L, 6L, 14L, 15L),
+      expected_core_controls = c(687L, 372L, 669L, 364L),
+      balance_controls_calendar = TRUE,
+      control_sample_source_profile =
+        "robust_m30_pop_m10_balanced_oldest_treatment_m20",
+      population_control = TRUE,
+      single_fair_event_window = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, single fair in e=[-30,+50], ",
+        "g = fair decade - 20, standard-decade timing, ref e=-10"
+      )
+    ),
+    robust_m30_pop_m10_balanced_oldest_treatment_m20_single_fair_g_shift = list(
+      name = paste0(
+        "robust_m30_pop_m10_balanced_oldest_treatment_m20_",
+        "single_fair_g_shift"
+      ),
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "g_shift_treatment_m20_e_m30_p50_balanced_oldest_logpop_m10_",
+        "single_fair"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1820L,
+      treated_cohort_max = 1890L,
+      treatment_timing = "alternative_decade",
+      treatment_cohort_shift = -20L,
+      event_time_min = -30L,
+      event_time_max = 50L,
+      expected_assigned = c(11L, 11L, 30L, 31L),
+      expected_eligible = c(6L, 6L, 17L, 18L),
+      expected_core_controls = c(687L, 373L, 669L, 365L),
+      balance_controls_calendar = TRUE,
+      control_sample_source_profile =
+        "robust_m30_pop_m10_balanced_oldest_treatment_m20_g_shift",
+      population_control = TRUE,
+      single_fair_event_window = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, single fair in e=[-30,+50], ",
+        "g = fair decade - 20, alternative-decade timing, ref e=-10"
+      )
+    ),
+    robust_m50_pop_m10_balanced_oldest_treatment_m20 = list(
+      name = "robust_m50_pop_m10_balanced_oldest_treatment_m20",
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "fair_cohorts_1840_1900_treatment_m20_e_m50_p50_",
+        "balanced_oldest_logpop_m10"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1820L,
+      treated_cohort_max = 1880L,
+      treatment_cohort_shift = -20L,
+      event_time_min = -50L,
+      event_time_max = 50L,
+      expected_assigned = c(15L, 15L, 42L, 46L),
+      expected_eligible = c(5L, 5L, 12L, 13L),
+      expected_core_controls = c(372L, 372L, 357L, 364L),
+      balance_controls_calendar = TRUE,
+      population_control = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, g = fair decade - 20, ",
+        "e=[-50,+50], ref e=-10"
+      )
+    ),
+    robust_m50_pop_m10_balanced_oldest_treatment_m20_g_shift = list(
+      name = "robust_m50_pop_m10_balanced_oldest_treatment_m20_g_shift",
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "g_shift_treatment_m20_e_m50_p50_balanced_oldest_logpop_m10"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1820L,
+      treated_cohort_max = 1890L,
+      treatment_timing = "alternative_decade",
+      treatment_cohort_shift = -20L,
+      event_time_min = -50L,
+      event_time_max = 50L,
+      expected_assigned = c(15L, 15L, 42L, 46L),
+      expected_eligible = c(5L, 5L, 12L, 13L),
+      expected_core_controls = c(372L, 373L, 357L, 365L),
+      balance_controls_calendar = TRUE,
+      population_control = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, alternative-decade timing, ",
+        "g = fair decade - 20, e=[-50,+50], ref e=-10"
+      )
+    ),
+    robust_m50_pop_m10_balanced_oldest_treatment_m20_single_fair = list(
+      name = "robust_m50_pop_m10_balanced_oldest_treatment_m20_single_fair",
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "fair_cohorts_1840_1900_treatment_m20_e_m50_p50_",
+        "balanced_oldest_logpop_m10_single_fair"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1820L,
+      treated_cohort_max = 1880L,
+      treatment_cohort_shift = -20L,
+      event_time_min = -50L,
+      event_time_max = 50L,
+      expected_assigned = c(11L, 11L, 30L, 31L),
+      expected_eligible = c(4L, 4L, 8L, 9L),
+      expected_core_controls = c(372L, 372L, 357L, 364L),
+      balance_controls_calendar = TRUE,
+      control_sample_source_profile =
+        "robust_m50_pop_m10_balanced_oldest_treatment_m20",
+      population_control = TRUE,
+      single_fair_event_window = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, single fair in e=[-50,+50], ",
+        "g = fair decade - 20, standard-decade timing, ref e=-10"
+      )
+    ),
+    robust_m50_pop_m10_balanced_oldest_treatment_m20_single_fair_g_shift = list(
+      name = paste0(
+        "robust_m50_pop_m10_balanced_oldest_treatment_m20_",
+        "single_fair_g_shift"
+      ),
+      results_subdir = paste0(
+        "worlds_fairs_us_amws_event_studies_",
+        "g_shift_treatment_m20_e_m50_p50_balanced_oldest_logpop_m10_",
+        "single_fair"
+      ),
+      treated_event_year_min = 1840L,
+      treated_event_year_max = 1909L,
+      treated_cohort_min = 1820L,
+      treated_cohort_max = 1890L,
+      treatment_timing = "alternative_decade",
+      treatment_cohort_shift = -20L,
+      event_time_min = -50L,
+      event_time_max = 50L,
+      expected_assigned = c(11L, 11L, 30L, 31L),
+      expected_eligible = c(4L, 4L, 8L, 9L),
+      expected_core_controls = c(372L, 373L, 357L, 365L),
+      balance_controls_calendar = TRUE,
+      control_sample_source_profile =
+        "robust_m50_pop_m10_balanced_oldest_treatment_m20_g_shift",
+      population_control = TRUE,
+      single_fair_event_window = TRUE,
+      est_method = "reg",
+      plot_estimator_label = paste0(
+        "CSDID + log population, single fair in e=[-50,+50], ",
+        "g = fair decade - 20, alternative-decade timing, ref e=-10"
+      )
     )
   )
 

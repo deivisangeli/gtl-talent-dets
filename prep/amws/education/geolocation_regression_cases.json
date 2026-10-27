@@ -1,0 +1,23 @@
+{
+  "purpose": "Validate conservative publication against explicit audit adjudications. These cases do not revise the frozen matching rules.",
+  "cases": [
+    {"name_id":"N06396","cause":"Historical Madison College namesake","status":"reviewed_match","accepted_ids":["I11883440"]},
+    {"name_id":"N02664","cause":"College of St Francis versus Brooklyn Saint Francis","status":"reviewed_match","accepted_ids":["I895289948"]},
+    {"name_id":"N08202","cause":"Notre Dame institutions in different countries","status":"ambiguous","accepted_ids":[]},
+    {"name_id":"N09294","cause":"Punjab and Panjab historical name collision","status":"ambiguous","accepted_ids":[]},
+    {"name_id":"N16407","cause":"OCR-damaged honorary award","status":"invalid_extraction","accepted_ids":[]},
+    {"name_id":"N06103","cause":"Historical constituent not represented by broader parent","status":"absent_reference","accepted_ids":[]},
+    {"name_id":"N14173","cause":"Impossible inherited Oshkosh PhD","status":"conditional","accepted_ids":[],"award_cases":[
+      {"requested_family":"ba_bs","year":"1972","ids":["I64185308"]},
+      {"requested_family":"ms","year":"1974","ids":["I64185308"]},
+      {"requested_family":"phd","year":"1977","ids":[]}]},
+    {"name_id":"N13217","cause":"Flint graduate program chronology","status":"conditional","accepted_ids":[],"award_cases":[
+      {"requested_family":"ba_bs","year":"1970","ids":["I4210092198"]},
+      {"requested_family":"ms","year":"1972","ids":[]},
+      {"requested_family":"phd","year":"1975","ids":[]}]},
+    {"name_id":"N03084","cause":"Same-name Minnesota colleges require reliable date","status":"conditional","accepted_ids":[],"award_cases":[
+      {"requested_family":"ba_bs","year":"1939","ids":["I114526571"]},
+      {"requested_family":"ba_bs","year":"1970","ids":[]},
+      {"requested_family":"ba_bs","year":"","ids":[]}]}
+  ]
+}

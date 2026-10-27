@@ -1,0 +1,139 @@
+{
+  "generated_utc": "2026-09-20T22:09:42Z",
+  "render_mode": "labels-only",
+  "source": {
+    "path": "C:\\Users\\megaj\\OneDrive\\Documentos\\usa_00001.csv.gz",
+    "bytes": 13080000000,
+    "elapsed_minutes": 16.0,
+    "rows": 220979023,
+    "recovered_from": "ipums_linked_1900_1940_dictionary.md"
+  },
+  "rows_total": 220979023,
+  "rows_by_year": {
+    "1900": 12971952,
+    "1910": 23984383,
+    "1920": 39982220,
+    "1930": 70207628,
+    "1940": 73832840
+  },
+  "n_columns": 58,
+  "ddi": {
+    "file": "usa_00001.xml",
+    "path": "C:\\Users\\megaj\\Globtalent Dropbox\\gtl_talent_dets\\Data\\raw\\mandatory_schooling\\usa_00001.xml",
+    "bytes": 497846,
+    "sha256": "44e7efb67c2f86b281f49a680dc56fdcc94a86c30c6a420489963d4462e646c5",
+    "n_vars": 58,
+    "title": "User Extract usa_00001.dat",
+    "producer": "IPUMS",
+    "prod_date": "September 18, 2026",
+    "notes": []
+  },
+  "ddi_cross_checked": true,
+  "label_check": {
+    "n_columns": 58,
+    "n_undocumented": 0,
+    "undocumented": [],
+    "n_reworded": 36,
+    "reworded": [
+      "COUNTYICP",
+      "MOMLOC",
+      "MOMRULE_HIST",
+      "POPLOC",
+      "POPRULE_HIST",
+      "RELATE",
+      "RELATED",
+      "AGE",
+      "RACE",
+      "RACED",
+      "BPL",
+      "BPLD",
+      "HIGRADE",
+      "HIGRADED",
+      "EDUC",
+      "EDUCD",
+      "EMPSTAT",
+      "EMPSTATD",
+      "LABFORCE",
+      "CLASSWKR",
+      "CLASSWKRD",
+      "PRESGL",
+      "MIGRATE5",
+      "MIGRATE5D",
+      "MIGCOUNTYICP5",
+      "VERSIONHIST",
+      "HISTID",
+      "QAGE",
+      "QSCHOOL",
+      "HIK",
+      "LINK1900",
+      "LINK1910",
+      "LINK1920",
+      "LINK1930",
+      "LINK1940",
+      "VERSIONHIK"
+    ]
+  },
+  "unmatched_codes": {
+    "PRESGL": [
+      "17.5",
+      "18.4",
+      "28.4",
+      "32.8",
+      "35.5",
+      "40.7",
+      "50.3"
+    ],
+    "ERSCOR50": [
+      "4.8",
+      "9.9",
+      "39.7",
+      "40.4",
+      "41.4",
+      "56.7",
+      "57.9",
+      "80.8",
+      "87.5",
+      "97.9",
+      "999.9"
+    ],
+    "EDSCOR50": [
+      "2.8",
+      "3.2",
+      "3.3",
+      "4.6",
+      "18.6",
+      "19.7",
+      "25.6",
+      "97.9",
+      "999.9"
+    ]
+  },
+  "coverage": {
+    "variables": 58,
+    "with_project_notes": 58,
+    "with_value_labels": 45,
+    "without_value_labels": [
+      "BIRTHYR",
+      "COUNTYICP",
+      "HIK",
+      "HISTID",
+      "HRSWORK1",
+      "INCWAGE",
+      "MIGCOUNTYICP5",
+      "MOMLOC",
+      "OCCSCORE",
+      "PERNUM",
+      "POPLOC",
+      "SERIAL",
+      "WKSWORK1"
+    ]
+  },
+  "findings": {
+    "carried_over_from_previous_run": true
+  },
+  "notes": [
+    "Numbers come from the data; value labels from the DDI; variable labels and coding notes from ipums_variable_labels.csv.",
+    "HIK is the cross-year person key. HISTID identifies a record within one census year and does not follow a person across years.",
+    "Join the CLS cohort file on yob = 1940 - AGE - 1, not on BIRTHYR."
+  ]
+}

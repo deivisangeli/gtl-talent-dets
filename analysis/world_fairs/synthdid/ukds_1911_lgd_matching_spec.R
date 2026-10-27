@@ -26,6 +26,11 @@
 #                              comparable across events. Writes under
 #                              match_v3_balanced/ and implies the balanced
 #                              event window.
+#   balanced3_rate_growth_density_e0
+#                              Corrected lead specification with the same five
+#                              donor-ranking columns and seven-bin support, but
+#                              treatment beginning at event time 0. Writes under
+#                              match_v4_balanced_e0/ and leaves v3 untouched.
 #
 # Event windows:
 #   full               Every decade bin in the 1850-1960 panel. The treatment
@@ -39,15 +44,23 @@
 #                      [1880, 1920]: T-30 must reach no earlier than the 1850
 #                      bin and T+30 no later than 1950, which keeps the 9-year
 #                      1850 bin but excludes the 2-year 1960 bin.
+#   balanced_3pre_4post
+#                      Corrected geometry on the same seven bins: pre offsets
+#                      -30, -20 and -10; post offsets 0, +10, +20 and +30.
+#                      Event time -10 is the reference, treatment begins at 0,
+#                      and a lead-20 fair occurs at event time +20.
 ###############################################################################
 
 wf_matching_spec_ids <- c(
   "pooled_rate_density",
   "lagged_rate_growth_density",
-  "balanced3_rate_growth_density"
+  "balanced3_rate_growth_density",
+  "balanced3_rate_growth_density_e0"
 )
 
-wf_event_window_ids <- c("full", "balanced_4pre_3post")
+wf_event_window_ids <- c(
+  "full", "balanced_4pre_3post", "balanced_3pre_4post"
+)
 
 wf_matching_spec_id <- function() {
   id <- tolower(trimws(Sys.getenv(
@@ -78,6 +91,11 @@ wf_matching_spec_string <- function(id = wf_matching_spec_id()) {
       "plus_log1p_20y_pre_treatment_population_cagr_",
       "plus_log_baseline_population_density"
     ),
+    balanced3_rate_growth_density_e0 = paste0(
+      "equal_z_euclidean_log1p_3_balanced_pre_treatment_wikipedia_rate_lags_",
+      "plus_log1p_20y_pre_treatment_population_cagr_",
+      "plus_log_baseline_population_density_treatment_e0"
+    ),
     stop("Unsupported matching specification: ", id, ".")
   )
 }
@@ -90,6 +108,7 @@ wf_matching_spec_dir_tag <- function(id = wf_matching_spec_id()) {
     pooled_rate_density = NULL,
     lagged_rate_growth_density = "match_v2_lagged",
     balanced3_rate_growth_density = "match_v3_balanced",
+    balanced3_rate_growth_density_e0 = "match_v4_balanced_e0",
     stop("Unsupported matching specification: ", id, ".")
   )
 }
@@ -102,13 +121,18 @@ wf_matching_spec_dir <- function(parent_dir, id = wf_matching_spec_id()) {
 # TRUE when the distance is built from one column per pre-treatment bin rather
 # than from a single pooled pre-treatment scalar.
 wf_matching_spec_uses_lags <- function(id = wf_matching_spec_id()) {
-  id %in% c("lagged_rate_growth_density", "balanced3_rate_growth_density")
+  id %in% c(
+    "lagged_rate_growth_density", "balanced3_rate_growth_density",
+    "balanced3_rate_growth_density_e0"
+  )
 }
 
 # TRUE when the matched lags are a fixed count anchored on the baseline decade
 # rather than every available pre-treatment bin.
 wf_matching_spec_fixed_lags <- function(id = wf_matching_spec_id()) {
-  identical(id, "balanced3_rate_growth_density")
+  id %in% c(
+    "balanced3_rate_growth_density", "balanced3_rate_growth_density_e0"
+  )
 }
 
 # The window a specification is designed for. A specification whose native
@@ -120,6 +144,7 @@ wf_matching_spec_native_window <- function(id = wf_matching_spec_id()) {
     pooled_rate_density = "full",
     lagged_rate_growth_density = "full",
     balanced3_rate_growth_density = "balanced_4pre_3post",
+    balanced3_rate_growth_density_e0 = "balanced_3pre_4post",
     stop("Unsupported matching specification: ", id, ".")
   )
 }
@@ -170,6 +195,19 @@ wf_event_window_spec <- function(id = wf_event_window_id()) {
       max_treatment_decade = 1920L,
       n_pre_periods = 4L,
       n_post_periods = 3L
+    ),
+    balanced_3pre_4post = list(
+      id = "balanced_3pre_4post",
+      dir_tag = "balanced_3p4",
+      balanced = TRUE,
+      pre_offsets = c(-30L, -20L, -10L),
+      post_offsets = c(0L, 10L, 20L, 30L),
+      treatment_offset = 0L,
+      matched_lag_offsets = c(-30L, -20L, -10L),
+      min_treatment_decade = 1880L,
+      max_treatment_decade = 1920L,
+      n_pre_periods = 3L,
+      n_post_periods = 4L
     ),
     stop("Unsupported event window: ", id, ".")
   )

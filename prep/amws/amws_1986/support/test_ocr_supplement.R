@@ -1,0 +1,25 @@
+repo_root <- normalizePath(commandArgs(TRUE)[1], winslash = "/")
+invisible(Sys.setlocale("LC_CTYPE", "English_United States.utf8"))
+source(file.path(repo_root, "prep/amws/amws_1986/ocr_supplement_helpers.R"))
+h <- load_amws_ocr_helpers(repo_root)
+# Loading helper definitions must not execute any of the legacy data workflows.
+stopifnot(!exists("input", h, inherits = FALSE), !exists("output_dir", h, inherits = FALSE))
+p <- h$parse_entry_regex("HADDOCK, GERALD HUGH, b Neosho, Mo, Mar 7, 29; m 60; c 3. GEOLOGY. Educ: Wheaton Col, BS, 56.")
+stopifnot(p$name_raw == "HADDOCK, GERALD HUGH", p$birth_place == "Neosho, Mo")
+stopifnot(h$parse_year_token("29") == "1929", h$parse_year_token("99") == "1899",
+          h$parse_year_token("1987") == "", h$parse_year_token("1820") == "1820")
+c <- h$parse_place_components("Vancouver, BC")
+stopifnot(c$birth_country == "Canada", c$birth_city == "Vancouver")
+d <- data.frame(birth_city=c("Boston","London","Boston",""),birth_year="1940",
+  birth_country=c("USA","England","USA","USA"), is_us_birth=c("TRUE","FALSE","TRUE","TRUE"),
+  is_us_geocoded=c("TRUE","FALSE","FALSE","TRUE"))
+stopifnot(identical(amws_final_eligible(d),c(TRUE,TRUE,FALSE,FALSE)))
+old <- data.frame(entry_id=c("1","2"),name_raw=c("A","B"),birth_year=c("1920","1930"))
+new <- data.frame(entry_id="",name_raw=c("B","A","C"),birth_year=c("1930","1920","1940"))
+kept <- amws_preserve_final_ids(new,old)
+stopifnot(identical(kept$entry_id,c("1","2","3")),identical(kept$name_raw,c("A","B","C")))
+stopifnot(inherits(try(amws_preserve_final_ids(new[1,,drop=FALSE],old),silent=TRUE),"try-error"))
+old$entry_id <- c("1","3")
+kept <- amws_preserve_final_ids(new,old)
+stopifnot(identical(kept$entry_id,c("1","3","4")))
+cat("AMWS OCR helper tests passed\n")
